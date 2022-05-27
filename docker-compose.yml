@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/backend
+    expose:
+      - 8000
+
+  frontend:
+    stdin_open: true
+    build: ./frontend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    expose:
+      - 3000
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+
+  reverse_proxy:
+  #change build to ./nginx/prod during PROD.
+    build: ./nginx/dev
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+      - frontend
