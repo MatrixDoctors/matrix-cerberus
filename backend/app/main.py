@@ -1,17 +1,17 @@
-from fastapi import FastAPI, Depends
-from starlette.requests import Request
+from fastapi import Depends, FastAPI
 
-from app.api.routers import users
+from app.api import api
 
-app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi")
+app = FastAPI(docs_url="/api/docs", redoc_url="/api/redoc", openapi_url="/api/openapi")
+
 
 @app.get("/api")
 async def root():
     return {"message": "Hello World"}
 
-# Routers
+
+# Endpoints
 app.include_router(
-    users.router,
-    prefix="/api/users",
-    tags=["users"],
+    api.api_router,
+    prefix="/api",
 )
