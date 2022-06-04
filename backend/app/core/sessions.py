@@ -7,17 +7,17 @@ from fastapi import Request, Response
 from redis import Redis
 
 
-def genID() -> str:
+def generate_id() -> str:
     return uuid4().hex
 
 
 """
-Session Storage class is used to maintain a connection 
+Redis Session Storage class is used to maintain a connection 
 between the redis database and the server.
 """
 
 
-class SessionStorage:
+class RedisSessionStorage:
     def __init__(self):
         self.client = Redis.from_url("redis://localhost:6379/")
 
@@ -34,10 +34,10 @@ class SessionStorage:
     def __delitem__(self, key: str):
         self.client.delete(key)
 
-    def genSessionId(self) -> str:
-        sessionId = genID()
+    def generate_session_id(self) -> str:
+        sessionId = generate_id()
         while self.client.exists(sessionId):
-            sessionId = genID()
+            sessionId = generate_id()
         return sessionId
 
 
@@ -49,11 +49,11 @@ to interact with the redis database
 
 class SessionCookie:
     def __init__(self):
-        self.sessions_storage = SessionStorage()
+        self.sessions_storage = RedisSessionStorage()
         self.session_key = "sessionID"
 
     def create_session(self, request: Request, response: Response):
-        session_id = self.sessions_storage.genSessionId()
+        session_id = self.sessions_storage.generate_session_id()
         data = {"matrix_user": None, "access_token": None}
         self.sessions_storage[session_id] = data
 
