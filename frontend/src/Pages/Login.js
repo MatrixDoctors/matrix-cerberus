@@ -76,7 +76,7 @@ export default function Login() {
 
     return (
 	<div>
-		<section className="fixed w-full h-full top-0 bg-gray-900">
+		<section className="fixed w-full h-full top-0" style={{ backgroundColor: "#161b22"}}>
 			
 			<div className="text-gray-300 hover:text-white px-4 py-4 font-bold">
                 <Link to='/'>matrix-cerberus</Link>

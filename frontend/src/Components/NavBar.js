@@ -12,10 +12,10 @@ export default function NavBar() {
     let contentDisplay = `${isOpen ? "block" : "hidden"} sm:block`;
 
     return (
-    <nav className="bg-gray-900 sm:flex sm:justify-between sm:items-center sm:px-4 sm:py-2">
+    <nav className="sm:flex sm:justify-between sm:items-center sm:px-4 sm:py-2" style={{ backgroundColor: "#161b22"}}>
         <div className='flex items-center justify-between px-4 py-2 sm:p-0'>
             <div className="text-white font-bold">
-                matrix-cerberus
+                <Link to='/'>matrix-cerberus</Link>
             </div>
             <div className='sm:hidden'>    
                 <button onClick={handleClick} className="block">
@@ -30,8 +30,7 @@ export default function NavBar() {
         <div className={contentDisplay}>
             <div>
                 <div className='px-4 pt-2 pb-4 sm:flex sm:items-center'>
-                    <Link to='/' className="block py-1 sm:px-2 sm:mt-1 font-semibold rounded text-gray-300 hover:bg-gray-800 focus:text-white">Home</Link>
-                    <Link to='/account' className="block mt-1 py-1 sm:px-2 sm:ml-2 font-semibold rounded text-gray-300 hover:bg-gray-800 focus:text-white">Account</Link>
+                    <Link to='/' className="block mt-1 py-1 sm:px-2 sm:ml-2 font-semibold rounded text-gray-300 hover:bg-gray-800 focus:text-white">Accounts</Link>
                     <Link to='/room-settings' className="block mt-1 py-1 sm:px-2 sm:ml-2 font-semibold rounded text-gray-300 hover:bg-gray-800 focus:text-white">Room Settings</Link>
                     <Link to='/server-settings' className="block mt-1 py-1 sm:px-2 sm:ml-2 font-semibold rounded text-gray-300 hover:bg-gray-800 focus:text-white">Server Settings</Link>
                     {/* Account dropdown for desktop views */}

@@ -18,7 +18,7 @@ export default function AccountDropdown() {
             </button>
             
             <div className={accountOptionsDisplay}>
-                <button onClick={()=>{setIsAccountDropdownOpen(false)}} className="fixed top-0 left-0 right-0 bottom-0 h-full w-full bg-black opacity-50"></button>
+                <button onClick={()=>{setIsAccountDropdownOpen(false)}} className="fixed top-0 left-0 right-0 bottom-0 h-full w-full"></button>
                 <div className='absolute right-0 mt-1 w-32 py-2 bg-white rounded-lg shadow-xl'>
                     <Link to='/login' onClick={()=>{setIsAccountDropdownOpen(false)}} className='block px-2 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white'>Login</Link>
                     <Link to='/logout' onClick={()=>{setIsAccountDropdownOpen(false)}} className='block px-2 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white'>Sign Out</Link>
