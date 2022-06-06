@@ -83,18 +83,18 @@ export default function AccountSettings() {
 							<div className='flex items-center w-full my-3'>
 								<div className='flex items-center w-1/3'>
 									<div
-										className="inline-block h-5 w-5 mx-2 rounded-full overflow-hidden"
+										className="inline-block h-4 w-4 mx-2"
 										type="button"
 										style={{ transition: "all .15s ease" }}
 									>
 										<img
 										alt="..."
 										className="h-full w-full mr-1"
-										src={require("../assets/img/gitlab.svg").default}
+										src={require("../assets/img/patreon.svg").default}
 										/>
 									</div>
 									<div className='inline-block text-gray-600 font-semibold'>
-										Gitlab
+										Patreon
 									</div>
 								</div>
 								<div className='w-1/3 px-2 text-gray-600'>
