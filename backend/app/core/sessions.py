@@ -19,7 +19,7 @@ between the redis database and the server.
 
 class RedisSessionStorage:
     def __init__(self):
-        self.client = Redis.from_url("redis://localhost:6379/")
+        self.client = Redis.from_url("redis://redis_service:6379/")
 
     def __getitem__(self, key: str):
         raw = self.client.get(key)

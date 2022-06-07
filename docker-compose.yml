@@ -8,25 +8,22 @@ services:
       - ./backend:/backend
     expose:
       - 8000
-
-  frontend:
-    stdin_open: true
-    build: ./frontend
-    volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
-    expose:
-      - 3000
-    environment:
-      - NODE_ENV=development
     depends_on:
-      - backend
+      - redis_service
+  
+  redis_service:
+    image: "redis:alpine"
+    expose:
+      - 6379
 
   reverse_proxy:
-  #change build to ./nginx/prod during PROD.
-    build: ./nginx/dev
+    image: "nginx:latest"
+    volumes:
+      - ./nginx/prod/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/prod/corsheaders.conf:/etc/nginx/conf.d/corsheaders.conf
+      - ./frontend/build:/usr/src/app
     ports:
       - 80:80
     depends_on:
       - backend
-      - frontend
+      - redis_service
