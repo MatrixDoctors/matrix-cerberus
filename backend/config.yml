@@ -1,0 +1,12 @@
+redis:
+  # Used to construct redis database URL
+  # 'uri' is in the form "redis :// [[username :] password@] host [:port][/database] [?[timeout=timeout[d|h|m|s|ms|us|ns]]"
+  #
+  uri: redis://redis_service:6379/
+
+server_sessions:
+  # Server side sessions to authenticate logged in users
+  # 'expires_key' is to be set in seconds
+  #
+  session_key: sessionID  
+  expires_in: 3600
