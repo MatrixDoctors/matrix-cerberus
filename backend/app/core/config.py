@@ -1,25 +1,29 @@
-import os
-from functools import lru_cache
 from pathlib import Path
 
 import yaml
-from pydantic import BaseSettings, RedisDsn
+from pydantic import BaseSettings, RedisDsn, validator
 
-yaml_settings = None
+class RedisSettings(BaseSettings):
+    uri: RedisDsn
 
-# Load the config file present in the root directory (backend)
-here = Path().absolute() / "config.yml"
-with open(str(here)) as f:
-    yaml_settings = yaml.safe_load(f)
-
+class ServerSessionsSettings(BaseSettings):
+    session_key: str
+    expires_in: int
 
 class Settings(BaseSettings):
-    redis_dsn: RedisDsn = yaml_settings["redis"]["uri"]
-    session_key: str = yaml_settings["server_sessions"]["session_key"]
-    session_expires_in: int = yaml_settings["server_sessions"]["expires_in"]
+    
+    redis: RedisSettings
+    server_sessions: ServerSessionsSettings
 
+    @classmethod
+    def from_yaml(cls, path_to_file):
+        absolute_path_to_file = Path(path_to_file).absolute()
 
-# Return only one instance of Settings for each call to 'get_settings'
-@lru_cache()
-def get_settings():
-    return Settings()
+        try:
+            with open(absolute_path_to_file) as f:
+                yaml_settings = yaml.safe_load(f)
+                return Settings.parse_obj(yaml_settings)
+        except (IOError, ImportError) as err:
+            print(f"Couldn't load config from file. Error: {err}")
+
+settings = Settings.from_yaml('config.yml')

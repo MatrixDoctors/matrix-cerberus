@@ -6,7 +6,7 @@ from uuid import uuid4
 from fastapi import Request, Response
 from redis import Redis
 
-from app.core.config import get_settings
+from app.core.config import settings
 
 
 def generate_id() -> str:
@@ -21,8 +21,7 @@ between the redis database and the server.
 
 class RedisSessionStorage:
     def __init__(self):
-        self.config = get_settings()
-        self.client = Redis.from_url(self.config.redis_dsn)
+        self.client = Redis.from_url(settings.redis.uri)
 
     def __getitem__(self, key: str):
         raw = self.client.get(key)
@@ -33,7 +32,7 @@ class RedisSessionStorage:
         self.client.set(
             key,
             pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL),
-            ex=self.config.session_expires_in,
+            ex=settings.server_sessions.expires_in,
         )
 
     def __delitem__(self, key: str):
@@ -55,8 +54,7 @@ to interact with the redis database
 class SessionCookie:
     def __init__(self):
         self.sessions_storage = RedisSessionStorage()
-        self.config = get_settings()
-        self.session_key = self.config.session_key
+        self.session_key = settings.server_sessions.session_key 
 
     def create_session(self, request: Request, response: Response):
         session_id = self.sessions_storage.generate_session_id()
@@ -67,7 +65,7 @@ class SessionCookie:
             key=self.session_key,
             value=session_id,
             httponly=True,
-            expires=self.config.session_expires_in,
+            expires=settings.server_sessions.expires_in,
         )
 
         return response
