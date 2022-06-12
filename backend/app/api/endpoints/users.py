@@ -4,8 +4,9 @@ from urllib import response
 from fastapi import APIRouter, Depends, Form, Request, encoders
 from starlette.responses import JSONResponse, RedirectResponse, Response
 
-from ..deps import fastapi_sessions
+from app.core.sessions import SessionCookie
 
+fastapi_sessions = SessionCookie()
 router = APIRouter()
 
 

@@ -6,6 +6,8 @@ from uuid import uuid4
 from fastapi import Request, Response
 from redis import Redis
 
+from app.core.config import settings
+
 
 def generate_id() -> str:
     return uuid4().hex
@@ -19,7 +21,7 @@ between the redis database and the server.
 
 class RedisSessionStorage:
     def __init__(self):
-        self.client = Redis.from_url("redis://redis_service:6379/")
+        self.client = Redis.from_url(settings.redis.uri)
 
     def __getitem__(self, key: str):
         raw = self.client.get(key)
@@ -28,7 +30,9 @@ class RedisSessionStorage:
     def __setitem__(self, key: str, value: Any):
         expireTime = timedelta(hours=1)
         self.client.set(
-            key, pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL), ex=expireTime
+            key,
+            pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL),
+            ex=settings.server_sessions.expires_in,
         )
 
     def __delitem__(self, key: str):
@@ -50,7 +54,7 @@ to interact with the redis database
 class SessionCookie:
     def __init__(self):
         self.sessions_storage = RedisSessionStorage()
-        self.session_key = "sessionID"
+        self.session_key = settings.server_sessions.session_key
 
     def create_session(self, request: Request, response: Response):
         session_id = self.sessions_storage.generate_session_id()
@@ -58,7 +62,10 @@ class SessionCookie:
         self.sessions_storage[session_id] = data
 
         response.set_cookie(
-            key=self.session_key, value=session_id, httponly=True, expires=3600
+            key=self.session_key,
+            value=session_id,
+            httponly=True,
+            expires=settings.server_sessions.expires_in,
         )
 
         return response
