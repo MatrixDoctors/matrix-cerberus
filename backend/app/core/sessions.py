@@ -54,7 +54,7 @@ to interact with the redis database
 class SessionCookie:
     def __init__(self):
         self.sessions_storage = RedisSessionStorage()
-        self.session_key = settings.server_sessions.session_key 
+        self.session_key = settings.server_sessions.session_key
 
     def create_session(self, request: Request, response: Response):
         session_id = self.sessions_storage.generate_session_id()

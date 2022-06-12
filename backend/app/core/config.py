@@ -3,15 +3,18 @@ from pathlib import Path
 import yaml
 from pydantic import BaseSettings, RedisDsn, validator
 
+
 class RedisSettings(BaseSettings):
     uri: RedisDsn
+
 
 class ServerSessionsSettings(BaseSettings):
     session_key: str
     expires_in: int
 
+
 class Settings(BaseSettings):
-    
+
     redis: RedisSettings
     server_sessions: ServerSessionsSettings
 
@@ -26,4 +29,5 @@ class Settings(BaseSettings):
         except (IOError, ImportError) as err:
             print(f"Couldn't load config from file. Error: {err}")
 
-settings = Settings.from_yaml('config.yml')
+
+settings = Settings.from_yaml("config.yml")
