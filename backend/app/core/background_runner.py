@@ -2,6 +2,7 @@ import asyncio
 
 from app.core.bot import BaseBotClient
 from app.core.config import settings
+from app.core.sessions import redis_session_storage
 
 
 class MatrixBotBackgroundRunner:
@@ -11,6 +12,8 @@ class MatrixBotBackgroundRunner:
 
     async def start_bot(self):
         try:
+            # Fetch next batch token stored in redis
+            self.client.next_batch = redis_session_storage["next_batch_token"]
             await self.client.login()
             await self.client.sync_forever(
                 30000,
@@ -30,6 +33,9 @@ class MatrixBotBackgroundRunner:
         self.background_task = asyncio.create_task(self.start_bot())
 
     async def cancel_background_task(self):
+        # Store next batch token in redis
+        redis_session_storage["next_batch_token"] = self.client.next_batch
+
         self.background_task.cancel()
         print(f"Background Task is cancelled")
 
