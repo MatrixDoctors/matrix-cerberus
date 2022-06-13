@@ -1,13 +1,9 @@
+import sys
 from asyncio import exceptions
 from typing import Optional
 
-from nio import (
-    AsyncClient,
-    AsyncClientConfig,
-    InviteEvent,
-    MatrixRoom,
-    RoomMessageText,
-)
+from nio import AsyncClient, AsyncClientConfig, InviteEvent, MatrixRoom, RoomMessageText
+from nio.responses import WhoamiResponse
 
 from app.core.config import settings
 
@@ -32,8 +28,15 @@ class BaseBotClient(AsyncClient):
         self.add_event_callback(self.cb_print_messages, RoomMessageText)
 
     async def login(self) -> None:
-        # Log in using the access token provided in config.yml
         self.access_token = settings.matrix_bot.access_token
+
+        # Verify the access_token and set user_id
+        response = await self.whoami()
+
+        if isinstance(response, WhoamiResponse):
+            self.user_id = response.user_id
+        else:
+            raise ValueError(f"Failed to log in: Access token or homeserver is invalid")
 
     async def cb_autojoin_room(self, room: MatrixRoom, event: InviteEvent):
         await self.join(room.room_id)
@@ -53,12 +56,3 @@ class BaseBotClient(AsyncClient):
             )
         except exceptions as err:
             print(err)
-
-    @classmethod
-    def get_bot_client(cls):
-        client = BaseBotClient(
-            settings.matrix_bot.homeserver,
-            settings.matrix_bot.user_id,
-        )
-
-        return client

@@ -1,5 +1,4 @@
 import asyncio
-import json
 
 from app.core.bot import BaseBotClient
 from app.core.config import settings
@@ -7,7 +6,7 @@ from app.core.config import settings
 
 class MatrixBotBackgroundRunner:
     def __init__(self):
-        self.client = BaseBotClient.get_bot_client()
+        self.client = BaseBotClient(homeserver=settings.matrix_bot.homeserver)
         self.background_task = None
 
     async def start_bot(self):
@@ -20,7 +19,10 @@ class MatrixBotBackgroundRunner:
                 loop_sleep_time=2000,
             )
             await asyncio.sleep(1)
-        except asyncio.CancelledError:
+        except (asyncio.CancelledError, ValueError) as err:
+            # Handles the ValueError received from BaseBotClient login function
+            if isinstance(err, ValueError):
+                print(err)
             await self.client.close()
 
     def create_background_task(self):

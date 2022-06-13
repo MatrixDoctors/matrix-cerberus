@@ -13,5 +13,4 @@ server_sessions:
 
 matrix_bot:
   homeserver: "https://matrix.org"
-  user_id: "@matrix-cerberus:matrix.org"
   access_token: some_access_token
