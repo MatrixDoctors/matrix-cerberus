@@ -12,15 +12,6 @@ class BackgroundRunner:
 
     async def start_bot(self):
         try:
-            with open(settings.matrix_bot.next_batch_token_file, "r") as f:
-                data = json.load(f)
-                self.client.next_batch = data["next_batch_token"]
-        except IOError:
-            print(f"Couldn't load next batch token from file.")
-        except json.JSONDecodeError:
-                print("Couldn't read JSON file; overwriting")
-
-        try:
             await self.client.login()
             await self.client.sync_forever(
                 30000,
@@ -39,16 +30,6 @@ class BackgroundRunner:
     async def cancel_background_task(self):
         self.background_task.cancel()
         print(f"Background Task is cancelled")
-        try:
-            with open(settings.matrix_bot.next_batch_token_file, "w") as f:
-                json.dump(
-                    {
-                        "next_batch_token": self.client.next_batch,
-                    },
-                    f,
-                )
-        except IOError as err:
-            print(f"Couldn't load next batch token from file. Error: {err}")
 
 
 runner = BackgroundRunner()

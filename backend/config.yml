@@ -12,12 +12,6 @@ server_sessions:
   expires_in: 3600
 
 matrix_bot:
-  # Contains details related to the Bot account
-  #
-  homeserver: https://matrix.org
+  homeserver: "https://matrix.org"
   user_id: "@matrix-cerberus:matrix.org"
-  password: "some_password"
-  device_id: "your_device"
-
-  session_details_file: "credentials_bot.json"
-  next_batch_token_file: "next_batch_token.json"
+  access_token: some_access_token

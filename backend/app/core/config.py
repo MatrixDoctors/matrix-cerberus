@@ -16,10 +16,7 @@ class ServerSessionsSettings(BaseSettings):
 class MatrixBotSettings(BaseSettings):
     homeserver: str
     user_id: str
-    password: str
-    device_id: str
-    session_details_file: str
-    next_batch_token_file: str
+    access_token: str
 
 
 class Settings(BaseSettings):
