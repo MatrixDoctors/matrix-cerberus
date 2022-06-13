@@ -13,10 +13,20 @@ class ServerSessionsSettings(BaseSettings):
     expires_in: int
 
 
+class MatrixBotSettings(BaseSettings):
+    homeserver: str
+    user_id: str
+    password: str
+    device_id: str
+    session_details_file: str
+    next_batch_token_file: str
+
+
 class Settings(BaseSettings):
 
     redis: RedisSettings
     server_sessions: ServerSessionsSettings
+    matrix_bot: MatrixBotSettings
 
     @classmethod
     def from_yaml(cls, path_to_file):
