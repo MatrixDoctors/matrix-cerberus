@@ -28,7 +28,6 @@ class RedisSessionStorage:
         return raw and pickle.loads(raw)
 
     def __setitem__(self, key: str, value: Any):
-        expireTime = timedelta(hours=1)
         self.client.set(
             key,
             pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL),

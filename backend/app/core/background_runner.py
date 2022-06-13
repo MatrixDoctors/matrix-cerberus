@@ -5,7 +5,7 @@ from app.core.bot import BaseBotClient
 from app.core.config import settings
 
 
-class BackgroundRunner:
+class MatrixBotBackgroundRunner:
     def __init__(self):
         self.client = BaseBotClient.get_bot_client()
         self.background_task = None
@@ -32,4 +32,4 @@ class BackgroundRunner:
         print(f"Background Task is cancelled")
 
 
-runner = BackgroundRunner()
+matrix_bot_runner = MatrixBotBackgroundRunner()

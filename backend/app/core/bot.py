@@ -1,7 +1,3 @@
-import asyncio
-import json
-import os
-import sys
 from asyncio import exceptions
 from typing import Optional
 
@@ -9,7 +5,6 @@ from nio import (
     AsyncClient,
     AsyncClientConfig,
     InviteEvent,
-    LoginResponse,
     MatrixRoom,
     RoomMessageText,
 )
