@@ -12,7 +12,7 @@ const Images = {
 	'gitlab': require('../assets/img/gitlab.svg').default
 }
 
-function AuthButton({ imgUrl}){
+function AuthButton({ imgUrl }){
 	return (
 		<button
 			className="block h-8 w-8 mx-4 rounded-full overflow-hidden border-2 border-gray-300 hover:border-white"
@@ -42,6 +42,7 @@ function UserField({ type }) {
 					className="border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
 					placeholder="Username"
 					style={{ transition: "all .15s ease" }}
+					onBlur={()=>console.log("On Blurred")}
 					/>
 				</div>
 			)
@@ -85,13 +86,19 @@ UserField.propTypes = {
 	type: PropTypes.string
 }
 
-function SSOLogin({ ssoProviders }) {
+function SSOLogin({ ssoProviders, errorMessage }) {
 	return (
 		<div className="rounded-t mb-0 px-6 py-6">
 			<div className="text-center mb-3">
 			<h6 className="text-gray-600 text-md font-bold">
 				{ssoProviders.length > 0 ? 'Sign in with' : 'Sign In'}
 			</h6>
+			</div>
+
+			<div className="text-center mb-3">
+				<p className="text-red-600 text-sm">
+					{errorMessage}
+				</p>
 			</div>
 
 			{/* Button Wrapper */}
@@ -113,6 +120,7 @@ export default function Login() {
 	const [inputHomeServer, setInputHomeServer] = useState('matrix.org');
 	const [homeServer, setHomeServer] = useState('matrix.org');
 	const [ssoProviders, setSSOProviders] = useState([]);
+	const [errorMessage, setErrorMessage] = useState('Error');
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -144,7 +152,7 @@ export default function Login() {
 				<div className="flex content-center items-center justify-center h-full">
 					<div className="w-full lg:w-4/12 px-4">
 						<div className="relative flex flex-col min-w-0 break-words w-full shadow-lg rounded-lg bg-gray-300 border-0">
-							<SSOLogin ssoProviders={ssoProviders}/>
+							<SSOLogin ssoProviders={ssoProviders} errorMessage={errorMessage} />
 						
 							<div className="flex-auto px-4 lg:px-10 py-10 pt-0">
 								<div className="text-gray-500 text-center mb-3 font-bold">
