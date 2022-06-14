@@ -24,7 +24,7 @@ class MatrixBotSettings(BaseSettings):
     def validate(cls, values):
         homeserver = values.get("homeserver")
 
-        if re.search(r"https?://", homeserver) is None:
+        if re.search(r"(https|http)?://", homeserver) is None:
             raise ValueError("Invalid homeserver")
 
         return values

@@ -49,7 +49,7 @@ class RedisSessionStorage:
         return sessionId
 
 
-redis_session_storage = RedisSessionStorage()
+session_storage = RedisSessionStorage()
 
 
 """
@@ -60,14 +60,14 @@ to interact with the redis database
 
 class SessionCookie:
     def __init__(self):
-        self.sessions_storage = redis_session_storage
+        self.session_storage = session_storage
         self.session_key = settings.server_sessions.session_key
         self.expires_in = settings.server_sessions.expires_in
 
     def create_session(self, request: Request, response: Response):
-        session_id = self.sessions_storage.generate_session_id()
+        session_id = self.session_storage.generate_session_id()
         data = {"matrix_user": None, "access_token": None}
-        self.sessions_storage.set_item_with_expiry_time(
+        self.session_storage.set_item_with_expiry_time(
             key=session_id, value=data, expires_in=self.expires_in
         )
 
@@ -85,11 +85,11 @@ class SessionCookie:
 
     def get_session(self, request: Request):
         session_id = self.get_session_id(request)
-        return self.sessions_storage[session_id]
+        return self.session_storage[session_id]
 
     def set_session(self, request: Request, response: Response, data):
         session_id = self.get_session_id(request)
-        self.sessions_storage.set_item_with_expiry_time(
+        self.session_storage.set_item_with_expiry_time(
             key=session_id, value=data, expires_in=self.expires_in
         )
         return response
@@ -97,7 +97,7 @@ class SessionCookie:
     def delete_session(self, request: Request, response: Response):
         session_id = self.get_session_id(request)
         if session_id:
-            del self.sessions_storage[session_id]
+            del self.session_storage[session_id]
             response.delete_cookie(self.session_key)
 
         return response
