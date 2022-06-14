@@ -15,6 +15,7 @@ function validateAndReturnURL(url) {
 	return url;
 }
 
+
 export default function Login() {
 	const default_homeserver = 'matrix.org';
 
