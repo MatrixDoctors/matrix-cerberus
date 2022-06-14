@@ -20,6 +20,7 @@ iniconfig==1.1.1
 isort==5.10.1
 makefun==1.13.1
 mypy-extensions==0.4.3
+nio==3.4.2
 packaging==21.3
 passlib==1.7.4
 pathspec==0.9.0
@@ -32,8 +33,10 @@ PyJWT==2.3.0
 pyparsing==3.0.9
 pytest==7.1.2
 python-multipart==0.0.5
+PyYAML==6.0
 redis==4.3.1
 requests==2.27.1
+safepickle==0.2.0
 six==1.16.0
 sniffio==1.2.0
 starlette==0.19.1

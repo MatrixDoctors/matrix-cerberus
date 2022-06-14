@@ -1,5 +1,4 @@
 import pickle
-from datetime import timedelta
 from typing import Any
 from uuid import uuid4
 
@@ -28,21 +27,29 @@ class RedisSessionStorage:
         return raw and pickle.loads(raw)
 
     def __setitem__(self, key: str, value: Any):
-        expireTime = timedelta(hours=1)
         self.client.set(
             key,
             pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL),
-            ex=settings.server_sessions.expires_in,
         )
 
     def __delitem__(self, key: str):
         self.client.delete(key)
+
+    def set_item_with_expiry_time(self, key: str, value: Any, expires_in: int = None):
+        self.client.set(
+            key,
+            pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL),
+            ex=expires_in,
+        )
 
     def generate_session_id(self) -> str:
         sessionId = generate_id()
         while self.client.exists(sessionId):
             sessionId = generate_id()
         return sessionId
+
+
+session_storage = RedisSessionStorage()
 
 
 """
@@ -53,13 +60,16 @@ to interact with the redis database
 
 class SessionCookie:
     def __init__(self):
-        self.sessions_storage = RedisSessionStorage()
+        self.session_storage = session_storage
         self.session_key = settings.server_sessions.session_key
+        self.expires_in = settings.server_sessions.expires_in
 
     def create_session(self, request: Request, response: Response):
-        session_id = self.sessions_storage.generate_session_id()
+        session_id = self.session_storage.generate_session_id()
         data = {"matrix_user": None, "access_token": None}
-        self.sessions_storage[session_id] = data
+        self.session_storage.set_item_with_expiry_time(
+            key=session_id, value=data, expires_in=self.expires_in
+        )
 
         response.set_cookie(
             key=self.session_key,
@@ -75,17 +85,19 @@ class SessionCookie:
 
     def get_session(self, request: Request):
         session_id = self.get_session_id(request)
-        return self.sessions_storage[session_id]
+        return self.session_storage[session_id]
 
     def set_session(self, request: Request, response: Response, data):
         session_id = self.get_session_id(request)
-        self.sessions_storage[session_id] = data
+        self.session_storage.set_item_with_expiry_time(
+            key=session_id, value=data, expires_in=self.expires_in
+        )
         return response
 
     def delete_session(self, request: Request, response: Response):
         session_id = self.get_session_id(request)
         if session_id:
-            del self.sessions_storage[session_id]
+            del self.session_storage[session_id]
             response.delete_cookie(self.session_key)
 
         return response

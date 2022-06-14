@@ -10,3 +10,7 @@ server_sessions:
   #
   session_key: sessionID  
   expires_in: 3600
+
+matrix_bot:
+  homeserver: "https://matrix.org"
+  access_token: some_access_token
