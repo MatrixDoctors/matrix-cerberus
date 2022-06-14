@@ -78,10 +78,7 @@ UserField.propTypes = {
 export default function Login() {
 
 	const [fieldType, setFieldType] = useState('Username');
-
-	function handleChange(e) {
-		setFieldType(e.target.value);
-	}
+	const [homeServer, setHomeServer] = useState('matrix.org');
 
     return (
 	<div>
@@ -125,12 +122,20 @@ export default function Login() {
 									>
 									Homeserver
 									</label>
-									<input
-									type="email"
-									className="border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
-									placeholder="matrix.org"
-									style={{ transition: "all .15s ease" }}
-									/>
+									<div className='flex items-center justify-between w-full no-overflow'>
+										<input
+										type="homeserver"
+										className="block border-0 px-3 py-3 w-3/4 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring"
+										value={homeServer}
+										style={{ transition: "all .15s ease" }}
+										onChange={(e) => setHomeServer(e.target.value)}
+										/>
+										<div className='flex justify-end w-1/4 ml-4'>
+											<button type="button" className="block px-3 py-2.5 bg-gray-900 text-white text-xs font-semibold shadow leading-tight uppercase rounded hover:shadow-lg active:bg-gray-700">
+												Save
+											</button>
+										</div>
+									</div>
 								</div>
 
 								<div className="flex items-center justify-between w-full my-4">
@@ -141,7 +146,7 @@ export default function Login() {
 										Sign in with
 									</label>
 									<div className="">
-										<select value={fieldType} onChange={handleChange} className='block px-1 py-1 rounded-md bg-white shadow border border-solid border-gray-300 text-sm focus:outline-none focus:ring'>
+										<select value={fieldType} onChange={(e) => setFieldType(e.target.value)} className='block px-1 py-1 rounded-md bg-white shadow border border-solid border-gray-300 text-sm focus:outline-none focus:ring'>
 											<option default>Username</option>
 											<option value="Email address">Email address</option>
 											<option value="Phone">Phone</option>
