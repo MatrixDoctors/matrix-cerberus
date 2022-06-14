@@ -14,9 +14,9 @@ export default function App() {
       <NavBar />
       <Routes>
         <Route path="/" element={<AccountSettings />} />
-        <Route path="room-settings" element={<RoomSettings />} />
-        <Route path="server-settings" element={<ServerSettings />} />
-        <Route path="login" element={<Login />} />
+        <Route path="/room-settings" element={<RoomSettings />} />
+        <Route path="/server-settings" element={<ServerSettings />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   )

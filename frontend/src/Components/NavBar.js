@@ -40,7 +40,7 @@ export default function NavBar() {
                 {/* Account dropdown for mobile views */}                    
                 <div className='px-4 py-5 border-t border-gray-800 sm:hidden'>
                     <div className='mb-3 flex items-center'>
-                        <img alt="..." className='h-6 w-6 border-2 border-gray-600 rounded-full object-cover' src='https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80' />
+                        <img alt="..." className='h-6 w-6 border-2 border-gray-600 rounded-full object-cover' src={require('../assets/img/user.svg').default} />
                         <span className='ml-3 font-semibold text-white'>kuries</span>
                     </div>
                     <Link to='/login' className='block mt-2 text-gray-400 hover:text-white'>Log in</Link>

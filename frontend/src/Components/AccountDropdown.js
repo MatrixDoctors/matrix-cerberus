@@ -8,13 +8,13 @@ export default function AccountDropdown() {
         setIsAccountDropdownOpen(!isAccountDropdownOpen);
     }
 
-    let accountOptionsDisplay = `${isAccountDropdownOpen ? "block" : "hidden"}`;
+    let accountOptionsDisplay = isAccountDropdownOpen ? "block" : "hidden";
 
     return (
     <div className="hidden sm:block mt-2 sm:ml-6">
         <div className='relative'>
             <button onClick={handleClick} className='block h-6 w-6 overflow-hidden rounded-full mr-2 mb-1 border-2 border-gray-600 hover:border-gray-50'>
-                <img className='h-full w-full object-cover' src='https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80' />
+                <img className='h-full w-full object-cover' src={require('../assets/img/user.svg').default} alt="..."/>
             </button>
             
             <div className={accountOptionsDisplay}>
