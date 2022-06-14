@@ -12,6 +12,14 @@ const Images = {
 	'gitlab': require('../assets/img/gitlab.svg').default
 }
 
+function validateAndReturnURL(url) {
+	var pattern = /^((http|https):\/\/)/;
+	if(!pattern.test(url)) {
+		url = "https://" + url;
+	}
+	return url;
+}
+
 function AuthButton({ imgUrl }){
 	return (
 		<button
@@ -32,22 +40,8 @@ AuthButton.propTypes = {
 	imgUrl: PropTypes.string
 }
 
-function UserField({ type }) {
+function UserField({ type, onBlur }) {
 	switch (type) {
-		case 'Username': {
-			return (
-				<div className="w-full mb-3">
-					<input
-					type="username"
-					className="border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
-					placeholder="Username"
-					style={{ transition: "all .15s ease" }}
-					onBlur={()=>console.log("On Blurred")}
-					/>
-				</div>
-			)
-		}
-
 		case 'Email address': {
 			return (
 				<div className="w-full mb-3">
@@ -79,6 +73,20 @@ function UserField({ type }) {
 				</div>
 			)
 		}
+		// Username is default.
+		default: {
+			return (
+				<div className="w-full mb-3">
+					<input
+					type="username"
+					className="border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
+					placeholder="Username"
+					style={{ transition: "all .15s ease" }}
+					onBlur={onBlur}
+					/>
+				</div>
+			)
+		} 
 	}
 }
 
@@ -95,6 +103,7 @@ function SSOLogin({ ssoProviders, errorMessage }) {
 			</h6>
 			</div>
 
+			{/* Error Message Display */}
 			<div className="text-center mb-3">
 				<p className="text-red-600 text-sm">
 					{errorMessage}
@@ -116,29 +125,78 @@ function SSOLogin({ ssoProviders, errorMessage }) {
 
 export default function Login() {
 
+	// Used to set the Identifier type for password based login
 	const [fieldType, setFieldType] = useState('Username');
-	const [inputHomeServer, setInputHomeServer] = useState('matrix.org');
-	const [homeServer, setHomeServer] = useState('matrix.org');
-	const [ssoProviders, setSSOProviders] = useState([]);
-	const [errorMessage, setErrorMessage] = useState('Error');
 
+	// Updated every time the homeserver input text is changed.
+	const [inputHomeServer, setInputHomeServer] = useState('matrix.org');
+
+	// Updated after save button is clicked
+	const [homeServer, setHomeServer] = useState('matrix.org');
+
+	// List of available SSO providers
+	const [ssoProviders, setSSOProviders] = useState([]);
+	const [errorMessage, setErrorMessage] = useState('');
+
+	// Fetches the available login types for a particular homeserver. Defaults to 'matrix.org'
 	useEffect(() => {
 		const fetchData = async () => {
-			const baseUrl = "https://" + homeServer;
+			const baseUrl = validateAndReturnURL(homeServer);
 			const endpoint = "/_matrix/client/v3/login";
 			const fullUrl = new URL(endpoint, baseUrl);
-
-			let response = await axios.get(fullUrl);
-			let listOfSSOProviders = [];
-			for(let flowItem of response.data.flows){
-				if(flowItem.type === 'm.login.sso'){
-					listOfSSOProviders = flowItem.identity_providers.map((value) => value.name.toLowerCase());
+			try {
+				let response = await axios.get(fullUrl);
+				let listOfSSOProviders = [];
+				for(let flowItem of response.data.flows){
+					if(flowItem.type === 'm.login.sso'){
+						listOfSSOProviders = flowItem.identity_providers.map((value) => value.name.toLowerCase());
+					}
 				}
+				setSSOProviders(listOfSSOProviders);
 			}
-			setSSOProviders(listOfSSOProviders);
+			catch (err) {
+				// Still need to handle network errors and URL not found.
+				console.log(err.response);
+			}
 		}
 		fetchData();
 	}, [homeServer]);
+
+	// Autofills the homeserver field when a user enters a complete and valid matrix user_id.
+	async function usernameOnBlur (e) {
+		// Regex test for complete user_id
+		const pattern = /^@[\w_-]+:\S+/;
+		if(!pattern.test(e.target.value)){
+			return;
+		}
+		const userName = e.target.value;
+	
+		// Extract server name from username
+		let server_name = userName.split(':')[1];
+		server_name = validateAndReturnURL(server_name);
+	
+		// Extract host name from server name
+		let hostName = new URL(server_name).hostname;
+		hostName = validateAndReturnURL(hostName);
+	
+		const url = new URL('.well-known/matrix/client', hostName);	
+		await axios.get(url)
+		.then(response => {
+			let homeserver_url = response.data['m.homeserver'].base_url;
+			if (homeserver_url === undefined){
+				throw new Error("Auto Discovery failed due to invalid data");
+			}
+			homeserver_url = new URL(homeserver_url).hostname;
+			setHomeServer(homeserver_url);
+			setInputHomeServer(homeserver_url);
+
+			// removes the error message the next time auto discovery is successful
+			setErrorMessage('');
+		})
+		.catch(err => {
+			setErrorMessage(err.message);
+		});
+	}
 
     return (
 	<div>
@@ -206,7 +264,7 @@ export default function Login() {
 										</div>
 									</div>
 
-									<UserField type={fieldType}/>
+									<UserField type={fieldType} onBlur={usernameOnBlur}/>
 									
 
 									<div className="w-full mb-3">
