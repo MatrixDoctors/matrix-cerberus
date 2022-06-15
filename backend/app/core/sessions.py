@@ -1,6 +1,6 @@
 import pickle
-from typing import Any
 from uuid import uuid4
+from typing import Any
 
 from fastapi import Request, Response
 from redis import Redis
@@ -13,7 +13,7 @@ def generate_id() -> str:
 
 
 """
-Redis Session Storage class is used to maintain a connection 
+Redis Session Storage class is used to maintain a connection
 between the redis database and the server.
 """
 
@@ -53,7 +53,7 @@ session_storage = RedisSessionStorage()
 
 
 """
-Session Cookie class provides high level methods 
+Session Cookie class provides high level methods
 to interact with the redis database
 """
 

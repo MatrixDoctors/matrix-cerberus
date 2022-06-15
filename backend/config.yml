@@ -8,7 +8,7 @@ server_sessions:
   # Server side sessions to authenticate logged in users
   # 'expires_key' is to be set in seconds
   #
-  session_key: sessionID  
+  session_key: sessionID
   expires_in: 3600
 
 matrix_bot:

@@ -1,6 +1,6 @@
 import sys
-from asyncio import exceptions
 from typing import Optional
+from asyncio import exceptions
 
 from nio import AsyncClient, AsyncClientConfig, InviteEvent, MatrixRoom, RoomMessageText
 from nio.responses import WhoamiResponse
