@@ -4,6 +4,7 @@ import PropTypes from "prop-types"
 
 import UserField from '../Components/UserField'
 import SSOLogin from '../Components/SSOLogin'
+import {parsePhoneNumber} from "react-phone-number-input"
 import axios from 'axios'
 
 function validateAndReturnURL(url) {
@@ -20,6 +21,10 @@ export default function Login() {
 	// Used to set the Identifier type for password based login
 	const [fieldType, setFieldType] = useState('Username');
 	const [userField, setUserField] = useState('');
+
+	// State variable to store the complete phone number including the country calling code.
+	//Ex: 
+	const [phoneNumber, setPhoneNumber] = useState('');
 
 	const [password, setPassword] = useState('');
 
@@ -90,7 +95,7 @@ export default function Login() {
 			setHomeServer(homeserver_url);
 			setInputHomeServer(homeserver_url);
 
-			// removes the error message the next time auto discovery is successful
+			// Removes the error message the next time auto discovery is successful
 			setErrorMessage('');
 		})
 		.catch(err => {
@@ -100,6 +105,16 @@ export default function Login() {
 
 	async function handleSignInClick() {
 		let identifier;
+
+		let phone, country;
+		if(fieldType === 'Phone'){
+			const intlPhoneObject = parsePhoneNumber(phoneNumber);
+			const callingCode = '+' + intlPhoneObject.countryCallingCode;
+			phone = phoneNumber.replace(callingCode, '');
+			country = intlPhoneObject.country;
+			console.log(country);
+		}
+
 		switch (fieldType) {
 			case 'Email address':
 				identifier = {
@@ -107,6 +122,14 @@ export default function Login() {
 					"medium": "email",
 					  "address": userField
 				};
+				break;
+			case 'Phone':
+				identifier = {
+					"type": "m.id.phone",
+					"country": country,
+					"phone": phone,
+					"number": phone
+				}
 				break;
 			default:
 				identifier = {
@@ -127,6 +150,7 @@ export default function Login() {
 			setErrorMessage(`You have logged in as ${userId}`);
 		})
 		.catch( (err) => {
+			// Login attempt has failed. The provided authentication data was incorrect.
 			if(err.response.status === 403){
 				setErrorMessage("Incorrect credentials")
 			}
@@ -221,7 +245,7 @@ export default function Login() {
 										</div>
 									</div>
 
-									<UserField type={fieldType} setUserField={setUserField} onUserNameBlur={usernameOnBlur}/>
+									<UserField type={fieldType} setUserField={setUserField} phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} onUserNameBlur={usernameOnBlur} />
 									
 									{/* Password field */}
 									<div className="w-full mb-3">

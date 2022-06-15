@@ -1,4 +1,8 @@
-export default function UserField({ type, setUserField , onUserNameBlur }) {
+import 'react-phone-number-input/style.css'
+import PhoneInput from 'react-phone-number-input'
+
+export default function UserField({ type, setUserField, phoneNumber, setPhoneNumber, onUserNameBlur}) {
+
 	switch (type) {
 		case 'Email address': {
 			return (
@@ -16,19 +20,14 @@ export default function UserField({ type, setUserField , onUserNameBlur }) {
 
 		case 'Phone': {
 			return (
-				<div className="flex items-center justify-start mb-3">
-					<input 
-					type="tel"
-					className="block mr-1 px-3 py-3 w-1/5 border-0 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring"
-					placeholder='+1'
-					style={{ transition: "all .15s ease" }}
-					/>
-					<input
-					type="tel"
-					className="block border-0 px-3 py-3 w-4/5 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring"
-					placeholder="Phone"
-					style={{ transition: "all .15s ease" }}
-					/>
+				<div className="flex items-center justify-center mb-3">
+					<div className='px-2 py-2 w-full'>
+						<PhoneInput
+							placeholder="Enter phone number"
+							value={phoneNumber}
+							onChange={setPhoneNumber}
+						/>
+					</div>
 				</div>
 			)
 		}
