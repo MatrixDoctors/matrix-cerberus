@@ -94,37 +94,20 @@ UserField.propTypes = {
 	type: PropTypes.string
 }
 
-function SSOLogin({ ssoProviders, errorMessage }) {
+function SSOLogin({ ssoProviders}) {
 	return (
-		<div className="rounded-t mb-0 px-6 py-6">
-			<div className="text-center mb-3">
-			<h6 className="text-gray-600 text-md font-bold">
-				{ssoProviders.length > 0 ? 'Sign in with' : 'Sign In'}
-			</h6>
+		<div className={ssoProviders.length > 0 ? '' : 'hidden'}>
+			<div className="btn-wrapper flex items-center justify-center">
+				{ssoProviders.map((name) => {
+					return <AuthButton imgUrl={Images[name]} key={`${name}`} />
+				})}
 			</div>
-
-			{/* Error Message Display */}
-			<div className="text-center mb-3">
-				<p className="text-red-600 text-sm">
-					{errorMessage}
-				</p>
-			</div>
-
-			{/* Button Wrapper */}
-			<div className={ssoProviders.length > 0 ? '' : 'hidden'}>
-				<div className="btn-wrapper flex items-center justify-center">
-					{ssoProviders.map((name) => {
-						return <AuthButton imgUrl={Images[name]} key={`${name}`} />
-					})}
-				</div>
-			</div>
-			<hr className="mt-6 border-b-1 border-gray-400" />	
 		</div>
 	)
 }
 
 export default function Login() {
-
+	const default_homeserver = 'matrix.org';
 	// Used to set the Identifier type for password based login
 	const [fieldType, setFieldType] = useState('Username');
 
@@ -132,7 +115,7 @@ export default function Login() {
 	const [inputHomeServer, setInputHomeServer] = useState('matrix.org');
 
 	// Updated after save button is clicked
-	const [homeServer, setHomeServer] = useState('matrix.org');
+	const [homeServer, setHomeServer] = useState(default_homeserver);
 
 	// List of available SSO providers
 	const [ssoProviders, setSSOProviders] = useState([]);
@@ -153,10 +136,15 @@ export default function Login() {
 					}
 				}
 				setSSOProviders(listOfSSOProviders);
+				setErrorMessage('');
 			}
 			catch (err) {
-				// Still need to handle network errors and URL not found.
-				console.log(err.response);
+				if (err.message === 'Network Error') {
+					setErrorMessage('Invalid Homeserver URL')
+				}
+				else{
+					setErrorMessage(err.message);
+				}
 			}
 		}
 		fetchData();
@@ -184,7 +172,7 @@ export default function Login() {
 		.then(response => {
 			let homeserver_url = response.data['m.homeserver'].base_url;
 			if (homeserver_url === undefined){
-				throw new Error("Auto Discovery failed due to invalid data");
+				throw new Error();
 			}
 			homeserver_url = new URL(homeserver_url).hostname;
 			setHomeServer(homeserver_url);
@@ -194,7 +182,7 @@ export default function Login() {
 			setErrorMessage('');
 		})
 		.catch(err => {
-			setErrorMessage(err.message);
+			setErrorMessage("Invalid homeserver directory response");
 		});
 	}
 
@@ -210,8 +198,28 @@ export default function Login() {
 				<div className="flex content-center items-center justify-center h-full">
 					<div className="w-full lg:w-4/12 px-4">
 						<div className="relative flex flex-col min-w-0 break-words w-full shadow-lg rounded-lg bg-gray-300 border-0">
-							<SSOLogin ssoProviders={ssoProviders} errorMessage={errorMessage} />
-						
+							
+							{/* First half of login componenet */}
+							<div className="rounded-t mb-0 px-6 py-6">
+								<div className="text-center mb-3">
+								<h6 className="text-gray-600 text-md font-bold">
+									{ssoProviders.length > 0 ? 'Sign in with' : 'Sign In'}
+								</h6>
+								</div>
+
+								{/* Error Message Display */}
+								<div className="text-center mb-3">
+									<p className="text-red-600 text-sm">
+										{errorMessage}
+									</p>
+								</div>
+
+								{/* Button Wrapper */}
+								<SSOLogin ssoProviders={ssoProviders}/>
+								<hr className="mt-6 border-b-1 border-gray-400" />	
+							</div>
+
+							{/* Second half of login componenet */}
 							<div className="flex-auto px-4 lg:px-10 py-10 pt-0">
 								<div className="text-gray-500 text-center mb-3 font-bold">
 								
@@ -221,6 +229,7 @@ export default function Login() {
 								
 								</div>
 								<form>
+									{/* Homeserver componenet */}
 									<div className="w-full mb-3">
 										<label
 										className="block text-gray-700 text-sm font-bold mb-2"
@@ -247,7 +256,8 @@ export default function Login() {
 											</div>
 										</div>
 									</div>
-
+									
+									{/* Select option for password based identifiers */}
 									<div className="flex items-center justify-between w-full my-4">
 										<label
 											className="block text-gray-700 text-xs"
@@ -266,7 +276,7 @@ export default function Login() {
 
 									<UserField type={fieldType} onBlur={usernameOnBlur}/>
 									
-
+									{/* Sign in button */}
 									<div className="w-full mb-3">
 										<input
 										type="password"
