@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - '*'
+      - 'main'
     tags:
       - 'v*'
       - '!*dev*'
@@ -24,15 +24,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Install Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+
       - name: Update pip
         run: python -m pip install -U pip
+
       - name: Install pytest
         run: python -m pip install -U pytest
+
       - name: Install backend requirements
         run: python -m pip install -r backend/requirements.txt
+
       - name: Run pytest
         run: pytest backend/
