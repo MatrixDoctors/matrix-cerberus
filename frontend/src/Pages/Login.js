@@ -15,7 +15,6 @@ function validateAndReturnURL(url) {
 	return url;
 }
 
-
 export default function Login() {
 	const default_homeserver = 'matrix.org';
 
@@ -161,7 +160,6 @@ export default function Login() {
 		}
 		const baseUrl = validateAndReturnURL(homeServer);
 		const fullUrl = new URL('/_matrix/client/v3/login', baseUrl);
-
 		await axios.post(fullUrl, {
 			type: "m.login.password",
 			identifier: identifier,
@@ -287,7 +285,6 @@ export default function Login() {
 										onChange={(e) => setPassword(e.target.value)}
 										/>
 									</div>
-
 									{/* Sign in button */}
 									<div className="text-center mt-6">
 										<button
