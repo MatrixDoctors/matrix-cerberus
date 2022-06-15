@@ -2,15 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from "prop-types"
 
+import UserField from '../Components/UserField'
+import SSOLogin from '../Components/SSOLogin'
 import axios from 'axios'
-
-const Images = {
-	'apple': require('../assets/img/apple.svg').default,
-	'github': require('../assets/img/github.svg').default,
-	'facebook': require('../assets/img/facebook.svg').default,
-	'google': require('../assets/img/google.svg').default,
-	'gitlab': require('../assets/img/gitlab.svg').default
-}
 
 function validateAndReturnURL(url) {
 	var pattern = /^((http|https):\/\/)/;
@@ -20,96 +14,14 @@ function validateAndReturnURL(url) {
 	return url;
 }
 
-function AuthButton({ imgUrl }){
-	return (
-		<button
-			className="block h-8 w-8 mx-4 rounded-full overflow-hidden border-2 border-gray-300 hover:border-white"
-			type="button"
-			style={{ transition: "all .15s ease" }}
-		>
-			<img
-			alt="..."
-			className="h-full w-full mr-1"
-			src={imgUrl}
-			/>
-		</button>
-	)
-}
-
-AuthButton.propTypes = {
-	imgUrl: PropTypes.string
-}
-
-function UserField({ type, onBlur }) {
-	switch (type) {
-		case 'Email address': {
-			return (
-				<div className="w-full mb-3">
-					<input
-					type="email"
-					className="border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
-					placeholder="Email"
-					style={{ transition: "all .15s ease" }}
-					/>
-				</div>
-			)
-		}
-
-		case 'Phone': {
-			return (
-				<div className="flex items-center justify-start mb-3">
-					<input
-					type="tel"
-					className="block mr-1 px-3 py-3 w-1/5 border-0 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring"
-					placeholder='+1'
-					style={{ transition: "all .15s ease" }}
-					/>
-					<input
-					type="tel"
-					className="block border-0 px-3 py-3 w-4/5 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring"
-					placeholder="Phone"
-					style={{ transition: "all .15s ease" }}
-					/>
-				</div>
-			)
-		}
-		// Username is default.
-		default: {
-			return (
-				<div className="w-full mb-3">
-					<input
-					type="username"
-					className="border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
-					placeholder="Username"
-					style={{ transition: "all .15s ease" }}
-					onBlur={onBlur}
-					/>
-				</div>
-			)
-		} 
-	}
-}
-
-UserField.propTypes = {
-	type: PropTypes.string
-}
-
-function SSOLogin({ ssoProviders}) {
-	return (
-		<div className={ssoProviders.length > 0 ? '' : 'hidden'}>
-			<div className="btn-wrapper flex items-center justify-center">
-				{ssoProviders.map((name) => {
-					return <AuthButton imgUrl={Images[name]} key={`${name}`} />
-				})}
-			</div>
-		</div>
-	)
-}
-
 export default function Login() {
 	const default_homeserver = 'matrix.org';
+
 	// Used to set the Identifier type for password based login
 	const [fieldType, setFieldType] = useState('Username');
+	const [userField, setUserField] = useState('');
+
+	const [password, setPassword] = useState('');
 
 	// Updated every time the homeserver input text is changed.
 	const [inputHomeServer, setInputHomeServer] = useState('matrix.org');
@@ -184,6 +96,41 @@ export default function Login() {
 		.catch(err => {
 			setErrorMessage("Invalid homeserver directory response");
 		});
+	}
+
+	async function handleSignInClick() {
+		let identifier;
+		switch (fieldType) {
+			case 'Email address':
+				identifier = {
+					"type": "m.id.thirdparty",
+					"medium": "email",
+					  "address": userField
+				};
+				break;
+			default:
+				identifier = {
+					"type": "m.id.user",
+					  "user": userField
+				}
+		}
+		const baseUrl = validateAndReturnURL(homeServer);
+		const fullUrl = new URL('/_matrix/client/v3/login', baseUrl);
+	
+		await axios.post(fullUrl, {
+			type: "m.login.password",
+			identifier: identifier,
+			password: password
+		})
+		.then((resp) => {
+			const userId = resp.data.user_id;
+			setErrorMessage(`You have logged in as ${userId}`);
+		})
+		.catch( (err) => {
+			if(err.response.status === 403){
+				setErrorMessage("Incorrect credentials")
+			}
+		})
 	}
 
     return (
@@ -267,30 +214,33 @@ export default function Login() {
 										</label>
 										<div className="">
 											<select value={fieldType} onChange={(e) => setFieldType(e.target.value)} className='block px-1 py-1 rounded-md bg-white shadow border border-solid border-gray-300 text-sm focus:outline-none focus:ring'>
-												<option default>Username</option>
+												<option default value="Username">Username</option>
 												<option value="Email address">Email address</option>
 												<option value="Phone">Phone</option>
 											</select>
 										</div>
 									</div>
 
-									<UserField type={fieldType} onBlur={usernameOnBlur}/>
+									<UserField type={fieldType} setUserField={setUserField} onUserNameBlur={usernameOnBlur}/>
 									
-									{/* Sign in button */}
+									{/* Password field */}
 									<div className="w-full mb-3">
 										<input
 										type="password"
 										className="border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
 										placeholder="Password"
 										style={{ transition: "all .15s ease" }}
+										onChange={(e) => setPassword(e.target.value)}
 										/>
 									</div>
-
+									
+									{/* Sign in button */}
 									<div className="text-center mt-6">
 										<button
 										className="bg-gray-900 text-white active:bg-gray-700 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full"
 										type="button"
 										style={{ transition: "all .15s ease" }}
+										onClick={handleSignInClick}
 										>
 										Sign In
 										</button>
