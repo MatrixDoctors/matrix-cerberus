@@ -22,8 +22,8 @@ export default function Login() {
 	const [fieldType, setFieldType] = useState('Username');
 	const [userField, setUserField] = useState('');
 
-	// State variable to store the complete phone number including the country calling code.
-	//Ex: 
+	// State variable to store the complete phone number including the country calling code with no '+'.
+	//Ex: 919676765xxxxx (India (91) )
 	const [phoneNumber, setPhoneNumber] = useState('');
 
 	const [password, setPassword] = useState('');
@@ -37,6 +37,14 @@ export default function Login() {
 	// List of available SSO providers
 	const [ssoProviders, setSSOProviders] = useState([]);
 	const [errorMessage, setErrorMessage] = useState('');
+
+	// Enable save button in homeserver when the inputHomeServer is being changed
+	// and Disable it when the save button is clicked.
+	const [disableSave, setDisableSave] = useState(true);
+
+	const [disableFields, setDisableFields] = useState(false);
+
+	const styleClassForFields = `border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full disabled:opacity-50`;
 
 	// Fetches the available login types for a particular homeserver. Defaults to 'matrix.org'
 	useEffect(() => {
@@ -53,15 +61,17 @@ export default function Login() {
 					}
 				}
 				setSSOProviders(listOfSSOProviders);
+				setDisableFields(false);
 				setErrorMessage('');
 			}
 			catch (err) {
 				if (err.message === 'Network Error') {
-					setErrorMessage('Invalid Homeserver URL')
+					setErrorMessage('Invalid Homeserver URL');
 				}
 				else{
 					setErrorMessage(err.message);
 				}
+				setDisableFields(true);
 			}
 		}
 		fetchData();
@@ -104,6 +114,17 @@ export default function Login() {
 	}
 
 	async function handleSignInClick() {
+		
+		// Homeserver url is invalid
+		if(disableFields){
+			return;
+		}
+		
+		if(userField === '' || password === ''){
+			setErrorMessage("Input Fields are empty");
+			return;
+		}
+
 		let identifier;
 
 		let phone, country;
@@ -214,14 +235,18 @@ export default function Login() {
 											className="block border-0 px-3 py-3 w-3/4 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring"
 											value={inputHomeServer}
 											style={{ transition: "all .15s ease" }}
-											onChange={(e) => setInputHomeServer(e.target.value)}
-											/>
+											onChange={(e) => {
+												setInputHomeServer(e.target.value);
+												setDisableSave(!e.target.value);
+											}}/>
 											<div className='flex justify-end w-1/4 ml-4'>
-												<button 
-												type="button" 
-												className="block px-3 py-2.5 bg-gray-900 text-white text-xs font-semibold shadow leading-tight uppercase rounded hover:shadow-lg active:bg-gray-700"
-												onClick={() => {setHomeServer(inputHomeServer)}}
-												>
+												<button
+												type="button" disabled={disableSave}
+												className="block px-3 py-2.5 bg-gray-900 text-white text-xs font-semibold shadow leading-tight uppercase rounded hover:shadow-lg hover:bg-gray-800 disabled:opacity-20"
+												onClick={() => {
+													setHomeServer(inputHomeServer);
+													setDisableSave(true);
+												}}>
 													Save
 												</button>
 											</div>
@@ -237,7 +262,12 @@ export default function Login() {
 											Sign in with
 										</label>
 										<div className="">
-											<select value={fieldType} onChange={(e) => setFieldType(e.target.value)} className='block px-1 py-1 rounded-md bg-white shadow border border-solid border-gray-300 text-sm focus:outline-none focus:ring'>
+											<select 
+											disabled={disableFields}
+											value={fieldType} 
+											onChange={(e) => setFieldType(e.target.value)} 
+											className='block px-1 py-1 rounded-md bg-white shadow border border-solid border-gray-300 text-sm focus:outline-none focus:ring disabled:opacity-50'
+											>
 												<option default value="Username">Username</option>
 												<option value="Email address">Email address</option>
 												<option value="Phone">Phone</option>
@@ -245,13 +275,14 @@ export default function Login() {
 										</div>
 									</div>
 
-									<UserField type={fieldType} setUserField={setUserField} phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} onUserNameBlur={usernameOnBlur} />
+									<UserField styleClassForFields={styleClassForFields} type={fieldType} setUserField={setUserField} disableFields={disableFields} phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} onUserNameBlur={usernameOnBlur} />
 									
 									{/* Password field */}
 									<div className="w-full mb-3">
 										<input
+										disabled={disableFields}
 										type="password"
-										className="border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
+										className={styleClassForFields}
 										placeholder="Password"
 										style={{ transition: "all .15s ease" }}
 										onChange={(e) => setPassword(e.target.value)}
