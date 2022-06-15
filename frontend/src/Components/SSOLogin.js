@@ -9,11 +9,30 @@ const Images = {
 	'gitlab': require('../assets/img/gitlab.svg').default
 }
 
-function AuthButton({ imgUrl }){
+function validateAndReturnURL(url) {
+	var pattern = /^((http|https):\/\/)/;
+	if(!pattern.test(url)) {
+		url = "https://" + url;
+	}
+	return url;
+}
+
+function AuthButton({ imgUrl, idpId, homeServer }){
+
+	async function handleClick() {
+		const baseUrl = validateAndReturnURL(homeServer);
+		const redirectUrl = 'http://localhost:80/login-success'
+		const endpoint = '_matrix/client/v3/login/sso/redirect/' + idpId + '?redirectUrl=' + redirectUrl;
+		const fullUrl = new URL(endpoint, baseUrl);
+
+		window.location.href = fullUrl;
+	}
+
 	return (
 		<button
 			className="block h-8 w-8 mx-4 rounded-full overflow-hidden border-2 border-gray-300 hover:border-white"
 			type="button"
+			onClick={handleClick}
 			style={{ transition: "all .15s ease" }}
 		>
 			<img
@@ -29,12 +48,12 @@ AuthButton.propTypes = {
 	imgUrl: PropTypes.string
 }
 
-export default function SSOLogin({ ssoProviders }) {
+export default function SSOLogin({ ssoProviders, homeServer }) {
 	return (
 		<div className={ssoProviders.length > 0 ? '' : 'hidden'}>
 			<div className="btn-wrapper flex items-center justify-center">
-				{ssoProviders.map((name) => {
-					return <AuthButton imgUrl={Images[name]} key={`${name}`} />
+				{ssoProviders.map((value) => {
+					return <AuthButton imgUrl={Images[value.brand]} idpId={value.id} homeServer={homeServer} key={value.id} />
 				})}
 			</div>
 		</div>

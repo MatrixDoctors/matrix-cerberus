@@ -57,12 +57,14 @@ export default function Login() {
 				let listOfSSOProviders = [];
 				for(let flowItem of response.data.flows){
 					if(flowItem.type === 'm.login.sso'){
-						listOfSSOProviders = flowItem.identity_providers.map((value) => value.name.toLowerCase());
+						listOfSSOProviders = flowItem.identity_providers;
 					}
 				}
 				setSSOProviders(listOfSSOProviders);
 				setDisableFields(false);
 				setErrorMessage('');
+
+				localStorage.setItem('homeServer', baseUrl);
 			}
 			catch (err) {
 				if (err.message === 'Network Error') {
@@ -105,6 +107,8 @@ export default function Login() {
 			setHomeServer(homeserver_url);
 			setInputHomeServer(homeserver_url);
 
+			//Setting the value in local storage
+			localStorage.setItem('homeServer', homeserver_url);
 			// Removes the error message the next time auto discovery is successful
 			setErrorMessage('');
 		})
@@ -205,8 +209,8 @@ export default function Login() {
 								</div>
 
 								{/* Button Wrapper */}
-								<SSOLogin ssoProviders={ssoProviders}/>
-								<hr className="mt-6 border-b-1 border-gray-400" />
+								<SSOLogin ssoProviders={ssoProviders} homeServer={homeServer} />
+								<hr className="mt-6 border-b-1 border-gray-400" />	
 							</div>
 
 							{/* Second half of login componenet */}
