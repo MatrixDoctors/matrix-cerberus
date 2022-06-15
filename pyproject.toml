@@ -1,0 +1,14 @@
+[tool.isort]
+profile = "black"
+src_paths = ["backend"]
+sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
+default_section = "THIRDPARTY"
+known_first_party = "app"
+multi_line_output = 0
+balanced_wrapping = true
+length_sort = false
+length_sort_sections = "stdlib"
+
+[tool.black]
+line-length = 100
+target-version = ['py39']
