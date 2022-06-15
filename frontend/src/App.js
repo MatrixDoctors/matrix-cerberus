@@ -6,6 +6,7 @@ import NavBar from './Components/NavBar';
 import RoomSettings from './Pages/RoomSettings';
 import ServerSettings from './Pages/ServerSettings';
 import Login from './Pages/Login';
+import LoginSuccess from './Pages/LoginSuccess';
 
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/room-settings" element={<RoomSettings />} />
         <Route path="/server-settings" element={<ServerSettings />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/login-success" element={<LoginSuccess/>} />
       </Routes>
     </BrowserRouter>
   )
