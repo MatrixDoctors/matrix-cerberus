@@ -191,7 +191,6 @@ export default function Login() {
 				<div className="flex content-center items-center justify-center h-full">
 					<div className="w-full lg:w-4/12 px-4">
 						<div className="relative flex flex-col min-w-0 break-words w-full shadow-lg rounded-lg bg-gray-300 border-0">
-
 							{/* First half of login componenet */}
 							<div className="rounded-t mb-0 px-6 py-6">
 								<div className="text-center mb-3">
@@ -253,7 +252,6 @@ export default function Login() {
 											</div>
 										</div>
 									</div>
-
 									{/* Select option for password based identifiers */}
 									<div className="flex items-center justify-between w-full my-4">
 										<label
