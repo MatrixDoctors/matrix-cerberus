@@ -5,15 +5,9 @@ import PropTypes from "prop-types"
 import UserField from '../Components/UserField'
 import SSOLogin from '../Components/SSOLogin'
 import {parsePhoneNumber} from "react-phone-number-input"
+import validateAndReturnUrl from '../HelperFunctions/validateAndReturnUrl'
 import axios from 'axios'
 
-function validateAndReturnURL(url) {
-	var pattern = /^((http|https):\/\/)/;
-	if(!pattern.test(url)) {
-		url = "https://" + url;
-	}
-	return url;
-}
 
 export default function Login() {
 	const default_homeserver = 'matrix.org';
@@ -42,6 +36,7 @@ export default function Login() {
 	// and Disable it when the save button is clicked.
 	const [disableSave, setDisableSave] = useState(true);
 
+	// Used to disable input fields when the homeserver url is invalid.
 	const [disableFields, setDisableFields] = useState(false);
 
 	const styleClassForFields = `border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full disabled:opacity-50`;
@@ -49,7 +44,7 @@ export default function Login() {
 	// Fetches the available login types for a particular homeserver. Defaults to 'matrix.org'
 	useEffect(() => {
 		const fetchData = async () => {
-			const baseUrl = validateAndReturnURL(homeServer);
+			const baseUrl = validateAndReturnUrl(homeServer);
 			const endpoint = "/_matrix/client/v3/login";
 			const fullUrl = new URL(endpoint, baseUrl);
 			try {
@@ -90,13 +85,13 @@ export default function Login() {
 
 		// Extract server name from username
 		let server_name = userName.split(':')[1];
-		server_name = validateAndReturnURL(server_name);
-
+		server_name = validateAndReturnUrl(server_name);
+	
 		// Extract host name from server name
 		let hostName = new URL(server_name).hostname;
-		hostName = validateAndReturnURL(hostName);
-
-		const url = new URL('.well-known/matrix/client', hostName);
+		hostName = validateAndReturnUrl(hostName);
+	
+		const url = new URL('.well-known/matrix/client', hostName);	
 		await axios.get(url)
 		.then(response => {
 			let homeserver_url = response.data['m.homeserver'].base_url;
@@ -162,7 +157,7 @@ export default function Login() {
 					  "user": userField
 				}
 		}
-		const baseUrl = validateAndReturnURL(homeServer);
+		const baseUrl = validateAndReturnUrl(homeServer);
 		const fullUrl = new URL('/_matrix/client/v3/login', baseUrl);
 		await axios.post(fullUrl, {
 			type: "m.login.password",

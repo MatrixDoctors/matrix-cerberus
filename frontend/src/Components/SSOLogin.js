@@ -8,29 +8,25 @@ const Images = {
 	'google': require('../assets/img/google.svg').default,
 	'gitlab': require('../assets/img/gitlab.svg').default
 }
+import validateAndReturnUrl from '../HelperFunctions/validateAndReturnUrl';
+import parseImageUrl from '../HelperFunctions/parseImageUrl';
 
-function validateAndReturnURL(url) {
-	var pattern = /^((http|https):\/\/)/;
-	if(!pattern.test(url)) {
-		url = "https://" + url;
-	}
-	return url;
-}
-
-function AuthButton({ imgUrl, idpId, homeServer }){
+function AuthButton({ idp, homeServer }){
 
 	async function handleClick() {
-		const baseUrl = validateAndReturnURL(homeServer);
+		const baseUrl = validateAndReturnUrl(homeServer);
 		const redirectUrl = 'http://localhost:80/login-success'
-		const endpoint = '_matrix/client/v3/login/sso/redirect/' + idpId + '?redirectUrl=' + redirectUrl;
+		const endpoint = '_matrix/client/v3/login/sso/redirect/' + idp.id + '?redirectUrl=' + redirectUrl;
 		const fullUrl = new URL(endpoint, baseUrl);
 
 		window.location.href = fullUrl;
 	}
 
+	const imgUrl = parseImageUrl(homeServer, idp.icon);
+
 	return (
 		<button
-			className="block h-8 w-8 mx-4 rounded-full overflow-hidden border-2 border-gray-300 hover:border-white"
+			className="block h-7 w-7 mx-4 rounded-full overflow-hidden border-2 border-gray-300 hover:border-white"
 			type="button"
 			onClick={handleClick}
 			style={{ transition: "all .15s ease" }}
@@ -38,7 +34,7 @@ function AuthButton({ imgUrl, idpId, homeServer }){
 			<img
 			alt="..."
 			className="h-full w-full mr-1"
-			src={imgUrl}
+			src={imgUrl.href}
 			/>
 		</button>
 	)
@@ -53,7 +49,7 @@ export default function SSOLogin({ ssoProviders, homeServer }) {
 		<div className={ssoProviders.length > 0 ? '' : 'hidden'}>
 			<div className="btn-wrapper flex items-center justify-center">
 				{ssoProviders.map((value) => {
-					return <AuthButton imgUrl={Images[value.brand]} idpId={value.id} homeServer={homeServer} key={value.id} />
+					return <AuthButton idp={value} homeServer={homeServer} key={value.id} />
 				})}
 			</div>
 		</div>
