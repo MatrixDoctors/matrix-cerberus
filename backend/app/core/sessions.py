@@ -1,6 +1,6 @@
 import pickle
-from typing import Any
 from uuid import uuid4
+from typing import Any
 
 from fastapi import Request, Response
 from redis import Redis
@@ -12,13 +12,12 @@ def generate_id() -> str:
     return uuid4().hex
 
 
-"""
-Redis Session Storage class is used to maintain a connection 
-between the redis database and the server.
-"""
-
-
 class RedisSessionStorage:
+    """
+    Redis Session Storage class is used to maintain a connection
+    between the redis database and the server.
+    """
+
     def __init__(self):
         self.client = Redis.from_url(settings.redis.uri)
 
@@ -52,13 +51,12 @@ class RedisSessionStorage:
 session_storage = RedisSessionStorage()
 
 
-"""
-Session Cookie class provides high level methods 
-to interact with the redis database
-"""
-
-
 class SessionCookie:
+    """
+    Session Cookie class provides high level methods
+    to interact with the redis database
+    """
+
     def __init__(self):
         self.session_storage = session_storage
         self.session_key = settings.server_sessions.session_key
