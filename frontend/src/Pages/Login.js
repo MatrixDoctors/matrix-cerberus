@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import PropTypes from "prop-types"
 
-function AuthButton({ imgUrl, name }){
+function AuthButton({ imgUrl }){
 	return (
 		<button
 			className="block h-8 w-8 mx-4 rounded-full overflow-hidden border-2 border-gray-300 hover:border-white"
@@ -15,6 +16,10 @@ function AuthButton({ imgUrl, name }){
 			/>
 		</button>
 	)
+}
+
+AuthButton.propTypes = {
+	imgUrl: PropTypes.string
 }
 
 function UserField({ type }) {
@@ -48,7 +53,7 @@ function UserField({ type }) {
 		case 'Phone': {
 			return (
 				<div className="flex items-center justify-start mb-3">
-					<input 
+					<input
 					type="tel"
 					className="block mr-1 px-3 py-3 w-1/5 border-0 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring"
 					placeholder='+1'
@@ -66,6 +71,10 @@ function UserField({ type }) {
 	}
 }
 
+UserField.propTypes = {
+	type: PropTypes.string
+}
+
 export default function Login() {
 
 	const [fieldType, setFieldType] = useState('Username');
@@ -77,7 +86,7 @@ export default function Login() {
     return (
 	<div>
 		<section className="fixed w-full h-full top-0" style={{ backgroundColor: "#161b22"}}>
-			
+
 			<div className="text-gray-300 hover:text-white px-4 py-4 font-bold">
                 <Link to='/'>matrix-cerberus</Link>
             </div>
@@ -103,7 +112,7 @@ export default function Login() {
 								</div>
 								<hr className="mt-6 border-b-1 border-gray-400" />
 							</div>
-						
+
 							<div className="flex-auto px-4 lg:px-10 py-10 pt-0">
 								<div className="text-gray-500 text-center mb-3 font-bold">
 								<small>Or sign in with credentials</small>
@@ -141,7 +150,7 @@ export default function Login() {
 								</div>
 
 								<UserField type={fieldType}/>
-								
+
 
 								<div className="w-full mb-3">
 									<input
