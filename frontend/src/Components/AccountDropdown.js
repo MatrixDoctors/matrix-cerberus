@@ -16,7 +16,7 @@ export default function AccountDropdown() {
             <button onClick={handleClick} className='block h-6 w-6 overflow-hidden rounded-full mr-2 mb-1 border-2 border-gray-600 hover:border-gray-50'>
                 <img className='h-full w-full object-cover' src={require('../assets/img/user.svg').default} alt="..."/>
             </button>
-            
+
             <div className={accountOptionsDisplay}>
                 <button onClick={()=>{setIsAccountDropdownOpen(false)}} className="fixed top-0 left-0 right-0 bottom-0 h-full w-full"></button>
                 <div className='absolute right-0 mt-1 w-32 py-2 bg-white rounded-lg shadow-xl'>

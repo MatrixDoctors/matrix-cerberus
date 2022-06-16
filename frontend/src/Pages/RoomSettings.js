@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from "prop-types"
 
 const TableHeader = ({ values }) => {
   return (
@@ -12,6 +13,10 @@ const TableHeader = ({ values }) => {
       })}
     </tr>
   )
+}
+
+TableHeader.propTypes = {
+  values: PropTypes.arrayOf(PropTypes.string)
 }
 
 const TableRows =  ({ values }) => {
@@ -37,6 +42,10 @@ const TableRows =  ({ values }) => {
   )
 };
 
+TableRows.propTypes = {
+  values: PropTypes.arrayOf(PropTypes.object)
+}
+
 export default function RoomSettings() {
 
   // Dummy data for tables
@@ -48,10 +57,8 @@ export default function RoomSettings() {
   ];
 
   return (
-    <div>  
-			<div className="flex items-center w-full h-48 py-5 shadow-lg" 
-				style={{ backgroundColor: "#0d1117" }} 
-			>
+    <div>
+			<div className="flex items-center w-full h-48 py-5 shadow-lg bg-dark-eye" >
 				<div className='flex items-center justify-center w-full sm:w-1/3'>
 					<div className='relative bottom-5 font-bold text-3xl my-5 px-3 sm:px-0 text-gray-200'>
 						Room Settings
@@ -79,7 +86,7 @@ export default function RoomSettings() {
                         <thead className="bg-gray-300 border-b">
                           <TableHeader values={roomHeaderData} />
                         </thead>
-                        <tbody>                          
+                        <tbody>
                           <TableRows values={roomBodyData} />
                         </tbody>
                       </table>

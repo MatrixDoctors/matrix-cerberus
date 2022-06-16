@@ -3,10 +3,8 @@ import React from 'react'
 export default function AccountSettings() {
 
 	return (
-		<div>  
-			<div className="flex items-center w-full h-48 py-5 shadow-lg" 
-				style={{ backgroundColor: "#0d1117" }} 
-			>
+		<div>
+			<div className="flex items-center w-full h-48 py-5 shadow-lg bg-dark-eye" >
 				<div className='flex items-center justify-center w-full sm:w-1/3'>
 					<div className='relative bottom-5 font-bold text-3xl my-5 px-3 sm:px-0 text-gray-200'>
 						Accounts
@@ -34,8 +32,8 @@ export default function AccountSettings() {
 							</div>
 
 							<hr className="border-b-1 border-gray-300" />
-							
-							<div className='flex items-center w-full my-3'>	
+
+							<div className='flex items-center w-full my-3'>
 								<div className='w-1/3 text-gray-600 font-semibold'>
 									Homeserver
 								</div>
@@ -75,7 +73,7 @@ export default function AccountSettings() {
 										Edit
 									</span>
 								</div>
-								
+
 							</div>
 
 							<hr className="border-b-1 border-gray-300" />
