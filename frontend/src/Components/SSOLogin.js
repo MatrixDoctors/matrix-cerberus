@@ -1,3 +1,6 @@
+import PropTypes from 'prop-types'
+import React from 'react'
+
 const Images = {
 	'apple': require('../assets/img/apple.svg').default,
 	'github': require('../assets/img/github.svg').default,
@@ -22,7 +25,11 @@ function AuthButton({ imgUrl }){
 	)
 }
 
-export default function SSOLogin({ ssoProviders}) {
+AuthButton.propTypes = {
+	imgUrl: PropTypes.string
+}
+
+export default function SSOLogin({ ssoProviders }) {
 	return (
 		<div className={ssoProviders.length > 0 ? '' : 'hidden'}>
 			<div className="btn-wrapper flex items-center justify-center">
@@ -32,4 +39,8 @@ export default function SSOLogin({ ssoProviders}) {
 			</div>
 		</div>
 	)
+}
+
+SSOLogin.propTypes = {
+	ssoProviders: PropTypes.array
 }

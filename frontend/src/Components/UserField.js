@@ -1,3 +1,5 @@
+import React from 'react'
+import PropTypes from 'prop-types'
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
 
@@ -48,6 +50,16 @@ export default function UserField({ styleClassForFields, type, setUserField, dis
 					/>
 				</div>
 			)
-		} 
+		}
 	}
+}
+
+UserField.propTypes = {
+	styleClassForFields: PropTypes.string,
+	type: PropTypes.string,
+	setUserField: PropTypes.any,
+	disableFields: PropTypes.bool,
+	phoneNumber: PropTypes.string,
+	setPhoneNumber: PropTypes.any,
+	onUserNameBlur: PropTypes.any
 }

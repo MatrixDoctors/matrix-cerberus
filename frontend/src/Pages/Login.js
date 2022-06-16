@@ -85,16 +85,16 @@ export default function Login() {
 			return;
 		}
 		const userName = e.target.value;
-	
+
 		// Extract server name from username
 		let server_name = userName.split(':')[1];
 		server_name = validateAndReturnURL(server_name);
-	
+
 		// Extract host name from server name
 		let hostName = new URL(server_name).hostname;
 		hostName = validateAndReturnURL(hostName);
-	
-		const url = new URL('.well-known/matrix/client', hostName);	
+
+		const url = new URL('.well-known/matrix/client', hostName);
 		await axios.get(url)
 		.then(response => {
 			let homeserver_url = response.data['m.homeserver'].base_url;
@@ -114,12 +114,12 @@ export default function Login() {
 	}
 
 	async function handleSignInClick() {
-		
+
 		// Homeserver url is invalid
 		if(disableFields){
 			return;
 		}
-		
+
 		if(userField === '' || password === ''){
 			setErrorMessage("Input Fields are empty");
 			return;
@@ -160,7 +160,7 @@ export default function Login() {
 		}
 		const baseUrl = validateAndReturnURL(homeServer);
 		const fullUrl = new URL('/_matrix/client/v3/login', baseUrl);
-	
+
 		await axios.post(fullUrl, {
 			type: "m.login.password",
 			identifier: identifier,
@@ -190,7 +190,7 @@ export default function Login() {
 				<div className="flex content-center items-center justify-center h-full">
 					<div className="w-full lg:w-4/12 px-4">
 						<div className="relative flex flex-col min-w-0 break-words w-full shadow-lg rounded-lg bg-gray-300 border-0">
-							
+
 							{/* First half of login componenet */}
 							<div className="rounded-t mb-0 px-6 py-6">
 								<div className="text-center mb-3">
@@ -208,17 +208,17 @@ export default function Login() {
 
 								{/* Button Wrapper */}
 								<SSOLogin ssoProviders={ssoProviders}/>
-								<hr className="mt-6 border-b-1 border-gray-400" />	
+								<hr className="mt-6 border-b-1 border-gray-400" />
 							</div>
 
 							{/* Second half of login componenet */}
 							<div className="flex-auto px-4 lg:px-10 py-10 pt-0">
 								<div className="text-gray-500 text-center mb-3 font-bold">
-								
+
 								<small className={ssoProviders.length > 0 ? 'font-semibold' : 'hidden'}>
 									Or sign in with credentials
 								</small>
-								
+
 								</div>
 								<form>
 									{/* Homeserver componenet */}
@@ -252,7 +252,7 @@ export default function Login() {
 											</div>
 										</div>
 									</div>
-									
+
 									{/* Select option for password based identifiers */}
 									<div className="flex items-center justify-between w-full my-4">
 										<label
@@ -262,10 +262,10 @@ export default function Login() {
 											Sign in with
 										</label>
 										<div className="">
-											<select 
+											<select
 											disabled={disableFields}
-											value={fieldType} 
-											onChange={(e) => setFieldType(e.target.value)} 
+											value={fieldType}
+											onChange={(e) => setFieldType(e.target.value)}
 											className='block px-1 py-1 rounded-md bg-white shadow border border-solid border-gray-300 text-sm focus:outline-none focus:ring disabled:opacity-50'
 											>
 												<option default value="Username">Username</option>
@@ -276,7 +276,7 @@ export default function Login() {
 									</div>
 
 									<UserField styleClassForFields={styleClassForFields} type={fieldType} setUserField={setUserField} disableFields={disableFields} phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} onUserNameBlur={usernameOnBlur} />
-									
+
 									{/* Password field */}
 									<div className="w-full mb-3">
 										<input
@@ -288,7 +288,7 @@ export default function Login() {
 										onChange={(e) => setPassword(e.target.value)}
 										/>
 									</div>
-									
+
 									{/* Sign in button */}
 									<div className="text-center mt-6">
 										<button
