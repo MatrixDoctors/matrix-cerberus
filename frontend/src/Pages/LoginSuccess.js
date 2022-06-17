@@ -2,6 +2,7 @@ import React from 'react'
 import { useSearchParams } from 'react-router-dom'
 import axios from 'axios';
 import { MatrixApi } from '../MatrixApi';
+import authenticateWithOpenId from "../HelperFunctions/authenticateWithOpenId"
 
 /**
  * This page is sent as a redirectUrl parameter when a request is sent to the '/login/sso/rediect/ endpoint.
@@ -17,11 +18,8 @@ export default function LoginSuccess() {
         const response = await new MatrixApi(homeServer).login('POST', {
             type: "m.login.token",
             token: loginToken
-        })
+        });
+        authenticateWithOpenId(response.data, "localhost:80/api/users/openid");
     }
     fetchData();
-
-    return (
-        <div>LoginSuccess</div>
-    )
 }

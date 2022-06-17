@@ -7,6 +7,7 @@ import {parsePhoneNumber} from "react-phone-number-input"
 import validateAndReturnUrl from '../HelperFunctions/validateAndReturnUrl'
 import axios from 'axios'
 import { MatrixApi } from '../MatrixApi'
+import authenticateWithOpenId from '../HelperFunctions/authenticateWithOpenId'
 
 /**
  * Login page which authenticates a user with the backend for a chosen matrix homeserver.
@@ -168,7 +169,8 @@ export default function Login() {
 		})
 		.then((resp) => {
 			const userId = resp.data.user_id;
-			setErrorMessage(`You have logged in as ${userId}`);
+			console.log(resp.data);
+			authenticateWithOpenId(resp.data, "localhost:80/api/users/openid");
 		})
 		.catch( (err) => {
 			// Login attempt has failed. The provided authentication data was incorrect.
