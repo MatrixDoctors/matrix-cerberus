@@ -11,6 +11,7 @@ import axios from 'axios'
 
 export default function Login() {
 	const default_homeserver = 'matrix.org';
+	localStorage.setItem("homeServer", "https://matrix.org");
 
 	// Used to set the Identifier type for password based login
 	const [fieldType, setFieldType] = useState('Username');
@@ -28,7 +29,6 @@ export default function Login() {
 	// Updated after save button is clicked
 	const [homeServer, setHomeServer] = useState(default_homeserver);
 
-	// List of available SSO providers
 	const [ssoProviders, setSSOProviders] = useState([]);
 	const [errorMessage, setErrorMessage] = useState('');
 
@@ -44,10 +44,11 @@ export default function Login() {
 	// Fetches the available login types for a particular homeserver. Defaults to 'matrix.org'
 	useEffect(() => {
 		const fetchData = async () => {
-			const baseUrl = validateAndReturnUrl(homeServer);
-			const endpoint = "/_matrix/client/v3/login";
-			const fullUrl = new URL(endpoint, baseUrl);
 			try {
+				const baseUrl = validateAndReturnUrl(homeServer);
+				const endpoint = "/_matrix/client/v3/login";
+				const fullUrl = new URL(endpoint, baseUrl);
+
 				let response = await axios.get(fullUrl);
 				let listOfSSOProviders = [];
 				for(let flowItem of response.data.flows){
@@ -102,7 +103,6 @@ export default function Login() {
 			setHomeServer(homeserver_url);
 			setInputHomeServer(homeserver_url);
 
-			//Setting the value in local storage
 			localStorage.setItem('homeServer', homeserver_url);
 			// Removes the error message the next time auto discovery is successful
 			setErrorMessage('');
@@ -204,7 +204,7 @@ export default function Login() {
 								</div>
 
 								{/* Button Wrapper */}
-								<SSOLogin ssoProviders={ssoProviders} homeServer={homeServer} />
+								<SSOLogin ssoProviders={ssoProviders} />
 								<hr className="mt-6 border-b-1 border-gray-400" />
 							</div>
 
@@ -233,6 +233,7 @@ export default function Login() {
 											value={inputHomeServer}
 											style={{ transition: "all .15s ease" }}
 											onChange={(e) => {
+												e.preventDefault();
 												setInputHomeServer(e.target.value);
 												setDisableSave(!e.target.value);
 											}}/>

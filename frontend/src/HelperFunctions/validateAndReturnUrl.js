@@ -1,7 +1,22 @@
 export default function validateAndReturnUrl(url) {
-	var pattern = /^((http|https):\/\/)/;
-	if(!pattern.test(url)) {
-		url = "https://" + url;
+	let validUrl;
+	// Check for protocol.
+	try {
+		validUrl = new URL(url);
 	}
-	return url;
+	catch {
+		validUrl = "https://" + url;
+		validUrl = new URL(validUrl);
+	}
+
+	if (validUrl.protocol !==  "http:" &&  validUrl.protocol !==  "https:") {
+		throw new Error("Invalid URL protocol");
+	}
+
+	// URL().href returns a url with a trailing '/'
+	if (validUrl.origin + '/' !== validUrl.href){
+		throw new Error("Invalid Homeserver URL");
+	}
+
+	return validUrl.origin;
 }

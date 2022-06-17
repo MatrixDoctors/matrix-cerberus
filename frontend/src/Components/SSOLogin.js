@@ -14,7 +14,7 @@ const Images = {
 function AuthButton({ idp, homeServer }){
 
 	async function handleClick() {
-		const baseUrl = validateAndReturnUrl(homeServer);
+		const baseUrl = homeServer;
 		const redirectUrl = 'http://localhost:80/login-success'
 		const endpoint = '_matrix/client/v3/login/sso/redirect/' + idp.id + '?redirectUrl=' + redirectUrl;
 		const fullUrl = new URL(endpoint, baseUrl);
@@ -22,7 +22,14 @@ function AuthButton({ idp, homeServer }){
 		window.location.href = fullUrl;
 	}
 
-	const imgUrl = parseImageUrl(homeServer, idp.icon);
+	let imgUrl, name = idp.name.toLowerCase();
+	if(name in Images) {
+		imgUrl = Images[name];
+	}
+	else {
+		imgUrl = parseImageUrl(homeServer, idp.icon);
+		imgUrl = imgUrl.href;
+	}
 
 	return (
 		<button
@@ -34,7 +41,7 @@ function AuthButton({ idp, homeServer }){
 			<img
 			alt="..."
 			className="h-full w-full mr-1"
-			src={imgUrl.href}
+			src={imgUrl}
 			/>
 		</button>
 	)
@@ -50,19 +57,18 @@ AuthButton.propTypes = {
 	homeServer: PropTypes.string
 }
 
-export default function SSOLogin({ ssoProviders, homeServer }) {
+export default function SSOLogin({ ssoProviders }) {
+	const homeServer = localStorage.getItem("homeServer");
 	return (
-		<div className={ssoProviders.length > 0 ? '' : 'hidden'}>
-			<div className="btn-wrapper flex items-center justify-center">
-				{ssoProviders.map((value) => {
-					return <AuthButton idp={value} homeServer={homeServer} key={value.id} />
-				})}
-			</div>
+		<div className="btn-wrapper flex items-center justify-center">
+			{ssoProviders.map((value) => {
+				return <AuthButton idp={value} homeServer={homeServer} key={value.id} />
+			})}
 		</div>
 	)
 }
 
 SSOLogin.propTypes = {
 	ssoProviders: PropTypes.array,
-	homeServer: PropTypes.string
+	homeServer: PropTypes.string,
 }
