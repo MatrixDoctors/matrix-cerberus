@@ -86,12 +86,12 @@ export default function Login() {
 		// Extract server name from username
 		let server_name = userName.split(':')[1];
 		server_name = validateAndReturnUrl(server_name);
-	
+
 		// Extract host name from server name
 		let hostName = new URL(server_name).hostname;
 		hostName = validateAndReturnUrl(hostName);
-	
-		const url = new URL('.well-known/matrix/client', hostName);	
+
+		const url = new URL('.well-known/matrix/client', hostName);
 		await axios.get(url)
 		.then(response => {
 			let homeserver_url = response.data['m.homeserver'].base_url;
@@ -205,7 +205,7 @@ export default function Login() {
 
 								{/* Button Wrapper */}
 								<SSOLogin ssoProviders={ssoProviders} homeServer={homeServer} />
-								<hr className="mt-6 border-b-1 border-gray-400" />	
+								<hr className="mt-6 border-b-1 border-gray-400" />
 							</div>
 
 							{/* Second half of login componenet */}

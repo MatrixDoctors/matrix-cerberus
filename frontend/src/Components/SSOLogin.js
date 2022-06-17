@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
+import validateAndReturnUrl from '../HelperFunctions/validateAndReturnUrl';
+import parseImageUrl from '../HelperFunctions/parseImageUrl';
 
 const Images = {
 	'apple': require('../assets/img/apple.svg').default,
@@ -8,8 +10,6 @@ const Images = {
 	'google': require('../assets/img/google.svg').default,
 	'gitlab': require('../assets/img/gitlab.svg').default
 }
-import validateAndReturnUrl from '../HelperFunctions/validateAndReturnUrl';
-import parseImageUrl from '../HelperFunctions/parseImageUrl';
 
 function AuthButton({ idp, homeServer }){
 
@@ -41,7 +41,13 @@ function AuthButton({ idp, homeServer }){
 }
 
 AuthButton.propTypes = {
-	imgUrl: PropTypes.string
+	idp: PropTypes.shape({
+		id: PropTypes.string,
+		icon: PropTypes.string,
+		brand: PropTypes.string,
+		name: PropTypes.string
+	}),
+	homeServer: PropTypes.string
 }
 
 export default function SSOLogin({ ssoProviders, homeServer }) {
@@ -57,5 +63,6 @@ export default function SSOLogin({ ssoProviders, homeServer }) {
 }
 
 SSOLogin.propTypes = {
-	ssoProviders: PropTypes.array
+	ssoProviders: PropTypes.array,
+	homeServer: PropTypes.string
 }
