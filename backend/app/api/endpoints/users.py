@@ -32,7 +32,7 @@ async def verify_openid(request: Request, open_id_info: OpenIdInfo):
                 raise HTTPException(status_code=404, detail="Invalid token")
             data = await resp.json()
             response = JSONResponse({"message": "success"})
-            response = fastapi_sessions.create_session(request, response)
+            response = fastapi_sessions.create_session(request)
             return response
     except aiohttp.ClientConnectionError as err:
         raise HTTPException(status_code=500, detail="Internal server error")
@@ -41,7 +41,7 @@ async def verify_openid(request: Request, open_id_info: OpenIdInfo):
 @router.post("/login")
 async def login(request: Request):
     response = JSONResponse({"message": "successfully logged in"})
-    response = fastapi_sessions.create_session(request, response)
+    response = fastapi_sessions.create_session(response)
     return response
 
 
@@ -56,16 +56,16 @@ async def logout(request: Request):
 async def change_tokens(request: Request, name: str):
     data = fastapi_sessions.get_session(request)
     data["matrix_user"] = f"{name}"
+    fastapi_sessions.set_session(request, data)
     response = JSONResponse({"message": "success"})
-    response = fastapi_sessions.set_session(request, response, data)
     return response
 
 
 @router.post("/printToken")
 async def change_tokens(request: Request):
     data = fastapi_sessions.get_session(request)
+    fastapi_sessions.set_session(request, data)
     response = JSONResponse({"matrix_user": f"{data['matrix_user']}"})
-    response = fastapi_sessions.set_session(request, response, data)
     return response
 
 
