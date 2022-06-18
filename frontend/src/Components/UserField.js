@@ -3,7 +3,10 @@ import PropTypes from 'prop-types'
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
 
-export default function UserField({ styleClassForFields, type, setUserField, disableFields, phoneNumber, setPhoneNumber, onUserNameBlur}) {
+export default function UserField({ type, setUserField, disableFields, phoneNumber, setPhoneNumber, onUserNameBlur}) {
+	const styles = {
+		transition: "all .15s ease"
+	};
 
 	switch (type) {
 		case 'Email address': {
@@ -12,9 +15,9 @@ export default function UserField({ styleClassForFields, type, setUserField, dis
 					<input
 					disabled={disableFields}
 					type="email"
-					className={styleClassForFields}
+					className="field-input w-full"
 					placeholder="Email"
-					style={{ transition: "all .15s ease" }}
+					style={styles}
 					onChange={(e) => setUserField(e.target.value)}
 					/>
 				</div>
@@ -42,9 +45,9 @@ export default function UserField({ styleClassForFields, type, setUserField, dis
 					<input
 					disabled={disableFields}
 					type="username"
-					className={styleClassForFields}
+					className="field-input w-full"
 					placeholder="Username"
-					style={{ transition: "all .15s ease" }}
+					style={styles}
 					onBlur={onUserNameBlur}
 					onChange={(e) => setUserField(e.target.value)}
 					/>
@@ -55,7 +58,6 @@ export default function UserField({ styleClassForFields, type, setUserField, dis
 }
 
 UserField.propTypes = {
-	styleClassForFields: PropTypes.string,
 	type: PropTypes.string,
 	setUserField: PropTypes.func,
 	disableFields: PropTypes.bool,

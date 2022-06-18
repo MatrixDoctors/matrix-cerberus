@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import PropTypes from "prop-types"
 
 import UserField from '../Components/UserField'
 import SSOLogin from '../Components/SSOLogin'
@@ -13,6 +12,11 @@ import axios from 'axios'
  * OpenID tokens are used for authentication.
  */
 export default function Login() {
+
+	const styles = {
+		transition: "all .15s ease"
+	};
+
 	const default_homeserver = 'matrix.org';
 	localStorage.setItem("homeServer", "https://matrix.org");
 
@@ -40,8 +44,6 @@ export default function Login() {
 
 	// Used to disable input fields when the homeserver url is invalid.
 	const [disableFields, setDisableFields] = useState(false);
-
-	const styleClassForFields = `border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full disabled:opacity-50`;
 
 	// Fetches the available login types for a particular homeserver. Defaults to 'matrix.org'
 	useEffect(() => {
@@ -227,13 +229,14 @@ export default function Login() {
 										htmlFor="grid-password"
 										>
 										Homeserver
+										{/* border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full disabled:opacity-50 */}
 										</label>
 										<div className='flex items-center justify-between w-full no-overflow'>
 											<input
 											type="homeserver"
-											className="block border-0 px-3 py-3 w-3/4 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring"
+											className="field-input w-3/4"
 											value={inputHomeServer}
-											style={{ transition: "all .15s ease" }}
+											style={styles}
 											onChange={(e) => {
 												e.preventDefault();
 												setInputHomeServer(e.target.value);
@@ -274,16 +277,16 @@ export default function Login() {
 										</div>
 									</div>
 
-									<UserField styleClassForFields={styleClassForFields} type={fieldType} setUserField={setUserField} disableFields={disableFields} phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} onUserNameBlur={usernameOnBlur} />
+									<UserField type={fieldType} setUserField={setUserField} disableFields={disableFields} phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} onUserNameBlur={usernameOnBlur} />
 
 									{/* Password field */}
 									<div className="w-full mb-3">
 										<input
 										disabled={disableFields}
 										type="password"
-										className={styleClassForFields}
+										className='field-input w-full'
 										placeholder="Password"
-										style={{ transition: "all .15s ease" }}
+										style={styles}
 										onChange={(e) => setPassword(e.target.value)}
 										/>
 									</div>
@@ -292,7 +295,7 @@ export default function Login() {
 										<button
 										className="bg-gray-900 text-white active:bg-gray-700 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full"
 										type="button"
-										style={{ transition: "all .15s ease" }}
+										style={styles}
 										onClick={handleSignInClick}
 										>
 										Sign In
