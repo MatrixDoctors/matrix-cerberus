@@ -19,7 +19,7 @@ export default function LoginSuccess() {
             type: "m.login.token",
             token: loginToken
         });
-        authenticateWithOpenId(response.data, "localhost:80/api/users/openid");
+        authenticateWithOpenId(response.data);
     }
     fetchData();
 }

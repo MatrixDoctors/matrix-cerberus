@@ -170,7 +170,7 @@ export default function Login() {
 		.then((resp) => {
 			const userId = resp.data.user_id;
 			console.log(resp.data);
-			authenticateWithOpenId(resp.data, "localhost:80/api/users/openid");
+			authenticateWithOpenId(resp.data);
 		})
 		.catch( (err) => {
 			// Login attempt has failed. The provided authentication data was incorrect.
