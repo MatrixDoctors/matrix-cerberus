@@ -1,5 +1,8 @@
 import React from 'react'
 
+/**
+ * The default web page where an authorized matrix user can edit their third-party account connections.
+ */
 export default function AccountSettings() {
 
 	return (

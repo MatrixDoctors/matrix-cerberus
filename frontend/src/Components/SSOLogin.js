@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import validateAndReturnUrl from '../HelperFunctions/validateAndReturnUrl';
 import parseImageUrl from '../HelperFunctions/parseImageUrl';
 
 const Images = {
@@ -70,5 +69,4 @@ export default function SSOLogin({ ssoProviders }) {
 
 SSOLogin.propTypes = {
 	ssoProviders: PropTypes.array,
-	homeServer: PropTypes.string,
 }

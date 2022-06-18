@@ -57,9 +57,9 @@ export default function UserField({ styleClassForFields, type, setUserField, dis
 UserField.propTypes = {
 	styleClassForFields: PropTypes.string,
 	type: PropTypes.string,
-	setUserField: PropTypes.any,
+	setUserField: PropTypes.func,
 	disableFields: PropTypes.bool,
 	phoneNumber: PropTypes.string,
-	setPhoneNumber: PropTypes.any,
-	onUserNameBlur: PropTypes.any
+	setPhoneNumber: PropTypes.func,
+	onUserNameBlur: PropTypes.func
 }

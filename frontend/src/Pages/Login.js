@@ -8,7 +8,10 @@ import {parsePhoneNumber} from "react-phone-number-input"
 import validateAndReturnUrl from '../HelperFunctions/validateAndReturnUrl'
 import axios from 'axios'
 
-
+/**
+ * Login page which authenticates a user with the backend for a chosen matrix homeserver.
+ * OpenID tokens are used for authentication.
+ */
 export default function Login() {
 	const default_homeserver = 'matrix.org';
 	localStorage.setItem("homeServer", "https://matrix.org");
@@ -17,13 +20,12 @@ export default function Login() {
 	const [fieldType, setFieldType] = useState('Username');
 	const [userField, setUserField] = useState('');
 
-	// State variable to store the complete phone number including the country calling code with no '+'.
-	//Ex: 919676765xxxxx (India (91) )
+	// State variable to store the complete phone number including the country calling code without '+'.
+	//Ex: 919676765xxxxx (India:- +91)
 	const [phoneNumber, setPhoneNumber] = useState('');
 
 	const [password, setPassword] = useState('');
 
-	// Updated every time the homeserver input text is changed.
 	const [inputHomeServer, setInputHomeServer] = useState('matrix.org');
 
 	// Updated after save button is clicked
