@@ -6,6 +6,7 @@ from fastapi import Request, Response
 from redis import Redis
 
 from app.core.config import settings
+from app.core.models import ServerSessionData
 
 
 def generate_id() -> str:
@@ -62,9 +63,8 @@ class SessionCookie:
         self.session_key = settings.server_sessions.session_key
         self.expires_in = settings.server_sessions.expires_in
 
-    def create_session(self, response: Response):
+    def create_session(self, response: Response, data: ServerSessionData = ServerSessionData()):
         session_id = self.session_storage.generate_session_id()
-        data = {"matrix_user": None, "access_token": None}
         self.session_storage.set_item_with_expiry_time(
             key=session_id, value=data, expires_in=self.expires_in
         )
@@ -85,7 +85,7 @@ class SessionCookie:
         session_id = self.get_session_id(request)
         return self.session_storage[session_id]
 
-    def set_session(self, request: Request, data):
+    def set_session(self, request: Request, data: ServerSessionData):
         session_id = self.get_session_id(request)
         self.session_storage.set_item_with_expiry_time(
             key=session_id, value=data, expires_in=self.expires_in
