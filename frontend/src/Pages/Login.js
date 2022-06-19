@@ -6,6 +6,7 @@ import SSOLogin from '../Components/SSOLogin'
 import {parsePhoneNumber} from "react-phone-number-input"
 import validateAndReturnUrl from '../HelperFunctions/validateAndReturnUrl'
 import axios from 'axios'
+import { MatrixApi } from '../MatrixApi'
 
 /**
  * Login page which authenticates a user with the backend for a chosen matrix homeserver.
@@ -50,10 +51,8 @@ export default function Login() {
 		const fetchData = async () => {
 			try {
 				const baseUrl = validateAndReturnUrl(homeServer);
-				const endpoint = "/_matrix/client/v3/login";
-				const fullUrl = new URL(endpoint, baseUrl);
+				let response = await new MatrixApi(baseUrl).login('GET');
 
-				let response = await axios.get(fullUrl);
 				let listOfSSOProviders = [];
 				for(let flowItem of response.data.flows){
 					if(flowItem.type === 'm.login.sso'){
@@ -96,8 +95,7 @@ export default function Login() {
 		let hostName = new URL(server_name).hostname;
 		hostName = validateAndReturnUrl(hostName);
 
-		const url = new URL('.well-known/matrix/client', hostName);
-		await axios.get(url)
+		await new MatrixApi(hostName).wellKnown('GET')
 		.then(response => {
 			let homeserver_url = response.data['m.homeserver'].base_url;
 			if (homeserver_url === undefined){
@@ -162,8 +160,8 @@ export default function Login() {
 				}
 		}
 		const baseUrl = validateAndReturnUrl(homeServer);
-		const fullUrl = new URL('/_matrix/client/v3/login', baseUrl);
-		await axios.post(fullUrl, {
+
+		await new MatrixApi(baseUrl).login('POST', {
 			type: "m.login.password",
 			identifier: identifier,
 			password: password

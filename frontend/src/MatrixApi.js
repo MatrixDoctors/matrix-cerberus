@@ -1,0 +1,42 @@
+import axios from "axios";
+
+export class MatrixApi {
+    constructor(baseUrl) {
+        this._baseUrl = baseUrl;
+    }
+
+    login(type, data = {}) {
+        const fullUrl = new URL("/_matrix/client/v3/login", this._baseUrl);
+        switch(type) {
+            case "GET": {
+                return axios.get(fullUrl);
+            }
+
+            case "POST": {
+                return axios.post(fullUrl, data);
+            }
+        }
+    }
+
+    wellKnown(type, data={}) {
+        const fullUrl = new URL(".well-known/matrix/client", this._baseUrl);
+        switch(type) {
+            case "GET": {
+                return axios.get(fullUrl);
+            }
+        }
+    }
+
+    parseMedia(mxcUrl) {
+        const [serverName, mediaId] = mxcUrl.replace('mxc://', '').split('/');
+        const endpoint = `_matrix/media/v3/download/${serverName}/${mediaId}`;
+
+        return new URL(endpoint, this._baseUrl);
+    }
+
+    ssoRedirectUrl(id, redirectUrl){
+		const endpoint = '_matrix/client/v3/login/sso/redirect/' + id + '?redirectUrl=' + redirectUrl;
+		const imgUrl =  new URL(endpoint, this._baseUrl);
+        return imgUrl.href;
+    }
+}

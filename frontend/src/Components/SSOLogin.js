@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import parseImageUrl from '../HelperFunctions/parseImageUrl';
+import { MatrixApi } from '../MatrixApi';
 
 const Images = {
 	'apple': require('../assets/img/apple.svg').default,
@@ -13,12 +14,8 @@ const Images = {
 function AuthButton({ idp, homeServer }){
 
 	async function handleClick() {
-		const baseUrl = homeServer;
 		const redirectUrl = 'http://localhost:80/login-success'
-		const endpoint = '_matrix/client/v3/login/sso/redirect/' + idp.id + '?redirectUrl=' + redirectUrl;
-		const fullUrl = new URL(endpoint, baseUrl);
-
-		window.location.href = fullUrl;
+		window.location.href = new MatrixApi(homeServer).ssoRedirectUrl(idp.id, redirectUrl);
 	}
 
 	let imgUrl, name = idp.name.toLowerCase();
@@ -26,8 +23,7 @@ function AuthButton({ idp, homeServer }){
 		imgUrl = Images[name];
 	}
 	else {
-		imgUrl = parseImageUrl(homeServer, idp.icon);
-		imgUrl = imgUrl.href;
+		imgUrl = new MatrixApi(homeServer).parseMedia(idp.icon);
 	}
 
 	return (
