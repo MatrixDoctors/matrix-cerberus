@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import React from 'react'
-import parseImageUrl from '../HelperFunctions/parseImageUrl';
 import { MatrixApi } from '../MatrixApi';
 
 const Images = {
