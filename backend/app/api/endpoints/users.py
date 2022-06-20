@@ -8,7 +8,7 @@ from starlette.responses import JSONResponse, RedirectResponse, Response
 
 from app.api.deps import fastapi_sessions
 from app.api.models import OpenIdInfo
-from app.core.aiohttp_session import AioHttpSession
+from app.core.http_client import http_client
 from app.core.models import ServerSessionData
 
 router = APIRouter()
@@ -21,13 +21,12 @@ async def message_users():
 
 @router.post("/verify-openid")
 async def verify_openid(request: Request, open_id_info: OpenIdInfo):
-    session = AioHttpSession().session
     matrix_homeserver = "https://" + open_id_info.matrix_server_name
     params = {"access_token": open_id_info.access_token}
     url = urljoin(matrix_homeserver, "/_matrix/federation/v1/openid/userinfo")
 
     try:
-        async with session.get(url, params=params) as resp:
+        async with http_client.session.get(url, params=params) as resp:
             if resp.status != 200:
                 raise HTTPException(status_code=404, detail="Invalid token")
             data = await resp.json()
