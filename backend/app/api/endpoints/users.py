@@ -1,5 +1,3 @@
-import typing as t
-from urllib import response
 from urllib.parse import urljoin
 
 import aiohttp
@@ -40,13 +38,6 @@ async def verify_openid(request: Request, open_id_info: OpenIdInfo):
 
     except aiohttp.ClientConnectionError as err:
         raise HTTPException(status_code=500, detail="Internal server error")
-
-
-@router.post("/login")
-async def login(request: Request):
-    response = JSONResponse({"message": "successfully logged in"})
-    response = fastapi_sessions.create_session(response)
-    return response
 
 
 @router.post("/logout")
