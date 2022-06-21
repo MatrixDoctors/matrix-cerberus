@@ -46,6 +46,10 @@ TableRows.propTypes = {
   values: PropTypes.arrayOf(PropTypes.object)
 }
 
+/**
+ * This page lists out all the rooms for which the user is an admin.
+ * (Under the assumption that the bot account is also an admin for the same)
+ */
 export default function RoomSettings() {
 
   // Dummy data for tables
