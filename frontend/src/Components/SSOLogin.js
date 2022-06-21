@@ -7,7 +7,8 @@ const Images = {
 	'github': require('../assets/img/github.svg').default,
 	'facebook': require('../assets/img/facebook.svg').default,
 	'google': require('../assets/img/google.svg').default,
-	'gitlab': require('../assets/img/gitlab.svg').default
+	'gitlab': require('../assets/img/gitlab.svg').default,
+	'default': require('../assets/img/globe-wire.svg').default
 }
 
 function AuthButton({ idp, homeServer }){
@@ -27,15 +28,20 @@ function AuthButton({ idp, homeServer }){
 
 	return (
 		<button
+			title={idp.name}
 			className="block h-7 w-7 mx-4 rounded-full overflow-hidden border-2 border-gray-300 hover:border-white"
 			type="button"
 			onClick={handleClick}
 			style={{ transition: "all .15s ease" }}
 		>
 			<img
-			alt="..."
 			className="h-full w-full mr-1"
 			src={imgUrl}
+			onError={(e) => {
+				if(e.target.src !== Images['default']){
+					e.target.src = Images['default'];
+				}
+			}}
 			/>
 		</button>
 	)

@@ -18,8 +18,8 @@ export default function Login() {
 		transition: "all .15s ease"
 	};
 
-	const default_homeserver = 'matrix.org';
-	localStorage.setItem("homeServer", "https://matrix.org");
+	const default_homeserver = 'https://matrix.org';
+	localStorage.setItem("homeServer", default_homeserver);
 
 	// Used to set the Identifier type for password based login
 	const [fieldType, setFieldType] = useState('Username');
@@ -31,7 +31,7 @@ export default function Login() {
 
 	const [password, setPassword] = useState('');
 
-	const [inputHomeServer, setInputHomeServer] = useState('matrix.org');
+	const [inputHomeServer, setInputHomeServer] = useState(default_homeserver);
 
 	// Updated after save button is clicked
 	const [homeServer, setHomeServer] = useState(default_homeserver);
