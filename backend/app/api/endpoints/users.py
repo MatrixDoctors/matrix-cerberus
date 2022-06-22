@@ -29,7 +29,9 @@ async def verify_openid(request: Request, open_id_info: OpenIdInfo):
                 raise HTTPException(status_code=404, detail="Invalid token")
             data = await resp.json()
 
-            server_session_data = ServerSessionData(matrix_user=data["sub"])
+            server_session_data = ServerSessionData(
+                matrix_user=data["sub"], matrix_homeserver=matrix_homeserver
+            )
 
             response = JSONResponse({"message": "success"})
             # Creating a server session with the matrix username.

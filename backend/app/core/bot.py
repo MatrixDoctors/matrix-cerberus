@@ -70,6 +70,7 @@ class BaseBotClient(AsyncClient):
             print(resp.status)
             data = await resp.json()
             data = parse_events(type, data)
+            return data
 
     async def put_account_data(self, type: str, matrix_homeserver: str, data):
         access_token = self.access_token
@@ -78,4 +79,4 @@ class BaseBotClient(AsyncClient):
         url = urljoin(
             matrix_homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{type}"
         )
-        await http_client.session.put(url=url, headers=headers, data=json.dumps(data))
+        await http_client.session.put(url=url, headers=headers, data=data.json())
