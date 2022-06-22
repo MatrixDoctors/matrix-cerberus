@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Optional
 
 from pydantic import BaseModel
 
@@ -12,3 +12,12 @@ class ServerSessionData(BaseModel):
     matrix_user: Optional[str] = None
     github_access_token: Optional[str] = None
     patreon_access_token: Optional[str] = None
+
+
+class RoomUrlObject(BaseModel):
+    room_id: str
+    use_once_only: bool
+
+
+class ExternalUrlData(BaseModel):
+    content: Dict[str, RoomUrlObject]

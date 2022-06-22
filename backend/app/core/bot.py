@@ -1,11 +1,14 @@
-import sys
+import json
 from typing import Optional
 from asyncio import exceptions
+from urllib.parse import urljoin
 
 from nio import AsyncClient, AsyncClientConfig, InviteEvent, MatrixRoom, RoomMessageText
 from nio.responses import WhoamiResponse
 
 from app.core.config import settings
+from app.core.http_client import http_client
+from app.core.parse_events import parse_events
 
 
 class BaseBotClient(AsyncClient):
@@ -56,3 +59,23 @@ class BaseBotClient(AsyncClient):
             )
         except exceptions as err:
             print(err)
+
+    async def get_account_data(self, type: str, matrix_homeserver: str):
+        access_token = self.access_token
+        headers = {"Authorization": f"Bearer {access_token}"}
+        url = urljoin(
+            matrix_homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{type}"
+        )
+        async with http_client.session.get(url=url, headers=headers) as resp:
+            print(resp.status)
+            data = await resp.json()
+            data = parse_events(type, data)
+
+    async def put_account_data(self, type: str, matrix_homeserver: str, data):
+        access_token = self.access_token
+        data = parse_events(type, data)
+        headers = {"Authorization": f"Bearer {access_token}"}
+        url = urljoin(
+            matrix_homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{type}"
+        )
+        await http_client.session.put(url=url, headers=headers, data=json.dumps(data))
