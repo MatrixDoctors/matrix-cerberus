@@ -1,8 +1,8 @@
 from urllib.parse import urljoin
 
 import aiohttp
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, encoders
-from starlette.responses import JSONResponse, RedirectResponse, Response
+from fastapi import APIRouter, HTTPException, Request
+from starlette.responses import JSONResponse, RedirectResponse
 
 from app.api.deps import fastapi_sessions
 from app.api.models import OpenIdInfo

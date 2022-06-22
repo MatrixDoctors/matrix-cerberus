@@ -9,3 +9,9 @@ api_router.include_router(
     prefix="/users",
     tags=["users"],
 )
+
+api_router.include_router(
+    users.router,
+    prefix="/external-url",
+    tags=["external url"],
+)
