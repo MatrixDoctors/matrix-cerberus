@@ -21,4 +21,11 @@ class RoomUrlObject(BaseModel):
 
 
 class ExternalUrlData(BaseModel):
+    """
+    Pydantic model used to evaluate account data for '<app_name>.external_url' event type.
+
+    Attributes:
+    'content' is a mapping between 'url_code' (string of length 8) and RoomUrlObject.
+    """
+
     content: Dict[str, RoomUrlObject] = dict()

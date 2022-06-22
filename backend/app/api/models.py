@@ -11,3 +11,12 @@ class OpenIdInfo(BaseModel):
     expires_in: int
     matrix_server_name: str
     token_type: str
+
+
+class ExternalUrlInfo(BaseModel):
+    """
+    Pydantic model used to validate external url information required to generate a url.
+    """
+
+    room_id: str
+    use_once_only: bool
