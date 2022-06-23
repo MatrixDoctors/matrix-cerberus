@@ -8,6 +8,7 @@ import ServerSettings from './Pages/ServerSettings';
 import Login from './Pages/Login';
 import LoginSuccess from './Pages/LoginSuccess';
 import ErrorPage from './Pages/ErrorPage';
+import ExternalUrl from './Pages/ExternalUrl';
 
 function LayoutsWithNavbar() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/login-success" element={<LoginSuccess/>} />
         </Route>
 
+        <Route path="/i/:url_code" element={<ExternalUrl />} />
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<ErrorPage/>} />
       </Routes>
