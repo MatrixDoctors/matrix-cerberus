@@ -60,7 +60,7 @@ class BaseBotClient(AsyncClient):
         except exceptions as err:
             print(err)
 
-    async def get_account_data(self, type: str, matrix_homeserver: str):
+    async def get_account_data(self, type: str, matrix_homeserver: str, **additional_type_data):
         access_token = self.access_token
         headers = {"Authorization": f"Bearer {access_token}"}
         url = urljoin(
@@ -69,12 +69,14 @@ class BaseBotClient(AsyncClient):
         async with http_client.session.get(url=url, headers=headers) as resp:
             print(resp.status)
             data = await resp.json()
-            data = parse_events(type, data)
+            data = parse_events(type, data, **additional_type_data)
             return data
 
-    async def put_account_data(self, type: str, matrix_homeserver: str, data):
+    async def put_account_data(
+        self, type: str, matrix_homeserver: str, data, **additional_type_data
+    ):
         access_token = self.access_token
-        data = parse_events(type, data)
+        data = parse_events(type, data, **additional_type_data)
         headers = {"Authorization": f"Bearer {access_token}"}
         url = urljoin(
             matrix_homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{type}"
