@@ -15,6 +15,7 @@ class MatrixBotBackgroundRunner:
             # Fetch next batch token stored in redis
             self.client.next_batch = session_storage["next_batch_token"]
             await self.client.login()
+            await self.client.create_room_to_external_url_mapping()
             await self.client.sync_forever(
                 30000,
                 since=self.client.next_batch,

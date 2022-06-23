@@ -32,6 +32,10 @@ class ExternalUrlData(BaseModel):
 
 
 class RoomSpecificExternalUrl(BaseModel):
+    """
+    Pydantic class used to instantiate 'room_to_external_url_mapping' object for a particular room id in BaseBotClient class.
+    """
+
     permanent: str = None
     temporary: Set[str] = set()
 
@@ -41,12 +45,12 @@ class RoomConditionsData(BaseModel):
     RoomConditionsData class which handles conditions and data related to a specific room.
 
     Attributes:
-    'external_url' consists of "permanent" and "single-use" external url tokens.
     'github' has room invite conditions for GitHub users and sponsors.
     'patreon` has room invite conditions for Patreon users.
     """
 
-    external_url: RoomSpecificExternalUrl = RoomSpecificExternalUrl()
+    github: None = None
+    patreon: None = None
 
 
 class RoomSpecificData(BaseModel):

@@ -8,6 +8,7 @@ from nio.responses import WhoamiResponse
 
 from app.core.config import settings
 from app.core.http_client import http_client
+from app.core.models import RoomSpecificExternalUrl
 from app.core.parse_events import parse_events
 
 
@@ -29,6 +30,8 @@ class BaseBotClient(AsyncClient):
 
         # print all the messages we receive to console
         self.add_event_callback(self.cb_print_messages, RoomMessageText)
+
+        self.room_to_external_url_mapping = {}
 
     async def login(self) -> None:
         self.access_token = settings.matrix_bot.access_token
@@ -80,3 +83,16 @@ class BaseBotClient(AsyncClient):
             self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{type}"
         )
         await http_client.session.put(url=url, headers=headers, data=data.json())
+
+    async def create_room_to_external_url_mapping(self):
+        data = await self.get_account_data("matrix-cerberus.external_url")
+        external_url_data = data.content
+
+        for url_code, value in external_url_data.items():
+            if value.room_id not in self.room_to_external_url_mapping:
+                self.room_to_external_url_mapping[value.room_id] = RoomSpecificExternalUrl()
+
+            if value.use_once_only:
+                self.room_to_external_url_mapping[value.room_id].temporary.add(url_code)
+            else:
+                self.room_to_external_url_mapping[value.room_id].permanent = url_code
