@@ -70,7 +70,6 @@ class BaseBotClient(AsyncClient):
             self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{type}"
         )
         async with http_client.session.get(url=url, headers=headers) as resp:
-            print(resp.status)
             data = await resp.json()
             data = parse_events(type, data, **additional_type_data)
             return data
