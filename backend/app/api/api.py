@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.api.endpoints import external_url, users
-from app.matrix.external_url import ExternalUrl
+from app.matrix.external_url import ExternalUrlAPI
 
 api_router = APIRouter()
 
@@ -15,5 +15,5 @@ api_router.include_router(
     external_url.router,
     prefix="/external-url",
     tags=["external url"],
-    dependencies=[Depends(ExternalUrl)],
+    dependencies=[Depends(ExternalUrlAPI)],
 )

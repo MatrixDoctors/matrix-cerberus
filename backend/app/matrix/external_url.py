@@ -5,9 +5,9 @@ from app.core.background_runner import matrix_bot_runner
 from app.core.models import RoomSpecificExternalUrl
 
 
-class ExternalUrl:
+class ExternalUrlAPI:
     """
-    ExternalUrl class which abstracts out the interactions between the Bot Client and the API routes.
+    ExternalUrlAPI class which abstracts out the interactions between the Bot Client and the API routes.
     """
 
     def __init__(self):
@@ -49,7 +49,6 @@ class ExternalUrl:
         """
         data = await matrix_bot_runner.client.get_account_data(self._event_type)
         external_url_data = data.content
-        print(data)
 
         url_code = self._generate_url_code()
         while url_code in external_url_data:
@@ -69,7 +68,6 @@ class ExternalUrl:
         """
         data = await matrix_bot_runner.client.get_account_data(self._event_type)
         external_url_data = data.content
-        print(data)
 
         if url_code not in external_url_data:
             return False
@@ -99,7 +97,6 @@ class ExternalUrl:
         data = await matrix_bot_runner.client.get_account_data(self._event_type)
         external_url_data = data.content
         room_url_object = external_url_data[url_code]
-        print(data)
 
         # Generate new url and use the old data
         new_url_code = self._generate_url_code()
