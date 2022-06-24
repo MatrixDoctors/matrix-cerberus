@@ -1,5 +1,5 @@
-import random
 import string
+import secrets
 
 from app.core.background_runner import matrix_bot_runner
 from app.core.models import RoomSpecificExternalUrl
@@ -15,7 +15,7 @@ class ExternalUrlAPI:
         self._event_type = "matrix-cerberus.external_url"
 
     def _generate_url_code(self, N: int = 8):
-        return "".join(random.choices(self._characters, k=N))
+        return "".join([secrets.choice(self._characters) for i in range(N)])
 
     def add_url_to_rooms(
         self, room_id: str, use_once_only: str, new_url_code: str, old_url_code: str = None
