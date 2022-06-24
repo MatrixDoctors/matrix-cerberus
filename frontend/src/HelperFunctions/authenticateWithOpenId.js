@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'
 
 export default async function authenticateWithOpenId(responseDetails) {
   const baseUrl = localStorage.getItem('homeServer');
@@ -16,6 +15,4 @@ export default async function authenticateWithOpenId(responseDetails) {
   .then( (resp) => {
     console.log(resp.data);
   });
-  // const navigate = useNavigate();
-  // navigate('/');
 }

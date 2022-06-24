@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import UserField from '../Components/UserField'
 import SSOLogin from '../Components/SSOLogin'
 import {parsePhoneNumber} from "react-phone-number-input"
 import validateAndReturnUrl from '../HelperFunctions/validateAndReturnUrl'
-import axios from 'axios'
 import { MatrixApi } from '../MatrixApi'
 import authenticateWithOpenId from '../HelperFunctions/authenticateWithOpenId'
 
@@ -46,6 +45,8 @@ export default function Login() {
 
 	// Used to disable input fields when the homeserver url is invalid.
 	const [disableFields, setDisableFields] = useState(false);
+
+	const navigate = useNavigate();
 
 	// Fetches the available login types for a particular homeserver. Defaults to 'matrix.org'
 	useEffect(() => {
@@ -168,9 +169,8 @@ export default function Login() {
 			password: password
 		})
 		.then((resp) => {
-			const userId = resp.data.user_id;
-			console.log(resp.data);
 			authenticateWithOpenId(resp.data);
+			navigate('/');
 		})
 		.catch( (err) => {
 			// Login attempt has failed. The provided authentication data was incorrect.
