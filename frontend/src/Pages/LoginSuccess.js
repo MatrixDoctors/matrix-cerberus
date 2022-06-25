@@ -22,10 +22,18 @@ export default function LoginSuccess() {
             });
             await authenticateWithOpenId(response.data);
         }
-        const response = fetchData();
-        response.then( ()=>{
-            navigate('/');
-        });
+        try {
+            if(loginToken == null){
+                throw new Error("Invalid login token.");
+            }
+            const response = fetchData();
+            response.then( ()=>{
+                navigate('/');
+            });
+        }
+        catch (err) {
+            navigate('/login');
+        }
     }, []);
 
     return (

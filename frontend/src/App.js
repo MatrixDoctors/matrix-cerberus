@@ -29,11 +29,11 @@ export default function App() {
           <Route path="/" element={<AccountSettings />} />
           <Route path="/room-settings" element={<RoomSettings />} />
           <Route path="/server-settings" element={<ServerSettings />} />
-          <Route path="/login-success" element={<LoginSuccess/>} />
         </Route>
 
         <Route path="/i/:url_code" element={<ExternalUrl />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/login-success" element={<LoginSuccess/>} />
         <Route path="*" element={<ErrorPage/>} />
       </Routes>
     </BrowserRouter>
