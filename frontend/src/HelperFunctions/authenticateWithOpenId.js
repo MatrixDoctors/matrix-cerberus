@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { MatrixApi } from '../MatrixApi';
+import axios from "./customAxios";
 
 export default async function authenticateWithOpenId(responseDetails) {
   const baseUrl = localStorage.getItem('homeServer');

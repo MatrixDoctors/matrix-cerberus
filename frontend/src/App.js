@@ -10,7 +10,7 @@ import LoginSuccess from './Pages/LoginSuccess';
 import ErrorPage from './Pages/ErrorPage';
 import ExternalUrl from './Pages/ExternalUrl';
 import CustomRouter from './Components/CustomRouter';
-import customHistory from './HelperFunctions/customHistory';
+import history from './HelperFunctions/customHistory';
 
 function LayoutsWithNavbar() {
   return (
@@ -25,7 +25,7 @@ function LayoutsWithNavbar() {
 
 export default function App() {
   return (
-    <CustomRouter history={customHistory}>
+    <CustomRouter history={history}>
       <Routes>
         <Route path='/' element={<LayoutsWithNavbar/>}>
           <Route path="/" element={<AccountSettings />} />
