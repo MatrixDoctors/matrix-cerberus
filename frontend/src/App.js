@@ -9,6 +9,8 @@ import Login from './Pages/Login';
 import LoginSuccess from './Pages/LoginSuccess';
 import ErrorPage from './Pages/ErrorPage';
 import ExternalUrl from './Pages/ExternalUrl';
+import CustomRouter from './Components/CustomRouter';
+import customHistory from './HelperFunctions/customHistory';
 
 function LayoutsWithNavbar() {
   return (
@@ -23,7 +25,7 @@ function LayoutsWithNavbar() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <CustomRouter history={customHistory}>
       <Routes>
         <Route path='/' element={<LayoutsWithNavbar/>}>
           <Route path="/" element={<AccountSettings />} />
@@ -36,6 +38,6 @@ export default function App() {
         <Route path="/login-success" element={<LoginSuccess/>} />
         <Route path="*" element={<ErrorPage/>} />
       </Routes>
-    </BrowserRouter>
+    </CustomRouter>
   )
 };
