@@ -6,7 +6,7 @@ export default async function authenticateWithOpenId(responseDetails) {
 
   const response = await new MatrixApi().requestOpenIdToken('POST', baseUrl, responseDetails);
 
-  await axios.post("/api/users/verify-openid", response.data)
+  await axios.post("/api/verify-openid", response.data)
   .then( (resp) => {
     console.log(resp.data);
   });

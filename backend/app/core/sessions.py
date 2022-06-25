@@ -83,7 +83,8 @@ class SessionCookie:
 
     def get_session(self, request: Request):
         session_id = self.get_session_id(request)
-        return self.session_storage[session_id]
+        # Return None if session_id is not present
+        return session_id and self.session_storage[session_id]
 
     def set_session(self, request: Request, data: ServerSessionData):
         session_id = self.get_session_id(request)
