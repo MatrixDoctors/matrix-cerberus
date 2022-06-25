@@ -9,6 +9,4 @@ fastapi_sessions = SessionCookie()
 
 async def authenticate_user(request: Request):
     if fastapi_sessions.get_session(request) is None:
-        raise HTTPException(
-            status_code=302, detail="Not authorized", headers={"Location": "/login"}
-        )
+        raise HTTPException(status_code=401, detail="Not authorized")
