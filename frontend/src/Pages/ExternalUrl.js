@@ -20,7 +20,6 @@ export default function ExternalUrl() {
             else{
                 setLargeDisplayMessage("Invalid Url token entered.");
             }
-            console.log(resp.data)
         }
         verifyUrl();
     }, []);
