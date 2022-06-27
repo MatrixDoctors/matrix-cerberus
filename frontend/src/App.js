@@ -12,9 +12,10 @@ import CustomRouter from './Components/CustomRouter';
 import history from './HelperFunctions/customHistory';
 import { GlobalContext } from './GlobalContext';
 import LayoutsWithNavbar from './Components/LayoutsWithNavbar';
+import Logout from './Pages/Logout';
 
 export default function App() {
-  const [matrixUserId, setMatrixUserId] = useState('@kuries:matrix.org');
+  const [matrixUserId, setMatrixUserId] = useState('');
 
   return (
     <CustomRouter history={history}>
@@ -25,6 +26,7 @@ export default function App() {
             <Route path="/" element={<AccountSettings />} />
             <Route path="/room-settings" element={<RoomSettings />} />
             <Route path="/server-settings" element={<ServerSettings />} />
+            <Route path="/logout" element={<Logout />} />
           </Route>
 
         <Route path="/i/:url_code" element={<ExternalUrl />} />
