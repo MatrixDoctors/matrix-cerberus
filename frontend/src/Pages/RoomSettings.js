@@ -1,49 +1,37 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from "prop-types"
+import axios from '../HelperFunctions/customAxios'
 
-const TableHeader = ({ values }) => {
+const TableHeader = ({ colValue }) => {
   return (
-    <tr>
-      {values.map( (col) => {
-        return (
-          <th scope="col" className="text-md font-medium text-gray-900 px-6 py-4 text-left" key={col}>
-            {col}
-          </th>
-        )
-      })}
-    </tr>
+      <th scope="col" className="text-md font-medium text-gray-900 px-6 py-4 text-left">
+        {colValue}
+      </th>
   )
 }
 
 TableHeader.propTypes = {
-  values: PropTypes.arrayOf(PropTypes.string)
+  colValue: PropTypes.string
 }
 
-const TableRows =  ({ values }) => {
+const TableRows =  ({ rowValue }) => {
   return (
-    <>
-      {values.map( (row) => {
-        return (
-          // key is used to uniquely identify a child item
-          <tr className="border-b transition duration-300 ease-in-out hover:bg-gray-200" key={row.roomId}>
-            <td className="px-6 py-4 whitespace-nowrap text-md font-medium text-gray-900">
-              {row.id}
-            </td>
-            <td className="text-md text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-              {row.roomAlias}
-            </td>
-            <td className="text-md text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-              {row.roomId}
-            </td>
-          </tr>
-        )
-      })}
-    </>
+    <tr className="border-b transition duration-300 ease-in-out hover:bg-gray-200">
+      <td className="px-6 py-4 whitespace-nowrap text-md font-medium text-gray-900">
+        {rowValue.id}
+      </td>
+      <td className="text-md text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+        {rowValue.roomAlias}
+      </td>
+      <td className="text-md text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+        {rowValue.roomId}
+      </td>
+    </tr>
   )
 };
 
 TableRows.propTypes = {
-  values: PropTypes.arrayOf(PropTypes.object)
+  rowValue: PropTypes.object
 }
 
 /**
@@ -52,13 +40,27 @@ TableRows.propTypes = {
  */
 export default function RoomSettings() {
 
-  // Dummy data for tables
   const roomHeaderData = ['#', 'Room Alias', 'Room ID'];
-  const roomBodyData = [
-    {id: 1, roomAlias: "Matrix Cerberus", roomId: "!hMaAAyWsrBAMXEfXso:cadair.com"},
-    {id: 2, roomAlias: "GSoC Interns & Mentors 2022", roomId: "!auFsXYPeEIXfseVOEm:ergaster.org"},
-    {id: 3, roomAlias: "Element Web/Desktop", roomId: "!YTvKGNlinIzlkMTVRl:matrix.org"}
-  ];
+  const [roomBodyData, setRoomBodyData] = useState([]);
+
+  useEffect( () => {
+    async function fetchRoomData() {
+      const resp = await axios.get('api/users/room-list');
+      const data = resp.data.content;
+
+      let roomData = [], index=1;
+      for(let key in data){
+        roomData.push({
+          id: index,
+          roomAlias: data[key],
+          roomId: key
+        })
+        index += 1;
+      }
+      setRoomBodyData(roomData);
+    }
+    fetchRoomData();
+  }, []);
 
   return (
     <div>
@@ -88,10 +90,16 @@ export default function RoomSettings() {
                     <div className="overflow-hidden">
                       <table className="min-w-full">
                         <thead className="bg-gray-300 border-b">
-                          <TableHeader values={roomHeaderData} />
+                          <tr>
+                            {roomHeaderData.map( (colValue) => {
+                              return <TableHeader colValue={colValue} key={colValue}/>
+                            })}
+                          </tr>
                         </thead>
                         <tbody>
-                          <TableRows values={roomBodyData} />
+                          {roomBodyData.map( (rowValue) => {
+                            return <TableRows rowValue={rowValue} key={rowValue.roomId}/>
+                          })}
                         </tbody>
                       </table>
                     </div>

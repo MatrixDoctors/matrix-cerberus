@@ -95,3 +95,16 @@ class BaseBotClient(AsyncClient):
                 self.room_to_external_url_mapping[value.room_id].temporary.add(url_code)
             else:
                 self.room_to_external_url_mapping[value.room_id].permanent = url_code
+
+    async def get_rooms_with_mod_permissions(self, user_id: str):
+        rooms_with_mod_permissions = {}
+        for room_id, room_object in self.rooms.items():
+            # Check if bot has permissions to kick and invite
+            if room_object.power_levels.can_user_invite(
+                self.user_id
+            ) and room_object.power_levels.can_user_kick(self.user_id):
+                # Check if user is a member of the room
+                if user_id in room_object.users and not room_object.users[user_id].invited:
+                    if room_object.power_levels.get_user_level(user_id) >= 50:
+                        rooms_with_mod_permissions[room_id] = room_object.named_room_name()
+        return rooms_with_mod_permissions
