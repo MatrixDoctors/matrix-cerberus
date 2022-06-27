@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { GlobalContext } from '../GlobalContext';
 
 /**
  * The default web page where an authorized matrix user can edit their third-party account connections.
  */
 export default function AccountSettings() {
-
+	const {matrixUserId} = useContext(GlobalContext);
 	return (
 		<div>
 			<div className="flex items-center w-full h-48 py-5 shadow-lg bg-dark-eye" >
@@ -30,7 +31,7 @@ export default function AccountSettings() {
 									Matrix ID
 								</div>
 								<div className='w-2/3 px-2 text-gray-600'>
-									Kuries
+									{matrixUserId}
 								</div>
 							</div>
 

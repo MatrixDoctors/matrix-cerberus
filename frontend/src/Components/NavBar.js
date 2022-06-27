@@ -5,7 +5,7 @@ import AccountDropdown from './AccountDropdown';
 
 export default function NavBar() {
     const [isOpen, setIsOpen] = useState(false);
-    const {matrixUserId, setMatrixUserId} = useContext(GlobalContext);
+    const {matrixUserId} = useContext(GlobalContext);
 
     function handleClick() {
         setIsOpen(!isOpen);
@@ -43,7 +43,7 @@ export default function NavBar() {
                 <div className='px-4 py-5 border-t border-gray-800 sm:hidden'>
                     <div className='mb-3 flex items-center'>
                         <img alt="..." className='h-6 w-6 border-2 border-gray-600 rounded-full object-cover' src={require('../assets/img/user.svg').default} />
-                        <span className='ml-3 font-semibold text-white'>kuries</span>
+                        <span className='ml-3 font-semibold text-white'>{matrixUserId}</span>
                     </div>
                     <Link to='/login' className='block mt-2 text-gray-400 hover:text-white'>Log in</Link>
                     <Link to='/logout' className='block mt-2 text-gray-400 hover:text-white'>Sign Out</Link>
