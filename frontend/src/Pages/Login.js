@@ -19,7 +19,6 @@ export default function Login() {
 	};
 
 	const default_homeserver = 'https://matrix.org';
-	localStorage.setItem("homeServer", default_homeserver);
 
 	// Used to set the Identifier type for password based login
 	const [fieldType, setFieldType] = useState('Username');
