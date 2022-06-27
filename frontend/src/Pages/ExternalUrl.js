@@ -47,7 +47,7 @@ export default function ExternalUrl() {
                 </div>
             </div>
             <div>
-                <img src="https://i.ibb.co/ck1SGFJ/Group.png" />
+                <img src={require("../assets/img/error.png")} />
             </div>
         </div>
     )
