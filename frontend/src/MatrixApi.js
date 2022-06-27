@@ -5,39 +5,28 @@ export class MatrixApi {
         this._baseUrl = baseUrl;
     }
 
-    login(type, data = {}) {
+    getLogin() {
         const fullUrl = new URL("/_matrix/client/v3/login", this._baseUrl);
-        switch(type) {
-            case "GET": {
-                return axios.get(fullUrl);
-            }
-
-            case "POST": {
-                return axios.post(fullUrl, data);
-            }
-        }
+        return axios.get(fullUrl);
     }
 
-    wellKnown(type, data={}) {
+    postLogin(data) {
+        const fullUrl = new URL("/_matrix/client/v3/login", this._baseUrl);
+        return axios.post(fullUrl, data);
+    }
+
+    getWellKnown() {
         const fullUrl = new URL(".well-known/matrix/client", this._baseUrl);
-        switch(type) {
-            case "GET": {
-                return axios.get(fullUrl);
-            }
-        }
+        return axios.get(fullUrl);
     }
 
-    requestOpenIdToken(type, baseUrl, data) {
-        const fullUrl = new URL(`/_matrix/client/v3/user/${data.user_id}/openid/request_token`, baseUrl);
-        switch(type) {
-            case "POST": {
-                return axios.post(fullUrl, {}, {
-                    headers: {
-                        'Authorization': `Bearer ${data.access_token}`
-                    }
-                })
+    requestOpenIdToken(data) {
+        const fullUrl = new URL(`/_matrix/client/v3/user/${data.user_id}/openid/request_token`, this._baseUrl);
+        return axios.post(fullUrl, {}, {
+            headers: {
+                'Authorization': `Bearer ${data.access_token}`
             }
-        }
+        });
     }
 
     parseMedia(mxcUrl) {

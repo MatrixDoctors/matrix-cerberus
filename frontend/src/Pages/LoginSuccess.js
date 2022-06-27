@@ -16,7 +16,7 @@ export default function LoginSuccess() {
 
     useEffect( () => {
         async function fetchData(){
-            const response = await new MatrixApi(homeServer).login('POST', {
+            const response = await new MatrixApi(homeServer).postLogin({
                 type: "m.login.token",
                 token: loginToken
             });
