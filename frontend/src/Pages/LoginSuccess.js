@@ -22,8 +22,10 @@ export default function LoginSuccess() {
             });
             authenticateWithOpenId(response.data);
         }
-        fetchData();
-        navigate('/');
+        const response = fetchData();
+        response.then( ()=>{
+            navigate('/');
+        });
     }, []);
 
     return (

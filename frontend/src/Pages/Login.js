@@ -168,8 +168,10 @@ export default function Login() {
 			password: password
 		})
 		.then((resp) => {
-			authenticateWithOpenId(resp.data);
-			navigate('/');
+			const response = authenticateWithOpenId(resp.data);
+			response.then( () => {
+				navigate('/')
+			});
 		})
 		.catch( (err) => {
 			// Login attempt has failed. The provided authentication data was incorrect.
