@@ -20,7 +20,7 @@ export default function LoginSuccess() {
                 type: "m.login.token",
                 token: loginToken
             });
-            authenticateWithOpenId(response.data);
+            await authenticateWithOpenId(response.data);
         }
         const response = fetchData();
         response.then( ()=>{

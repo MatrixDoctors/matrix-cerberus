@@ -27,6 +27,19 @@ export class MatrixApi {
         }
     }
 
+    requestOpenIdToken(type, baseUrl, data) {
+        const fullUrl = new URL(`/_matrix/client/v3/user/${data.user_id}/openid/request_token`, baseUrl);
+        switch(type) {
+            case "POST": {
+                return axios.post(fullUrl, {}, {
+                    headers: {
+                        'Authorization': `Bearer ${data.access_token}`
+                    }
+                })
+            }
+        }
+    }
+
     parseMedia(mxcUrl) {
         const [serverName, mediaId] = mxcUrl.replace('mxc://', '').split('/');
         const endpoint = `_matrix/media/v3/download/${serverName}/${mediaId}`;
