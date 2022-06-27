@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { GlobalContext } from '../GlobalContext';
 import AccountDropdown from './AccountDropdown';
 
 export default function NavBar() {
     const [isOpen, setIsOpen] = useState(false);
+    const {matrixUserId, setMatrixUserId} = useContext(GlobalContext);
 
     function handleClick() {
         setIsOpen(!isOpen);
