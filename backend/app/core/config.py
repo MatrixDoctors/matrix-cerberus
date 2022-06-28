@@ -30,11 +30,17 @@ class MatrixBotSettings(BaseSettings):
         return values
 
 
+class GitHubAppCredentials(BaseSettings):
+    client_id: str
+    client_secret: str
+
+
 class Settings(BaseSettings):
 
     redis: RedisSettings
     server_sessions: ServerSessionsSettings
     matrix_bot: MatrixBotSettings
+    github: GitHubAppCredentials
 
     # Used to convert the dicitonary received from the root_validator of MatrixBotSettings class to an instance of the latter.
     @validator("matrix_bot")
