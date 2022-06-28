@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from app.api.deps import authenticate_user, fastapi_sessions
-from app.api.endpoints import external_url, users
+from app.api.endpoints import external_url, github_routes, users
 from app.api.models import OpenIdInfo
 from app.core.http_client import http_client
 from app.core.models import ServerSessionData
@@ -22,6 +22,13 @@ api_router.include_router(
     prefix="/external-url",
     tags=["external url"],
     dependencies=[Depends(authenticate_user), Depends(ExternalUrlAPI)],
+)
+
+api_router.include_router(
+    github_routes.router,
+    prefix="/github",
+    tags=["github"],
+    dependencies=[Depends(authenticate_user)],
 )
 
 
