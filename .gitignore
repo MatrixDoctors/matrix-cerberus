@@ -1,5 +1,6 @@
 frontend/build/
 frontend/node_modules
 backend/venv
+backend/config.yml
 **/__pycache__/
 book

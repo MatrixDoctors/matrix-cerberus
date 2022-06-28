@@ -2,7 +2,7 @@ redis:
   # Used to construct redis database URL
   # 'uri' is in the form "redis :// [[username :] password@] host [:port][/database] [?[timeout=timeout[d|h|m|s|ms|us|ns]]"
   #
-  uri: redis://127.0.0.1:6379/
+  uri: redis://redis_service/
 
 server_sessions:
   # Server side sessions to authenticate logged in users
@@ -12,5 +12,5 @@ server_sessions:
   expires_in: 3600
 
 matrix_bot:
-  homeserver: "https://matrix.org"
+  homeserver: "https://example.org"
   access_token: some_access_token
