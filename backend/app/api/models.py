@@ -20,3 +20,8 @@ class ExternalUrlInfo(BaseModel):
 
     room_id: str
     use_once_only: bool
+
+
+class GithubCode(BaseModel):
+
+    code: str

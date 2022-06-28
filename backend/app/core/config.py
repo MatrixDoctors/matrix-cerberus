@@ -18,8 +18,7 @@ class MatrixBotSettings(BaseSettings):
     homeserver: str
     access_token: str
 
-    # This checks if the user_id and homeserver match the rules set by the matrix spec.
-    # This returns a dictionary instead of a MatrixBotSettings object
+    # This checks if the homeserver url is valid or not.
     @root_validator(pre=True)
     def validate(cls, values):
         homeserver = values.get("homeserver")
@@ -33,6 +32,16 @@ class MatrixBotSettings(BaseSettings):
 class GitHubAppCredentials(BaseSettings):
     client_id: str
     client_secret: str
+    redirect_uri: str
+
+    @root_validator(pre=True)
+    def validate(cls, values):
+        redirect_uri = values.get("redirect_uri")
+
+        if re.search(r"(https|http)?://", redirect_uri) is None:
+            raise ValueError("Invalid redirect uri")
+
+        return values
 
 
 class Settings(BaseSettings):
