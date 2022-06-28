@@ -17,11 +17,12 @@ import GithubOauth from './Pages/GithubOauth';
 
 export default function App() {
   const [matrixUserId, setMatrixUserId] = useState('');
+  const [githubUserId, setGithubUserId] = useState('');
 
   return (
     <CustomRouter history={history}>
     <GlobalContext.Provider
-          value = {{matrixUserId, setMatrixUserId}}>
+          value = {{matrixUserId, setMatrixUserId, githubUserId, setGithubUserId}}>
       <Routes>
           <Route element={<LayoutsWithNavbar/>}>
             <Route path="/" element={<AccountSettings />} />

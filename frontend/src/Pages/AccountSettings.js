@@ -6,7 +6,7 @@ import axios from '../HelperFunctions/customAxios';
  * The default web page where an authorized matrix user can edit their third-party account connections.
  */
 export default function AccountSettings() {
-	const {matrixUserId} = useContext(GlobalContext);
+	const {matrixUserId, githubUserId} = useContext(GlobalContext);
 	const homeServer = localStorage.getItem('homeServer');
 
 	function githubHandleClick(){
@@ -81,13 +81,13 @@ export default function AccountSettings() {
 									</div>
 								</div>
 								<div className='inline-block px-2 w-1/3 text-gray-600'>
-									Connected as GitHub user.
+									{githubUserId == "" ? "Disconnected" : `Connected as ${githubUserId}.`}
 								</div>
 								<div className='flex justify-end mx-2 w-1/3'>
 									<button
 									onClick={githubHandleClick}
 									className='px-2 inline text-blue-600 hover:shadow-md'>
-										Edit
+										{githubUserId == "" ? "Connect" : "Edit"}
 									</button>
 								</div>
 
