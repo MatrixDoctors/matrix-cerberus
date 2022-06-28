@@ -11,7 +11,9 @@ class ServerSessionData(BaseModel):
 
     matrix_user: Optional[str] = None
     matrix_homeserver: Optional[str] = None
+    github_user_id: Optional[str] = None
     github_access_token: Optional[str] = None
+    patreon_user_id: Optional[str] = None
     patreon_access_token: Optional[str] = None
 
 
