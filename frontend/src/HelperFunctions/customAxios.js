@@ -1,7 +1,7 @@
 import axios from "axios";
 import history from "./customHistory";
 
-const axiosInstance = axios.create();
+const axiosInstance = axios.create({baseURL: "http://localhost:80"});
 
 axiosInstance.interceptors.response.use(
   function (response) {

@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { GlobalContext } from '../GlobalContext';
+import axios from '../HelperFunctions/customAxios';
 
 /**
  * The default web page where an authorized matrix user can edit their third-party account connections.
@@ -7,6 +8,15 @@ import { GlobalContext } from '../GlobalContext';
 export default function AccountSettings() {
 	const {matrixUserId} = useContext(GlobalContext);
 	const homeServer = localStorage.getItem('homeServer');
+
+	function githubHandleClick(){
+		axios.get('api/github/login')
+		.then( (resp) => {
+			localStorage.setItem('state', resp.data.state);
+			window.location.href = resp.data.url;
+		})
+	}
+
 	return (
 		<div>
 			<div className="flex items-center w-full h-48 py-5 shadow-lg bg-dark-eye" >
@@ -74,9 +84,11 @@ export default function AccountSettings() {
 									Connected as GitHub user.
 								</div>
 								<div className='flex justify-end mx-2 w-1/3'>
-									<span className='px-2 text-blue-600 hover:shadow-md'>
+									<button
+									onClick={githubHandleClick}
+									className='px-2 inline text-blue-600 hover:shadow-md'>
 										Edit
-									</span>
+									</button>
 								</div>
 
 							</div>
