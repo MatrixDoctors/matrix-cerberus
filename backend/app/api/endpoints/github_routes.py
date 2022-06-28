@@ -4,6 +4,7 @@ import aiohttp
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from app.api.deps import fastapi_sessions
 from app.api.models import GithubCode
 from app.core.config import settings
 from app.core.http_client import http_client
@@ -48,7 +49,11 @@ async def authenticate_user(request: Request, body: GithubCode):
             if resp.status != 200:
                 raise HTTPException(status_code=422, detail="Invalid code")
             data = await resp.json()
-            print(data)
+
+            session_data = fastapi_sessions.get_session(request)
+            session_data.github_user_id = "kuries"
+            session_data.github_access_token = data["access_token"]
+            fastapi_sessions.set_session(request, session_data)
 
             return JSONResponse({"message": "success"})
     except aiohttp.ClientConnectionError as err:

@@ -34,15 +34,6 @@ class GitHubAppCredentials(BaseSettings):
     client_secret: str
     redirect_uri: str
 
-    @root_validator(pre=True)
-    def validate(cls, values):
-        redirect_uri = values.get("redirect_uri")
-
-        if re.search(r"(https|http)?://", redirect_uri) is None:
-            raise ValueError("Invalid redirect uri")
-
-        return values
-
 
 class Settings(BaseSettings):
 
