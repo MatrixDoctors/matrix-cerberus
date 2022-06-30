@@ -35,3 +35,21 @@ class GithubAPI:
     async def get_org_membership(self, org, user):
         resp = await self.gh.getitem(f"/orgs/{org}/memberships/{user}")
         return resp
+
+    async def get_repos_in_an_org(self, org):
+        list_of_repos = []
+        async for item in self.gh.getiter(f"/orgs/{org}/repos"):
+            list_of_repos.append(item["name"])
+        return list_of_repos
+
+    async def get_individual_repos(self):
+        list_of_repos = []
+        async for item in self.gh.getiter(f"/user/repos?affliation=owner"):
+            list_of_repos.append(item["name"])
+        return list_of_repos
+
+    async def get_teams_in_an_org(self, org):
+        teams = {}
+        async for item in self.gh.getiter(f"/orgs/{org}/teams"):
+            teams[item["slug"]] = item["name"]
+        return teams
