@@ -27,7 +27,7 @@ async def get_github_user_id(access_token):
 async def get_login():
 
     client_id = settings.github.client_id
-    scope = ["read:org", "repo", "read:user"]
+    scope = ["read:org", "repo", "user"]
     scope = "%20".join(scope)
     redirect_uri = settings.github.redirect_uri
     state = uuid4().hex
@@ -64,7 +64,7 @@ async def authenticate_user(request: Request, body: GithubCode, background_tasks
 
             session_data.github_user_id = await get_github_user_id(data["access_token"])
             session_data.github_access_token = data["access_token"]
-
+            print(data["access_token"])
             fastapi_sessions.set_session(request, session_data)
 
             background_tasks.add_task(save_user_data, session_data)
@@ -78,3 +78,9 @@ async def authenticate_user(request: Request, body: GithubCode, background_tasks
 async def get_user(github_api: GithubAPI = Depends(github_api_instance)):
     resp = await github_api.display_user()
     return JSONResponse({"user": resp})
+
+
+@router.post("/orgs")
+async def get_orgs(github_api: GithubAPI = Depends(github_api_instance)):
+    resp = await github_api.get_orgs_with_membership()
+    return JSONResponse({"orgs": resp})
