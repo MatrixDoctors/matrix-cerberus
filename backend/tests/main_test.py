@@ -1,34 +1,6 @@
 import json
-from unittest import mock
 
 import pytest
-from aioresponses import aioresponses
-from fastapi.testclient import TestClient
-
-from app.core.config import Settings
-from app.core.http_client import http_client
-
-settings = Settings.from_yaml("config.sample.yml")
-
-
-@pytest.fixture
-@mock.patch("app.core.config.settings", settings)
-def client():
-    from app.main import app
-
-    return TestClient(app)
-
-
-@pytest.fixture
-def mock_server():
-    with aioresponses() as m:
-        yield m
-
-
-@pytest.fixture
-async def mock_http_client():
-    await http_client.start_session()
-    yield http_client
 
 
 def test_main(client):
@@ -45,8 +17,11 @@ def test_message_users(client):
 
 
 @pytest.mark.asyncio
-@mock.patch("app.api.api.fetch_user_data")
-async def test_user_session_flow(mock_fetch_user_data, client, mock_server, mock_http_client):
+async def test_user_session_flow(mocker, client, mock_server, mock_http_client, settings):
+    # mock_http_client is imported to start the aiohttp session.
+
+    mock_fetch_user_data = mocker.patch('app.api.api.fetch_user_data')
+
     matrix_user = "@example_user:matrix.org"
 
     mock_server.get(
