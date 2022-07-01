@@ -18,7 +18,7 @@ class GithubAPI:
             return 2
 
     async def display_user(self):
-        return self.user_id
+        return self.username
 
     async def get_orgs_with_membership(self):
         """
