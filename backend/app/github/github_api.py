@@ -1,4 +1,5 @@
 import gidgethub
+import gidgethub.aiohttp
 
 from app.core.background_runner import matrix_bot_runner
 from app.core.config import settings
@@ -20,6 +21,9 @@ class GithubAPI:
         return self.user_id
 
     async def get_orgs_with_membership(self):
+        """
+        Fetches all the organization memberships for the current user.
+        """
         list_of_orgs = []
         async for item in self.gh.getiter("/user/memberships/orgs"):
             if self.role_level(item["role"]) >= self.default_role_level:
@@ -27,12 +31,15 @@ class GithubAPI:
         return list_of_orgs
 
     async def get_all_orgs(self):
+        """
+        Get all orgs where the user is either an owner, member or collaborator (has support for Github apps)
+        """
         list_of_orgs = []
         async for item in self.gh.getiter(f"/user/{self.username}/orgs"):
             list_of_orgs.append(item)
         return list_of_orgs
 
-    async def get_org_membership(self, org, user):
+    async def org_membership_of_user(self, org, user):
         resp = await self.gh.getitem(f"/orgs/{org}/memberships/{user}")
         return resp
 
@@ -61,6 +68,90 @@ class GithubAPI:
             return False
         return True
 
-    async def get_repo_permissions(self, owner, repo, user):
+    async def repo_permissions(self, owner, repo, user):
         resp = await self.gh.getitem(f"/repos/{owner}/{repo}/collaborators/{user}/permission")
         return resp["permission"]
+
+    async def get_sponsorship_tiers_for_user(self, user):
+        query = """
+        query ($user:String!, $number_of_tiers_to_fetch:Int!)
+        {
+            user(login: $user) {
+                sponsorsListing {
+                    tiers(first: $number_of_tiers_to_fetch) {
+                        nodes {
+                            name
+                        }
+                    }
+                }
+            }
+        }
+        """
+
+        resp = await self.gh.graphql(query=query, user=user, number_of_tiers_to_fetch=10)
+        sponsor_tiers = []
+        for tier in resp["user"]["sponsorsListing"]["tiers"]["nodes"]:
+            sponsor_tiers.append(tier["name"])
+
+        return sponsor_tiers
+
+    async def get_sponsorship_tiers_for_org(self, org):
+        query = """
+        query ($org:String!)
+        {
+            organization(login: $org) {
+                sponsorsListing {
+                    tiers(first: $number_of_tiers_to_fetch) {
+                        nodes {
+                            name
+                        }
+                    }
+                }
+            }
+        }
+        """
+
+        resp = await self.gh.graphql(query=query, org=org, number_of_tiers_to_fetch=10)
+        sponsor_tiers = []
+        for tier in resp["organization"]["sponsorsListing"]["tiers"]["nodes"]:
+            sponsor_tiers.append(tier["name"])
+
+        return sponsor_tiers
+
+    async def user_sponsored_at_tier(self, user):
+        query = """
+        query ($user:String!)
+        {
+            user(login: $user) {
+                sponsorshipForViewerAsSponsor {
+                    tier {
+                        name
+                    }
+                }
+            }
+        }
+        """
+        resp = await self.gh.graphql(query=query, user=user)
+        sponsorship_data = resp["user"]["sponsorshipForViewerAsSponsor"]
+        if sponsorship_data is None:
+            return None
+        return sponsorship_data["tier"]["name"]
+
+    async def org_sponsored_at_tier(self, org):
+        query = """
+        query ($org:String!)
+        {
+            organization(login: $org) {
+                sponsorshipForViewerAsSponsor {
+                    tier {
+                        name
+                    }
+                }
+            }
+        }
+        """
+        resp = await self.gh.graphql(query=query, org=org)
+        sponsorship_data = resp["organization"]["sponsorshipForViewerAsSponsor"]
+        if sponsorship_data is None:
+            return None
+        return sponsorship_data["tier"]["name"]
