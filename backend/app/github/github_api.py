@@ -1,4 +1,4 @@
-import gidgethub.aiohttp
+import gidgethub
 
 from app.core.background_runner import matrix_bot_runner
 from app.core.config import settings
@@ -53,3 +53,14 @@ class GithubAPI:
         async for item in self.gh.getiter(f"/orgs/{org}/teams"):
             teams[item["slug"]] = item["name"]
         return teams
+
+    async def is_team_member(self, org, team_slug, user):
+        try:
+            resp = await self.gh.getitem(f"/orgs/{org}/teams/{team_slug}/memberships/{user}")
+        except gidgethub.BadRequest as err:
+            return False
+        return True
+
+    async def get_repo_permissions(self, owner, repo, user):
+        resp = await self.gh.getitem(f"/repos/{owner}/{repo}/collaborators/{user}/permission")
+        return resp["permission"]
