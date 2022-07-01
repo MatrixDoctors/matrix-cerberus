@@ -5,7 +5,7 @@
       "role": "admin",
       "organization_url": "https://api.github.com/orgs/octocat",
       "organization": {
-        "login": "github",
+        "login": "matrix-cerberus",
         "id": 1,
         "node_id": "MDEyOk9yZ2FuaXphdGlvbjE=",
         "url": "https://api.github.com/orgs/github",
@@ -41,8 +41,8 @@
     },
     {
       "url": "https://api.github.com/orgs/invitocat/memberships/defunkt",
-      "state": "pending",
-      "role": "admin",
+      "state": "active",
+      "role": "member",
       "organization_url": "https://api.github.com/orgs/invitocat",
       "organization": {
         "login": "github",

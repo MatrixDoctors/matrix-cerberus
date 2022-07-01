@@ -64,7 +64,7 @@ class GithubAPI:
     async def is_team_member(self, org, team_slug, user):
         try:
             resp = await self.gh.getitem(f"/orgs/{org}/teams/{team_slug}/memberships/{user}")
-        except gidgethub.BadRequest as err:
+        except gidgethub.BadRequest:
             return False
         return True
 
