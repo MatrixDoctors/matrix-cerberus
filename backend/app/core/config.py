@@ -37,6 +37,7 @@ class GitHubAppCredentials(BaseSettings):
 
 class Settings(BaseSettings):
 
+    app_name: str
     redis: RedisSettings
     server_sessions: ServerSessionsSettings
     matrix_bot: MatrixBotSettings

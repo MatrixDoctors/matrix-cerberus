@@ -15,9 +15,7 @@ async def authenticate_user(request: Request):
 
 async def fetch_user_data(session_id):
     session_data: ServerSessionData = session_storage[session_id]
-    resp = await matrix_bot_runner.client.get_account_data(
-        "matrix-cerberus.user", user_id=session_data.matrix_user
-    )
+    resp = await matrix_bot_runner.client.get_account_data("user", user_id=session_data.matrix_user)
 
     session_data.github_user_id = resp.content.github.username
     session_data.github_access_token = resp.content.github.access_token
