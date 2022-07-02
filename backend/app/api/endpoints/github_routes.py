@@ -1,11 +1,12 @@
 from uuid import uuid4
 
 import aiohttp
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from app.api.deps import fastapi_sessions
+from app.api.deps import fastapi_sessions, save_user_data
 from app.api.models import GithubCode
+from app.core.background_runner import matrix_bot_runner
 from app.core.config import settings
 from app.core.http_client import http_client
 
@@ -34,7 +35,7 @@ async def get_login():
 
 
 @router.post("/login")
-async def authenticate_user(request: Request, body: GithubCode):
+async def authenticate_user(request: Request, body: GithubCode, background_tasks: BackgroundTasks):
     client_id = settings.github.client_id
     client_secret = settings.github.client_secret
 
@@ -43,7 +44,6 @@ async def authenticate_user(request: Request, body: GithubCode):
     url = "https://github.com/login/oauth/access_token"
     headers = {"Accept": "application/json"}
 
-    print(params)
     try:
         async with http_client.session.post(url, params=params, headers=headers) as resp:
             if resp.status != 200:
@@ -54,6 +54,8 @@ async def authenticate_user(request: Request, body: GithubCode):
             session_data.github_user_id = "kuries"
             session_data.github_access_token = data["access_token"]
             fastapi_sessions.set_session(request, session_data)
+
+            background_tasks.add_task(save_user_data, session_data)
 
             return JSONResponse({"message": "success"})
     except aiohttp.ClientConnectionError as err:

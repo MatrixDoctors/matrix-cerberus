@@ -1,7 +1,7 @@
 from urllib.parse import urljoin
 
 import aiohttp
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from app.api.deps import authenticate_user, fastapi_sessions, fetch_user_data
@@ -44,7 +44,7 @@ async def current_user(request: Request):
 
 
 @api_router.post("/verify-openid")
-async def verify_openid(open_id_info: OpenIdInfo, background_tasks: BackgroundTasks):
+async def verify_openid(open_id_info: OpenIdInfo):
     matrix_homeserver = "https://" + open_id_info.matrix_server_name
     params = {"access_token": open_id_info.access_token}
     url = urljoin(matrix_homeserver, "/_matrix/federation/v1/openid/userinfo")
@@ -66,7 +66,7 @@ async def verify_openid(open_id_info: OpenIdInfo, background_tasks: BackgroundTa
                 response, data=server_session_data
             )
 
-            background_tasks.add_task(fetch_user_data, session_id)
+            await fetch_user_data(session_id, server_session_data)
             return response
 
     except aiohttp.ClientConnectionError as err:
