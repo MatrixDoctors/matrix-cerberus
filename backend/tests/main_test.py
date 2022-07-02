@@ -45,7 +45,8 @@ def test_message_users(client):
 
 
 @pytest.mark.asyncio
-async def test_user_session_flow(client, mock_server, mock_http_client):
+@mock.patch("app.api.api.fetch_user_data")
+async def test_user_session_flow(mock_fetch_user_data, client, mock_server, mock_http_client):
     matrix_user = "@example_user:matrix.org"
 
     mock_server.get(
@@ -62,9 +63,11 @@ async def test_user_session_flow(client, mock_server, mock_http_client):
     }
     response = client.post("api/verify-openid", data=json.dumps(open_id_data))
     session_cookie = response.cookies.get_dict()
+
     assert response.status_code == 200
     assert session_cookie[settings.server_sessions.session_key] is not None
     assert response.json() == {"message": "success"}
+    assert mock_fetch_user_data.call_count == 1
 
     # Check the saved details of the user
     response = client.post("api/users/printToken")
