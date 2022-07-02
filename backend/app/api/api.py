@@ -1,10 +1,10 @@
 from urllib.parse import urljoin
 
 import aiohttp
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from app.api.deps import authenticate_user, fastapi_sessions
+from app.api.deps import authenticate_user, fastapi_sessions, fetch_user_data
 from app.api.endpoints import external_url, github_routes, users
 from app.api.models import OpenIdInfo
 from app.core.http_client import http_client
@@ -44,7 +44,7 @@ async def current_user(request: Request):
 
 
 @api_router.post("/verify-openid")
-async def verify_openid(open_id_info: OpenIdInfo):
+async def verify_openid(open_id_info: OpenIdInfo, background_tasks: BackgroundTasks):
     matrix_homeserver = "https://" + open_id_info.matrix_server_name
     params = {"access_token": open_id_info.access_token}
     url = urljoin(matrix_homeserver, "/_matrix/federation/v1/openid/userinfo")
@@ -66,6 +66,7 @@ async def verify_openid(open_id_info: OpenIdInfo):
                 response, data=server_session_data
             )
 
+            background_tasks.add_task(fetch_user_data, session_id)
             return response
 
     except aiohttp.ClientConnectionError as err:
