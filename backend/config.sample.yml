@@ -1,3 +1,5 @@
+app_name: matrix-cerberus
+
 redis:
   # Used to construct redis database URL
   # 'uri' is in the form "redis :// [[username :] password@] host [:port][/database] [?[timeout=timeout[d|h|m|s|ms|us|ns]]"
