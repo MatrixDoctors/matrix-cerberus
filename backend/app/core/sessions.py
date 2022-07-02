@@ -76,7 +76,7 @@ class SessionCookie:
             expires=settings.server_sessions.expires_in,
         )
 
-        return response
+        return session_id, response
 
     def get_session_id(self, request: Response):
         return request.cookies.get(self.session_key)
