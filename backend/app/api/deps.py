@@ -1,3 +1,7 @@
+"""
+This module consists of all the dependencies, background tasks and instances of classes that will be required by the path functions.
+"""
+
 import gidgethub.aiohttp
 from fastapi import Depends, HTTPException, Request
 

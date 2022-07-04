@@ -1,4 +1,7 @@
-import json
+"""
+Module which provides classes and methods that interact with a matrix homeserver as a bot client.
+"""
+
 from typing import Optional
 from asyncio import exceptions
 from urllib.parse import urljoin
