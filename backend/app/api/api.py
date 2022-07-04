@@ -43,7 +43,7 @@ async def verify_openid(request: Request, open_id_info: OpenIdInfo):
     try:
         async with http_client.session.get(url, params=params) as resp:
             if resp.status != 200:
-                raise HTTPException(status_code=404, detail="Invalid token")
+                raise HTTPException(status_code=401, detail="Invalid token")
             data = await resp.json()
 
             server_session_data = ServerSessionData(
