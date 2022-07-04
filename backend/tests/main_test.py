@@ -1,9 +1,20 @@
+import json
+
+import pytest
+from aioresponses import aioresponses
 from fastapi.testclient import TestClient
 
 from app.core.config import settings
+from app.core.http_client import http_client
 from app.main import app
 
 client = TestClient(app)
+
+
+@pytest.fixture
+def mock_server():
+    with aioresponses() as m:
+        yield m
 
 
 def test_main():
@@ -18,28 +29,33 @@ def test_message_users():
     assert response.json() == {"message": "Hello User!!!"}
 
 
-def test_user_session_flow():
-    # Client logs in.
-    response = client.post(
-        "api/users/login",
+@pytest.mark.asyncio
+async def test_user_session_flow(mock_server):
+    matrix_user = "@example_user:matrix.org"
+    http_client.start_session()
+
+    mock_server.get(
+        url="https://matrix.org/_matrix/federation/v1/openid/userinfo?access_token=some_access_token",
+        status=200,
+        payload={"sub": matrix_user},
     )
+
+    open_id_data = {
+        "access_token": "some_access_token",
+        "expires_in": 3600,
+        "matrix_server_name": "matrix.org",
+        "token_type": "Bearer",
+    }
+    response = client.post("api/users/verify-openid", data=json.dumps(open_id_data))
     session_cookie = response.cookies.get_dict()
     assert response.status_code == 200
     assert session_cookie[settings.server_sessions.session_key] is not None
-    assert response.json() == {"message": "successfully logged in"}
-
-    # Set the 'matrix_user' field in session database
-    name = "John Paul"
-    params = {"name": name}
-    response = client.post("api/users/changeTokens", params=params)
-
-    assert response.status_code == 200
     assert response.json() == {"message": "success"}
 
-    # fetch the 'matrix_user' field in session database
+    # Check the saved details of the user
     response = client.post("api/users/printToken")
     assert response.status_code == 200
-    assert response.json() == {"matrix_user": name}
+    assert response.json() == {"matrix_user": matrix_user}
 
     # Client logs out
     response = client.post(

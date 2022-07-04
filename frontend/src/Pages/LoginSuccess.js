@@ -1,7 +1,7 @@
-import React from 'react'
-import { useSearchParams } from 'react-router-dom'
-import axios from 'axios';
+import React, { useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { MatrixApi } from '../MatrixApi';
+import authenticateWithOpenId from "../HelperFunctions/authenticateWithOpenId"
 
 /**
  * This page is sent as a redirectUrl parameter when a request is sent to the '/login/sso/rediect/ endpoint.
@@ -12,16 +12,21 @@ export default function LoginSuccess() {
     const [searchParams, setSearchParams] = useSearchParams();
     const loginToken = searchParams.get('loginToken');
     const homeServer = localStorage.getItem('homeServer');
+    const navigate = useNavigate();
 
-    async function fetchData(){
-        const response = await new MatrixApi(homeServer).login('POST', {
-            type: "m.login.token",
-            token: loginToken
-        })
-    }
-    fetchData();
+    useEffect( () => {
+        async function fetchData(){
+            const response = await new MatrixApi(homeServer).login('POST', {
+                type: "m.login.token",
+                token: loginToken
+            });
+            authenticateWithOpenId(response.data);
+        }
+        fetchData();
+        navigate('/');
+    }, []);
 
     return (
-        <div>LoginSuccess</div>
+        <></>
     )
 }

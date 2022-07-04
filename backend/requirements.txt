@@ -1,10 +1,12 @@
 aiofiles==0.6.0
 aiohttp==3.8.1
 aiohttp-socks==0.7.1
+aioresponses==0.7.3
 aiosignal==1.2.0
 anyio==3.6.1
 asgiref==3.5.2
 astroid==2.11.5
+async-generator==1.10
 async-timeout==4.0.2
 attrs==21.4.0
 bcrypt==3.2.2
@@ -42,6 +44,7 @@ mccabe==0.7.0
 multidict==6.0.2
 mypy-extensions==0.4.3
 nodeenv==1.6.0
+outcome==1.2.0
 packaging==21.3
 passlib==1.7.4
 pathspec==0.9.0
@@ -57,6 +60,7 @@ pylint==2.14.1
 pyparsing==3.0.9
 pyrsistent==0.18.1
 pytest==7.1.2
+pytest-asyncio==0.18.3
 python-multipart==0.0.5
 python-socks==2.0.3
 PyYAML==6.0
@@ -65,10 +69,12 @@ requests==2.27.1
 safepickle==0.2.0
 six==1.16.0
 sniffio==1.2.0
+sortedcontainers==2.4.0
 starlette==0.19.1
 toml==0.10.2
 tomli==2.0.1
 tomlkit==0.11.0
+trio==0.21.0
 typing_extensions==4.2.0
 unpaddedbase64==2.1.0
 urllib3==1.26.9

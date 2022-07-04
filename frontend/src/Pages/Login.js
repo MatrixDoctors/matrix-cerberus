@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import UserField from '../Components/UserField'
 import SSOLogin from '../Components/SSOLogin'
 import {parsePhoneNumber} from "react-phone-number-input"
 import validateAndReturnUrl from '../HelperFunctions/validateAndReturnUrl'
-import axios from 'axios'
 import { MatrixApi } from '../MatrixApi'
+import authenticateWithOpenId from '../HelperFunctions/authenticateWithOpenId'
 
 /**
  * Login page which authenticates a user with the backend for a chosen matrix homeserver.
@@ -19,7 +19,6 @@ export default function Login() {
 	};
 
 	const default_homeserver = 'https://matrix.org';
-	localStorage.setItem("homeServer", default_homeserver);
 
 	// Used to set the Identifier type for password based login
 	const [fieldType, setFieldType] = useState('Username');
@@ -45,6 +44,8 @@ export default function Login() {
 
 	// Used to disable input fields when the homeserver url is invalid.
 	const [disableFields, setDisableFields] = useState(false);
+
+	const navigate = useNavigate();
 
 	// Fetches the available login types for a particular homeserver. Defaults to 'matrix.org'
 	useEffect(() => {
@@ -167,8 +168,8 @@ export default function Login() {
 			password: password
 		})
 		.then((resp) => {
-			const userId = resp.data.user_id;
-			setErrorMessage(`You have logged in as ${userId}`);
+			authenticateWithOpenId(resp.data);
+			navigate('/');
 		})
 		.catch( (err) => {
 			// Login attempt has failed. The provided authentication data was incorrect.
