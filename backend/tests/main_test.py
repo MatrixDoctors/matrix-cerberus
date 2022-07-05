@@ -20,7 +20,7 @@ def test_message_users(client):
 async def test_user_session_flow(mocker, client, mock_server, mock_http_client, settings):
     # mock_http_client is imported to start the aiohttp session.
 
-    mock_fetch_user_data = mocker.patch('app.api.api.fetch_user_data')
+    mock_fetch_user_data = mocker.patch("app.api.api.fetch_user_data")
 
     matrix_user = "@example_user:matrix.org"
 
