@@ -85,3 +85,4 @@ uvicorn==0.17.6
 virtualenv==20.14.1
 wrapt==1.14.1
 yarl==1.7.2
+pytest-mock
