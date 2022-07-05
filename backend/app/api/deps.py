@@ -42,7 +42,8 @@ async def save_user_data(session_data: ServerSessionData):
     await matrix_bot_runner.client.put_account_data(
         type="user", data=data, user_id=session_data.matrix_user
     )
-    
+
+
 async def gidgethub_instance(request: Request):
     session_data = fastapi_sessions.get_session(request)
     return gidgethub.aiohttp.GitHubAPI(

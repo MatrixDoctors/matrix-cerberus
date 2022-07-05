@@ -1,11 +1,11 @@
 from uuid import uuid4
-import gidgethub.aiohttp
+
 import aiohttp
-
+import gidgethub.aiohttp
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
-from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException, Request
 
-from app.api.deps import fastapi_sessions, save_user_data, github_api_instance
+from app.api.deps import fastapi_sessions, github_api_instance, save_user_data
 from app.api.models import GithubCode
 from app.core.background_runner import matrix_bot_runner
 from app.core.config import settings
