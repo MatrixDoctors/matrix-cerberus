@@ -8,7 +8,9 @@ GITHUB_USER_ID = "Bob"
 
 
 @pytest.fixture
-async def logged_in_client(mock_http_client, mock_server, client):
+async def logged_in_client(mocker, mock_http_client, mock_server, client):
+    mocker.patch("app.api.api.fetch_user_data")
+
     mock_server.get(
         url="https://matrix.org/_matrix/federation/v1/openid/userinfo?access_token=some_access_token",
         status=200,
@@ -48,6 +50,7 @@ async def test_get_login(mocker, logged_in_client, settings):
 
 async def test_post_login(mocker, logged_in_client, mock_server, mock_http_client, settings):
     mocker.patch("app.api.endpoints.github_routes.get_github_user_id", return_value=GITHUB_USER_ID)
+    m_save_user_data = mocker.patch("app.api.endpoints.github_routes.save_user_data")
 
     client_id = settings.github.client_id
     client_secret = settings.github.client_secret
@@ -68,6 +71,7 @@ async def test_post_login(mocker, logged_in_client, mock_server, mock_http_clien
     response = logged_in_client.get("api/current-user")
     assert response.status_code == 200
     assert response.json() == {"matrix_user_id": MATRIX_USER_ID, "github_user_id": GITHUB_USER_ID}
+    assert m_save_user_data.call_count == 1
 
 
 async def test_failed_post_login(mocker, logged_in_client, mock_server, mock_http_client, settings):
