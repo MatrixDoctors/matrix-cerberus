@@ -22,12 +22,14 @@ class MatrixBotBackgroundRunner:
         self.session_storage = session_storage
         self.access_token = access_token
 
-    async def start_bot(self):
+    async def initialise_bot(self):
+        # Fetch next batch token stored in redis
+        self.client.next_batch = self.session_storage["next_batch_token"]
+        await self.client.login(access_token=self.access_token)
+        await self.client.create_room_to_external_url_mapping()
+
+    async def start_sync(self):
         try:
-            # Fetch next batch token stored in redis
-            self.client.next_batch = self.session_storage["next_batch_token"]
-            await self.client.login(access_token=self.access_token)
-            await self.client.create_room_to_external_url_mapping()
             await self.client.sync_forever(
                 30000,
                 since=self.client.next_batch,
@@ -42,13 +44,14 @@ class MatrixBotBackgroundRunner:
                 print(err)
             await self.client.close()
 
-    def create_background_task(self):
+    async def create_background_task(self):
         print("Background task has started")
-        self.background_task = asyncio.create_task(self.start_bot())
+        await self.initialise_bot()
+        self.background_sync_task = asyncio.create_task(self.start_sync())
 
     async def cancel_background_task(self):
         # Store next batch token in redis, returns None if not found.
         self.session_storage["next_batch_token"] = self.client.next_batch
 
-        self.background_task.cancel()
+        self.background_sync_task.cancel()
         print(f"Background Task is cancelled")
