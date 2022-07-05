@@ -1,7 +1,6 @@
 import gidgethub
 import gidgethub.aiohttp
 
-from app.core.background_runner import matrix_bot_runner
 from app.core.config import settings
 
 
