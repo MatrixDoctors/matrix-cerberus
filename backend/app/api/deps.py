@@ -55,5 +55,9 @@ async def github_api_instance(
     request: Request, gh: gidgethub.aiohttp.GitHubAPI = Depends(gidgethub_instance)
 ):
     session_data = fastapi_sessions.get_session(request)
-    github_api = GithubAPI(gh, session_data.github_user_id)
+    github_api = GithubAPI(
+        gh=gh,
+        username=session_data.github_user_id,
+        default_role=app_state.settings.github.organisation_membership,
+    )
     return github_api

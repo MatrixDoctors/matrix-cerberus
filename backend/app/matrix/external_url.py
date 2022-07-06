@@ -118,3 +118,6 @@ class ExternalUrlAPI:
         await app_state.bot_client.put_account_data(self._event_type, data)
 
         return new_url_code
+
+    async def get_room_external_url(self, room_id: str) -> RoomSpecificExternalUrl:
+        return app_state.bot_client.room_to_external_url_mapping[room_id]
