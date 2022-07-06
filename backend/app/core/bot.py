@@ -11,8 +11,13 @@ from nio.responses import WhoamiResponse
 
 from app.core.config import settings
 from app.core.http_client import http_client
-from app.core.models import RoomSpecificExternalUrl
-from app.core.parse_events import parse_event_data, parse_event_type
+from app.core.models import (
+    BotGlobalData,
+    ExternalUrlData,
+    RoomSpecificData,
+    RoomSpecificExternalUrl,
+    UserData,
+)
 
 
 class BaseBotClient(AsyncClient):
@@ -66,10 +71,38 @@ class BaseBotClient(AsyncClient):
         except exceptions as err:
             print(err)
 
+    def parse_event_data(self, type: str, data):
+        if type == f"external_url":
+            return ExternalUrlData.parse_obj(data)
+
+        elif type == "rooms":
+            return RoomSpecificData.parse_obj(data)
+
+        elif type == "user":
+            return UserData.parse_obj(data)
+
+        elif type == "global_data":
+            return BotGlobalData.parse_obj(data)
+
+    def parse_event_type(self, type: str, app_name, **additional_type_data):
+        if type == f"external_url":
+            event_type = f"{app_name}.external_url"
+
+        elif type == "rooms":
+            event_type = f"{app_name}.rooms.{additional_type_data['room_id']}"
+
+        elif type == "user":
+            event_type = f"{app_name}.user.{additional_type_data['user_id']}"
+
+        elif type == "global_data":
+            event_type = f"{app_name}.global_data"
+
+        return event_type
+
     async def get_account_data(self, type: str, **additional_type_data):
         access_token = self.access_token
         headers = {"Authorization": f"Bearer {access_token}"}
-        event_type = parse_event_type(type, settings.app_name, **additional_type_data)
+        event_type = self.parse_event_type(type, settings.app_name, **additional_type_data)
 
         url = urljoin(
             self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{event_type}"
@@ -77,15 +110,15 @@ class BaseBotClient(AsyncClient):
 
         async with http_client.session.get(url=url, headers=headers) as resp:
             data = await resp.json()
-            data = parse_event_data(type, data)
+            data = self.parse_event_data(type, data)
             return data
 
     async def put_account_data(self, type: str, data, **additional_type_data):
         access_token = self.access_token
         headers = {"Authorization": f"Bearer {access_token}"}
 
-        event_type = parse_event_type(type, settings.app_name, **additional_type_data)
-        data = parse_event_data(type, data)
+        event_type = self.parse_event_type(type, settings.app_name, **additional_type_data)
+        data = self.parse_event_data(type, data)
 
         url = urljoin(
             self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{event_type}"
