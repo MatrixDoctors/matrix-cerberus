@@ -13,12 +13,11 @@ from app.core.sessions import RedisSessionStorage
 class MatrixBotBackgroundRunner:
     def __init__(
         self,
-        homeserver: str,
+        client: BaseBotClient,
         access_token: str,
-        app_name: str,
         session_storage: RedisSessionStorage,
     ):
-        self.client = BaseBotClient(homeserver=homeserver, app_name=app_name)
+        self.client = client
         self.background_task = None
         self.session_storage = session_storage
         self.access_token = access_token

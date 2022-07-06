@@ -7,7 +7,6 @@ from fastapi.responses import JSONResponse
 
 from app.api.deps import fastapi_sessions, github_api_instance, save_user_data
 from app.api.models import GithubCode
-from app.core.background_runner import matrix_bot_runner
 from app.core.config import settings
 from app.core.http_client import http_client
 from app.github.github_api import GithubAPI

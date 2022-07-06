@@ -1,4 +1,5 @@
 from app.core.background_runner import MatrixBotBackgroundRunner
+from app.core.bot import BaseBotClient
 from app.core.config import settings
 from app.core.http_client import HttpClient
 from app.core.sessions import RedisSessionStorage, SessionCookie
@@ -16,13 +17,17 @@ class AppState:
             expires_in=self.settings.server_sessions.expires_in,
         )
 
-        self.matrix_bot_runner = MatrixBotBackgroundRunner(
+        self.bot_client = BaseBotClient(
             homeserver=self.settings.matrix_bot.homeserver,
+            app_name=self.settings.app_name,
+            http_client=self.http_client,
+        )
+
+        self.matrix_bot_runner = MatrixBotBackgroundRunner(
+            client=self.bot_client,
             access_token=self.settings.matrix_bot.access_token,
             session_storage=self.session_storage,
-            app_name=self.settings.app_name,
         )
-        self.bot_client = self.matrix_bot_runner.client
 
     async def setup_state(self):
         await self.http_client.start_session()

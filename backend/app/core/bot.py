@@ -9,7 +9,7 @@ from urllib.parse import urljoin
 from nio import AsyncClient, AsyncClientConfig, InviteEvent, MatrixRoom, RoomMessageText
 from nio.responses import WhoamiResponse
 
-from app.core.http_client import http_client
+from app.core.http_client import HttpClient
 from app.core.models import (
     BotGlobalData,
     ExternalUrlData,
@@ -24,6 +24,7 @@ class BaseBotClient(AsyncClient):
         self,
         homeserver: str,
         app_name: str,
+        http_client: HttpClient,
         user: str = "",
         device_id: Optional[str] = "",
         store_path: Optional[str] = "",
@@ -39,9 +40,9 @@ class BaseBotClient(AsyncClient):
         # print all the messages we receive to console
         self.add_event_callback(self.cb_print_messages, RoomMessageText)
 
-        self.room_to_external_url_mapping = {}
-
         self.app_name = app_name
+        self.http_client = http_client
+        self.room_to_external_url_mapping = {}
 
     async def login(self, access_token) -> None:
         self.access_token = access_token
@@ -110,7 +111,7 @@ class BaseBotClient(AsyncClient):
             self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{event_type}"
         )
 
-        async with http_client.session.get(url=url, headers=headers) as resp:
+        async with self.http_client.session.get(url=url, headers=headers) as resp:
             data = await resp.json()
             data = self.parse_event_data(type, data)
             return data
@@ -125,7 +126,7 @@ class BaseBotClient(AsyncClient):
         url = urljoin(
             self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{event_type}"
         )
-        await http_client.session.put(url=url, headers=headers, data=data.json())
+        await self.http_client.session.put(url=url, headers=headers, data=data.json())
 
     async def create_room_to_external_url_mapping(self):
         data = await self.get_account_data("external_url")
