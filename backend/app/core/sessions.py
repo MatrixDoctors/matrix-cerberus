@@ -5,7 +5,6 @@ from typing import Any
 from fastapi import Request, Response
 from redis import Redis
 
-from app.core.config import settings
 from app.core.models import ServerSessionData
 
 
@@ -19,8 +18,8 @@ class RedisSessionStorage:
     between the redis database and the server.
     """
 
-    def __init__(self):
-        self.client = Redis.from_url(settings.redis.uri)
+    def __init__(self, redis_uri):
+        self.client = Redis.from_url(redis_uri)
 
     def __getitem__(self, key: str):
         raw = self.client.get(key)
@@ -49,19 +48,16 @@ class RedisSessionStorage:
         return sessionId
 
 
-session_storage = RedisSessionStorage()
-
-
 class SessionCookie:
     """
     Session Cookie class provides high level methods
     to interact with the redis database
     """
 
-    def __init__(self):
+    def __init__(self, session_storage: RedisSessionStorage, session_key: str, expires_in: int):
         self.session_storage = session_storage
-        self.session_key = settings.server_sessions.session_key
-        self.expires_in = settings.server_sessions.expires_in
+        self.session_key = session_key
+        self.expires_in = expires_in
 
     def create_session(self, response: Response, data: ServerSessionData = ServerSessionData()):
         session_id = self.session_storage.generate_session_id()
@@ -73,7 +69,7 @@ class SessionCookie:
             key=self.session_key,
             value=session_id,
             httponly=True,
-            expires=settings.server_sessions.expires_in,
+            expires=self.expires_in,
         )
 
         return session_id, response

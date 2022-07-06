@@ -9,7 +9,6 @@ from urllib.parse import urljoin
 from nio import AsyncClient, AsyncClientConfig, InviteEvent, MatrixRoom, RoomMessageText
 from nio.responses import WhoamiResponse
 
-from app.core.config import settings
 from app.core.http_client import http_client
 from app.core.models import (
     BotGlobalData,
@@ -24,6 +23,7 @@ class BaseBotClient(AsyncClient):
     def __init__(
         self,
         homeserver: str,
+        app_name: str,
         user: str = "",
         device_id: Optional[str] = "",
         store_path: Optional[str] = "",
@@ -41,8 +41,10 @@ class BaseBotClient(AsyncClient):
 
         self.room_to_external_url_mapping = {}
 
-    async def login(self) -> None:
-        self.access_token = settings.matrix_bot.access_token
+        self.app_name = app_name
+
+    async def login(self, access_token) -> None:
+        self.access_token = access_token
 
         # Verify the access_token and set user_id
         response = await self.whoami()
@@ -102,7 +104,7 @@ class BaseBotClient(AsyncClient):
     async def get_account_data(self, type: str, **additional_type_data):
         access_token = self.access_token
         headers = {"Authorization": f"Bearer {access_token}"}
-        event_type = self.parse_event_type(type, settings.app_name, **additional_type_data)
+        event_type = self.parse_event_type(type, self.app_name, **additional_type_data)
 
         url = urljoin(
             self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{event_type}"
@@ -117,7 +119,7 @@ class BaseBotClient(AsyncClient):
         access_token = self.access_token
         headers = {"Authorization": f"Bearer {access_token}"}
 
-        event_type = self.parse_event_type(type, settings.app_name, **additional_type_data)
+        event_type = self.parse_event_type(type, self.app_name, **additional_type_data)
         data = self.parse_event_data(type, data)
 
         url = urljoin(

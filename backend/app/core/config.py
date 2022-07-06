@@ -52,7 +52,6 @@ class Settings(BaseSettings):
     @classmethod
     def from_yaml(cls, path_to_file):
         absolute_path_to_file = Path(path_to_file).absolute()
-
         try:
             with open(absolute_path_to_file) as f:
                 yaml_settings = yaml.safe_load(f)
