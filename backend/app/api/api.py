@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from app.api.deps import authenticate_user, fastapi_sessions, fetch_user_data
 from app.api.endpoints import external_url, github_routes, users
 from app.api.models import OpenIdInfo
-from app.core.http_client import http_client
+from app.core.global_app_state import app_state
 from app.core.models import ServerSessionData
 from app.matrix.external_url import ExternalUrlAPI
 
@@ -56,7 +56,7 @@ async def verify_openid(open_id_info: OpenIdInfo):
     url = urljoin(matrix_homeserver, "/_matrix/federation/v1/openid/userinfo")
 
     try:
-        async with http_client.session.get(url, params=params) as resp:
+        async with app_state.http_client.session.get(url, params=params) as resp:
             if resp.status != 200:
                 raise HTTPException(status_code=404, detail="Invalid token")
             data = await resp.json()
