@@ -23,13 +23,17 @@ class MatrixBotBackgroundRunner:
         self.access_token = access_token
 
     async def initialise_bot(self):
+        await self.client.login(access_token=self.access_token)
+
+        await self.client.sync(30000, since=self.session_storage["next_batch_token"], full_state=True)
         # Fetch next batch token stored in redis
         self.client.next_batch = self.session_storage["next_batch_token"]
-        await self.client.login(access_token=self.access_token)
-        await self.client.create_room_to_external_url_mapping()
 
     async def start_sync(self):
         try:
+            # This method requires the http_client session to be active in BaseBotClient class instance.
+            await self.client.create_room_to_external_url_mapping()
+
             await self.client.sync_forever(
                 30000,
                 since=self.client.next_batch,
@@ -46,7 +50,6 @@ class MatrixBotBackgroundRunner:
 
     async def create_background_task(self):
         print("Background task has started")
-        await self.initialise_bot()
         self.background_sync_task = asyncio.create_task(self.start_sync())
 
     async def cancel_background_task(self):
