@@ -10,6 +10,3 @@ class HttpClient:
     async def stop_session(self):
         await self.session.close()
         self.session = None
-
-
-http_client = HttpClient()
