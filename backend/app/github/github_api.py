@@ -1,14 +1,12 @@
 import gidgethub
 import gidgethub.aiohttp
 
-from app.core.config import settings
-
 
 class GithubAPI:
-    def __init__(self, gh: gidgethub.aiohttp.GitHubAPI, username):
+    def __init__(self, gh: gidgethub.aiohttp.GitHubAPI, username: str, default_role: str):
         self.username = username
         self.gh = gh
-        self.default_role_level = self.role_level(settings.github.organisation_membership)
+        self.default_role_level = self.role_level(default_role)
 
     def role_level(self, role: str):
         if role == "member":

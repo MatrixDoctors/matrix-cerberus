@@ -7,7 +7,6 @@ from fastapi.responses import JSONResponse
 
 from app.api.deps import fastapi_sessions, github_api_instance, save_user_data
 from app.api.models import GithubCode
-from app.core.config import settings
 from app.core.global_app_state import app_state
 from app.github.github_api import GithubAPI
 
@@ -25,10 +24,10 @@ async def get_github_user_id(access_token):
 @router.get("/login")
 async def get_login():
 
-    client_id = settings.github.client_id
+    client_id = app_state.settings.github.client_id
     scope = ["read:org", "repo", "user"]
     scope = "%20".join(scope)
-    redirect_uri = settings.github.redirect_uri
+    redirect_uri = app_state.settings.github.redirect_uri
     state = uuid4().hex
 
     params = {"scope": scope, "client_id": client_id, "redirect_uri": redirect_uri, "state": state}
@@ -45,8 +44,8 @@ async def get_login():
 
 @router.post("/login")
 async def authenticate_user(request: Request, body: GithubCode, background_tasks: BackgroundTasks):
-    client_id = settings.github.client_id
-    client_secret = settings.github.client_secret
+    client_id = app_state.settings.github.client_id
+    client_secret = app_state.settings.github.client_secret
 
     params = {"code": body.code, "client_secret": client_secret, "client_id": client_id}
 
