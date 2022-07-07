@@ -2,8 +2,9 @@
 Module which provides classes and methods that interact with a matrix homeserver as a bot client.
 """
 
-from typing import Optional
+from typing import Dict, Optional
 from asyncio import exceptions
+from collections import defaultdict
 from urllib.parse import urljoin
 
 from nio import AsyncClient, AsyncClientConfig, InviteEvent, MatrixRoom, RoomMessageText
@@ -40,9 +41,11 @@ class BaseBotClient(AsyncClient):
         # print all the messages we receive to console
         self.add_event_callback(self.cb_print_messages, RoomMessageText)
 
-        self.app_name = app_name
-        self.http_client = http_client
-        self.room_to_external_url_mapping = {}
+        self.app_name: str = app_name
+        self.http_client: HttpClient = http_client
+        self.room_to_external_url_mapping: Dict[str, RoomSpecificExternalUrl] = defaultdict(
+            RoomSpecificExternalUrl
+        )
 
     async def login(self, access_token) -> None:
         self.access_token = access_token
@@ -133,9 +136,6 @@ class BaseBotClient(AsyncClient):
         external_url_data = data.content
 
         for url_code, value in external_url_data.items():
-            if value.room_id not in self.room_to_external_url_mapping:
-                self.room_to_external_url_mapping[value.room_id] = RoomSpecificExternalUrl()
-
             if value.use_once_only:
                 self.room_to_external_url_mapping[value.room_id].temporary.add(url_code)
             else:
