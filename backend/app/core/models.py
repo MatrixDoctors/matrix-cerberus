@@ -74,6 +74,10 @@ class ClientEventData(BaseModel):
 
 
 class RoomMembersData(BaseModel):
+    """
+    Room Members data for the 'rooms/{roomId}/members' endpoint.
+    """
+
     chunk: List[ClientEventData]
 
 
@@ -83,6 +87,10 @@ class GlobalData(BaseModel):
 
 
 class BotGlobalData(BaseModel):
+    """
+    Pydantic model used to evaluate account data for `<app_name>.global_data` event type.
+    """
+
     content: GlobalData = dict(GlobalData())
 
 
@@ -103,4 +111,8 @@ class UserMappedData(BaseModel):
 
 
 class UserData(BaseModel):
+    """
+    Pydantic model used to evaluate account data for `<app_name>.user.<user_id>` event type.
+    """
+
     content: UserMappedData = UserMappedData()

@@ -12,9 +12,9 @@ app = FastAPI(docs_url="/api/docs", redoc_url="/api/redoc", openapi_url="/api/op
 @app.on_event("startup")
 async def app_startup():
     # Fetch the initial sync from matrix homeserver
-    await app_state.matrix_bot_runner.initialise_bot()
-    await background_validator.create_background_task()
+    await app_state.matrix_bot_runner.initialise_bot()    
     await app_state.setup_state()
+    await background_validator.create_background_task()
 
 
 @app.on_event("shutdown")

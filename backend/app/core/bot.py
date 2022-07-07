@@ -153,7 +153,7 @@ class BaseBotClient(AsyncClient):
 
     async def get_room_members(self, room_id: str) -> Union[RoomMembersData, ErrorResponse]:
         access_token = self.access_token
-        query_parameters = {"access_token": access_token, "membership": "ban"}
+        query_parameters = {"access_token": access_token, "membership": "leave"}
         path = ["rooms", room_id, "members"]
 
         method = "GET"
