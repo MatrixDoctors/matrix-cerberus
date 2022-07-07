@@ -63,6 +63,20 @@ class RoomSpecificData(BaseModel):
     content: RoomConditionsData = RoomConditionsData()
 
 
+class RoomMembershipContent(BaseModel):
+    membership: str
+
+
+class ClientEventData(BaseModel):
+    content: RoomMembershipContent
+    sender: str
+    state_key: str
+
+
+class RoomMembersData(BaseModel):
+    chunk: List[ClientEventData]
+
+
 class GlobalData(BaseModel):
     users: List[str] = []
     rooms: List[str] = []
