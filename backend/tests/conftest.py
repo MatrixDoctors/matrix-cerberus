@@ -6,32 +6,26 @@ from aioresponses import aioresponses
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings
-from app.core.http_client import http_client
+from app.core.global_app_state import AppState, app_state
 from app.github.github_api import GithubAPI
+from app.main import app
 
 GITHUB_USER_ID = "p0tato"
 GITHUB_ACCESS_TOKEN = "some_access_token"
 
 
 @pytest.fixture
-def settings():
-    return Settings.from_yaml("config.sample.yml")
-
-
-@pytest.fixture
-def app(mocker):
-    mocker.patch("app.core.config.settings", Settings.from_yaml("config.sample.yml"))
-    import app
-
-    return app
-
-
-@pytest.fixture
-def client(mocker):
-    mocker.patch("app.core.config.settings", Settings.from_yaml("config.sample.yml"))
-    from app.main import app
-
+def client():
     return TestClient(app)
+
+
+@pytest.fixture
+async def mock_app_state(mocker):
+    mocker.patch("app.core.global_app_state.settings", Settings.from_yaml("config.sample.yml"))
+
+    await app_state.http_client.start_session()
+    yield app_state
+    await app_state.http_client.stop_session()
 
 
 @pytest.fixture
@@ -41,23 +35,18 @@ def mock_server():
 
 
 @pytest.fixture
-async def mock_http_client():
-    await http_client.start_session()
-    yield http_client
-    await http_client.stop_session()
-
-
-@pytest.fixture
-async def gidgethub_instance(mock_http_client):
+async def gidgethub_instance(mock_app_state):
     yield gidgethub.aiohttp.GitHubAPI(
-        mock_http_client.session,
+        mock_app_state.http_client.session,
         requester=GITHUB_USER_ID,
         oauth_token=GITHUB_ACCESS_TOKEN,
     )
 
 
 @pytest.fixture
-async def github_api(mocker, gidgethub_instance):
-    mocker.patch("app.github.github_api.settings", Settings.from_yaml("config.sample.yml"))
-
-    return GithubAPI(gidgethub_instance, GITHUB_USER_ID)
+async def github_api(mock_app_state: AppState, gidgethub_instance):
+    return GithubAPI(
+        gh=gidgethub_instance,
+        username=GITHUB_USER_ID,
+        default_role=mock_app_state.settings.github.organisation_membership,
+    )
