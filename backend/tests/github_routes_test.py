@@ -8,7 +8,8 @@ GITHUB_USER_ID = "Bob"
 
 
 @pytest.fixture
-async def logged_in_client(mocker, mock_http_client, mock_server, client):
+async def logged_in_client(mocker, client, mock_server, mock_app_state):
+    # mock_app_state is imported to start the http_client session
     mocker.patch("app.api.api.fetch_user_data")
 
     mock_server.get(
@@ -23,6 +24,7 @@ async def logged_in_client(mocker, mock_http_client, mock_server, client):
         "matrix_server_name": "matrix.org",
         "token_type": "Bearer",
     }
+
     response = client.post("api/verify-openid", data=json.dumps(open_id_data))
     assert response.status_code == 200
 
@@ -32,10 +34,12 @@ async def logged_in_client(mocker, mock_http_client, mock_server, client):
     assert response.status_code == 200
 
 
-async def test_get_login(mocker, logged_in_client, settings):
+async def test_get_login(mocker, logged_in_client, mock_app_state):
     uuid = mock.Mock()
     uuid.hex = "abc123"
     mocker.patch("app.api.endpoints.github_routes.uuid4", return_value=uuid)
+
+    settings = mock_app_state.settings
 
     scope = ["read:org", "repo", "user"]
     scope = "%20".join(scope)
@@ -48,9 +52,11 @@ async def test_get_login(mocker, logged_in_client, settings):
     assert data["state"] == uuid.hex
 
 
-async def test_post_login(mocker, logged_in_client, mock_server, mock_http_client, settings):
+async def test_post_login(mocker, logged_in_client, mock_server, mock_app_state):
     mocker.patch("app.api.endpoints.github_routes.get_github_user_id", return_value=GITHUB_USER_ID)
     m_save_user_data = mocker.patch("app.api.endpoints.github_routes.save_user_data")
+
+    settings = mock_app_state.settings
 
     client_id = settings.github.client_id
     client_secret = settings.github.client_secret
@@ -74,8 +80,10 @@ async def test_post_login(mocker, logged_in_client, mock_server, mock_http_clien
     assert m_save_user_data.call_count == 1
 
 
-async def test_failed_post_login(mocker, logged_in_client, mock_server, mock_http_client, settings):
+async def test_failed_post_login(mocker, logged_in_client, mock_server, mock_app_state):
     mocker.patch("app.api.endpoints.github_routes.get_github_user_id", return_value=GITHUB_USER_ID)
+
+    settings = mock_app_state.settings
 
     client_id = settings.github.client_id
     client_secret = settings.github.client_secret
