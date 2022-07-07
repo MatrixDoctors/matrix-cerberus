@@ -6,7 +6,7 @@ from aioresponses import aioresponses
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings
-from app.core.global_app_state import AppState, app_state
+from app.core.global_app_state import AppState
 from app.github.github_api import GithubAPI
 from app.main import app
 
@@ -20,8 +20,8 @@ def client():
 
 
 @pytest.fixture
-async def mock_app_state(mocker):
-    mocker.patch("app.core.global_app_state.settings", Settings.from_yaml("config.sample.yml"))
+async def mock_app_state():
+    from app.core.app_state import app_state
 
     await app_state.http_client.start_session()
     yield app_state

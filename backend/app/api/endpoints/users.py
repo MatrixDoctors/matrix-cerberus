@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from starlette.responses import JSONResponse, RedirectResponse
 
 from app.api.deps import fastapi_sessions
-from app.core.global_app_state import app_state
+from app.core.app_state import app_state
 from app.core.models import ServerSessionData
 
 router = APIRouter()

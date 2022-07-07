@@ -1,7 +1,7 @@
 from fastapi import Depends, FastAPI
 
 from app.api import api
-from app.core.global_app_state import app_state
+from app.core.app_state import app_state
 
 # from app.core.background_runner import matrix_bot_runner
 
