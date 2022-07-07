@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.deps import fastapi_sessions, github_api_instance, save_user_data
 from app.api.models import GithubCode
-from app.core.global_app_state import app_state
+from app.core.app_state import app_state
 from app.github.github_api import GithubAPI
 
 router = APIRouter()

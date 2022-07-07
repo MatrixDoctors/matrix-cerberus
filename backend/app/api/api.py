@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from app.api.deps import authenticate_user, fastapi_sessions, fetch_user_data
 from app.api.endpoints import external_url, github_routes, users
 from app.api.models import OpenIdInfo
-from app.core.global_app_state import app_state
+from app.core.app_state import app_state
 from app.core.models import ServerSessionData
 from app.matrix.external_url import ExternalUrlAPI
 

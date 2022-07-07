@@ -5,7 +5,7 @@ This module consists of all the dependencies, background tasks and instances of 
 import gidgethub.aiohttp
 from fastapi import Depends, HTTPException, Request
 
-from app.core.global_app_state import app_state
+from app.core.app_state import app_state
 from app.core.models import ServerSessionData, UserData
 from app.github.github_api import GithubAPI
 

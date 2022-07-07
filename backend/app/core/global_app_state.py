@@ -1,13 +1,17 @@
+from pathlib import Path
+
+import yaml
+
 from app.core.background_runner import MatrixBotBackgroundRunner
 from app.core.bot import BaseBotClient
-from app.core.config import settings
+from app.core.config import Settings
 from app.core.http_client import HttpClient
 from app.core.sessions import RedisSessionStorage, SessionCookie
 
 
 class AppState:
-    def __init__(self):
-        self.settings = settings
+    def __init__(self, settings_file: str = "config.yml"):
+        self.settings = self.get_settings_from_yaml(settings_file)
         self.http_client = HttpClient()
         self.session_storage = RedisSessionStorage(self.settings.redis.uri)
 
@@ -37,5 +41,11 @@ class AppState:
         await self.http_client.stop_session()
         await self.matrix_bot_runner.cancel_background_task()
 
-
-app_state = AppState()
+    def get_settings_from_yaml(cls, path_to_file):
+        absolute_path_to_file = Path(path_to_file).absolute()
+        try:
+            with open(absolute_path_to_file) as f:
+                yaml_settings = yaml.safe_load(f)
+                return Settings.parse_obj(yaml_settings)
+        except (IOError, ImportError) as err:
+            print(f"Couldn't load config from file. Error: {err}")

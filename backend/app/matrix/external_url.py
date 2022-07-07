@@ -1,7 +1,7 @@
 import string
 import secrets
 
-from app.core.global_app_state import app_state
+from app.core.app_state import app_state
 from app.core.models import RoomSpecificExternalUrl
 
 
