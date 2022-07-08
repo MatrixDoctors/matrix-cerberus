@@ -27,7 +27,11 @@ class BackgroundValidater:
     def __init__(self):
         self.client = app_state.bot_client
         self.registered_users: Dict[str, RegisteredUser] = dict()
+
+        # List of rooms registered under the application and has "room membership" conditions.
         self.rooms_with_conditions: List[str] = []
+
+        # Set of rooms where the bot has invite and kick permissions.
         self.rooms_with_permissions: Set[str] = {}
         self.background_validator_task = None
 
@@ -45,7 +49,7 @@ class BackgroundValidater:
             await self.fetch_rooms_and_users()
 
             for room_id in self.rooms_with_conditions:
-                # When the user is either not part of the room or dosen't have the required permissions.
+                # When the bot is either not part of the room or dosen't have the required permissions.
                 if room_id not in self.rooms_with_permissions or room_id not in self.client.rooms:
                     continue
 
@@ -105,14 +109,12 @@ class BackgroundValidater:
         """
         Method that returns the set of users whose 'leave' state is not a result of the bot's actions.
         """
-        try:
-            resp = await self.client.get_room_members(room_id)
-            if isinstance(resp, ErrorResponse):
-                print("Error: ", err, sep=" ")
-        except ValidationError as err:
-            print("Error: ", err, sep=" ")
 
         ignore_members = set()
+
+        resp = await self.client.get_room_members(room_id)
+        if isinstance(resp, ErrorResponse):
+            print(f"Error: {resp}")
 
         for room_member in resp.chunk:
             # Bot is not the event's sender.

@@ -19,6 +19,7 @@ from nio import (
     RoomMessageText,
 )
 from nio.responses import WhoamiResponse
+from pydantic import ValidationError
 
 from app.core.http_client import HttpClient
 from app.core.models import (
@@ -161,10 +162,11 @@ class BaseBotClient(AsyncClient):
 
         resp = await self._send(CustomResponse, method, url_path)
 
-        if "errcode" in resp.content or "error" in resp.content:
+        try:
+            data = RoomMembersData.parse_obj(resp.content)
+            return data
+        except ValidationError:
             return ErrorResponse.from_dict(resp.content)
-
-        return RoomMembersData.parse_obj(resp.content)
 
     async def create_room_to_external_url_mapping(self):
         data = await self.get_account_data("external_url")
