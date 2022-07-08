@@ -2,8 +2,7 @@ import asyncio
 from typing import Set, Dict, List
 
 import gidgethub.aiohttp
-from nio import ErrorResponse, RoomGetStateEventError
-from pydantic import ValidationError
+from nio import ErrorResponse, RoomGetStateEventError, RoomInviteError, RoomKickError
 
 from app.core.app_state import app_state
 from app.core.models import RoomSpecificData, UserData
@@ -65,6 +64,16 @@ class BackgroundValidater:
                     if membership == "ignore":
                         continue
                     print(user_id, membership)
+
+                    is_permitted_through_github = await self.check_github_conditions(
+                        user_id, room_specific_data
+                    )
+                    is_permitted = is_permitted_through_github
+
+                    next_state = await self.decide_next_state_of_user(
+                        membership, is_permitted, room_specific_data.content.disable_room_kick
+                    )
+                    await self.send_next_state_event(room_id, user_id, next_state)
 
                 await asyncio.sleep(1)
             await asyncio.sleep(1)
@@ -168,6 +177,38 @@ class BackgroundValidater:
                 return True
 
         return False
+
+    async def decide_next_state_of_user(
+        self, current_state: str, is_permitted: bool, disable_room_kick: str
+    ) -> str:
+        """
+        Returns the next state of the user (str).
+        """
+        if is_permitted:
+            if current_state == "join":
+                return current_state
+            else:
+                return "invite"
+        elif disable_room_kick:
+            return current_state
+        else:
+            return "leave"
+
+    async def send_next_state_event(self, room_id: str, user_id: str, next_state: str):
+        """
+        Sends a state event which sets the room membership for a user.
+        """
+        if next_state == "invite":
+            resp = await self.client.room_invite(room_id, user_id)
+
+            if isinstance(resp, RoomInviteError):
+                print(f"Error: {resp}")
+
+        elif next_state == "leave":
+            resp = await self.client.room_kick(room_id, user_id)
+
+            if isinstance(resp, RoomKickError):
+                print(f"Error: {resp}")
 
     async def get_users_not_removed_by_bot(self, room_id: str) -> Set[str]:
         """
