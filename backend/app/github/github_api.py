@@ -47,8 +47,11 @@ class GithubAPI:
         return list_of_repos
 
     async def get_individual_repos(self):
+        """
+        Get repositories owned by the current user
+        """
         list_of_repos = []
-        async for item in self.gh.getiter(f"/user/repos?affliation=owner"):
+        async for item in self.gh.getiter(f"/user/repos?affiliation=owner"):
             list_of_repos.append(item["name"])
         return list_of_repos
 
