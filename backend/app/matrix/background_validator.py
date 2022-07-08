@@ -6,7 +6,7 @@ from nio import ErrorResponse, RoomGetStateEventError
 from pydantic import ValidationError
 
 from app.core.app_state import app_state
-from app.core.models import UserData
+from app.core.models import RoomSpecificData, UserData
 from app.github.github_api import GithubAPI
 
 
@@ -14,13 +14,14 @@ class RegisteredUser:
     def __init__(self, user_data: UserData):
         self.github_username = user_data.content.github.username
 
-        gh = gidgethub.aiohttp.GitHubAPI(
-            app_state.http_client.session,
-            requester=self.github_username,
-            oauth_token=user_data.content.github.access_token,
-        )
+        if self.github_username is not None:
+            gh = gidgethub.aiohttp.GitHubAPI(
+                app_state.http_client.session,
+                requester=self.github_username,
+                oauth_token=user_data.content.github.access_token,
+            )
 
-        self.github_api = GithubAPI(gh=gh, username=self.github_username, default_role=app_state.settings.github.organisation_membership)
+            self.github_api = GithubAPI(gh=gh, username=self.github_username, default_role=app_state.settings.github.organisation_membership)
 
 
 class BackgroundValidater:
@@ -54,9 +55,9 @@ class BackgroundValidater:
                     continue
 
                 ignore_members = await self.get_users_not_removed_by_bot(room_id)
-                # room_specific_data = await self.client.get_account_data("rooms", room_id=room_id)
+                room_specific_data = await self.client.get_account_data("rooms", room_id=room_id)
 
-                for user_id, user_data in self.registered_users.items():
+                for user_id in self.registered_users.keys():
                     if user_id in ignore_members:
                         continue
 
@@ -102,8 +103,71 @@ class BackgroundValidater:
                 return "ignore"
             return membership
 
-    async def check_github_conditions():
-        pass
+    async def check_github_conditions(
+        self, user_id: str, room_specific_data: RoomSpecificData
+    ) -> bool:
+        """
+        Method which validates a user's room membership based on a list of github conditions set by the room admin.
+        """
+        # If the user didn't register with github.
+        if self.registered_users[user_id].github_username is None:
+            return False
+
+        gh_username = self.registered_users[user_id].github_username
+        gh_api = self.registered_users[user_id].github_api
+
+        room_github_conditions = room_specific_data.content.github
+
+        # If there are no conditions present
+        if len(room_github_conditions.orgs) == 0 and len(room_github_conditions.users) == 0:
+            return True
+
+        # Organisation conditions
+        for org_name, org_conditions in room_github_conditions.orgs.items():
+
+            # Repository conditions
+            for repo_name, repo_conditions in org_conditions.repos.items():
+                resp = await gh_api.repo_permissions(org_name, repo_name, gh_username)
+
+                if resp == "admin" and repo_conditions.admin:
+                    return True
+                elif resp == "write" and repo_conditions.write:
+                    return True
+                elif resp == "read" and repo_conditions.read:
+                    return True
+
+            # Team conditions
+            for team_name, is_team_allowed in org_conditions.teams.items():
+                resp = await gh_api.is_team_member(org_name, team_name, gh_username)
+
+                if resp and is_team_allowed:
+                    return True
+
+            # Sponsorship tier conditions
+            sponsoring_tier = await gh_api.org_sponsored_at_tier(org_name)
+            if sponsoring_tier and org_conditions.sponsorship_tiers[sponsoring_tier]:
+                return True
+
+        # Organisation conditions
+        for user_name, user_conditions in room_github_conditions.users.items():
+
+            # Repository conditions
+            for repo_name, repo_conditions in user_conditions.repos.items():
+                resp = await gh_api.repo_permissions(user_name, repo_name, gh_username)
+
+                if resp == "admin" and repo_conditions.admin:
+                    return True
+                elif resp == "write" and repo_conditions.write:
+                    return True
+                elif resp == "read" and repo_conditions.read:
+                    return True
+
+            # Sponsorship tier conditions
+            sponsoring_tier = await gh_api.user_sponsored_at_tier(user_name)
+            if sponsoring_tier and user_conditions.sponsorship_tiers[sponsoring_tier]:
+                return True
+
+        return False
 
     async def get_users_not_removed_by_bot(self, room_id: str) -> Set[str]:
         """
