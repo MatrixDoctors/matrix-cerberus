@@ -49,7 +49,6 @@ class BackgroundValidater:
 
     async def start_task(self):
         while True:
-
             await self.fetch_rooms_and_users()
 
             for room_id in self.rooms_with_conditions:
@@ -64,10 +63,10 @@ class BackgroundValidater:
                     if user_id in ignore_members:
                         continue
 
-                    membership = await self.get_current_room_membership(user_id, room_id)
-                    if membership == "ignore":
+                    current_state = await self.get_current_room_membership(user_id, room_id)
+                    if current_state == "ignore":
                         continue
-                    print(user_id, membership)
+                    print(user_id, current_state)
 
                     is_permitted_through_github = await self.check_github_conditions(
                         user_id, room_specific_data
@@ -75,8 +74,12 @@ class BackgroundValidater:
                     is_permitted = is_permitted_through_github
 
                     next_state = await self.decide_next_state_of_user(
-                        membership, is_permitted, room_specific_data.content.disable_room_kick
+                        current_state, is_permitted, room_specific_data.content.disable_room_kick
                     )
+
+                    if current_state == next_state:
+                        continue
+
                     await self.send_next_state_event(room_id, user_id, next_state)
 
                 await asyncio.sleep(1)
@@ -122,18 +125,19 @@ class BackgroundValidater:
         """
         Method which validates a user's room membership based on a list of github conditions set by the room admin.
         """
-        # If the user didn't register with github.
-        if self.registered_users[user_id].github_username is None:
-            return False
-
-        gh_username = self.registered_users[user_id].github_username
-        gh_api = self.registered_users[user_id].github_api
 
         room_github_conditions = room_specific_data.content.github
 
         # If there are no conditions present
         if len(room_github_conditions.orgs) == 0 and len(room_github_conditions.users) == 0:
             return True
+
+        # If the user didn't register with github.
+        if self.registered_users[user_id].github_username is None:
+            return False
+
+        gh_username = self.registered_users[user_id].github_username
+        gh_api = self.registered_users[user_id].github_api
 
         # Organisation conditions
         for org_name, org_conditions in room_github_conditions.orgs.items():
@@ -188,6 +192,7 @@ class BackgroundValidater:
         """
         Returns the next state of the user (str).
         """
+
         if is_permitted:
             if current_state == "join":
                 return current_state
@@ -202,6 +207,7 @@ class BackgroundValidater:
         """
         Sends a state event which sets the room membership for a user.
         """
+
         if next_state == "invite":
             resp = await self.client.room_invite(room_id, user_id)
 
