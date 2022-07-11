@@ -25,10 +25,10 @@ from app.core.http_client import HttpClient
 from app.core.models import (
     BotGlobalData,
     ExternalUrlData,
+    RoomMembersData,
     RoomSpecificData,
     RoomSpecificExternalUrl,
     UserData,
-    RoomMembersData
 )
 
 

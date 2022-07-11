@@ -20,7 +20,11 @@ class RegisteredUser:
                 oauth_token=user_data.content.github.access_token,
             )
 
-            self.github_api = GithubAPI(gh=gh, username=self.github_username, default_role=app_state.settings.github.organisation_membership)
+            self.github_api = GithubAPI(
+                gh=gh,
+                username=self.github_username,
+                default_role=app_state.settings.github.organisation_membership,
+            )
 
 
 class BackgroundValidater:
