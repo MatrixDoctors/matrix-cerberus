@@ -1,13 +1,15 @@
 import React, {useState} from "react";
+import { useParams } from "react-router-dom";
 
 function Room() {
+    const { roomId } = useParams();
     return (
         <>
             <div className="flex flex-col sm:flex-row items-center justify-around w-full h-48 py-5 shadow-lg bg-dark-eye" >
                 <div className='flex w-full justify-center'>
                     <div className="hidden sm:w-1/4 sm:block"/>
                     <div className='sm:w-3/4 relative font-bold text-3xl m-5 px-3 sm:px-0 text-gray-200'>
-                        Room Settings
+                        { roomId }
                     </div>
                 </div>
 
