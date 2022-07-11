@@ -15,6 +15,7 @@ import LayoutsWithNavbar from './Components/LayoutsWithNavbar';
 import Logout from './Pages/Logout';
 import GithubOauth from './Pages/GithubOauth';
 import Room from './Pages/Room';
+import RoomExternalUrl from './Pages/RoomExternalUrl';
 
 export default function App() {
   const [matrixUserId, setMatrixUserId] = useState('');
@@ -31,6 +32,7 @@ export default function App() {
             <Route path="/server-settings" element={<ServerSettings />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/room/:roomId" element={<Room />} />
+            <Route path="/room/:roomId/external-url" element={<RoomExternalUrl />} />
           </Route>
 
         <Route path="/i/:url_code" element={<ExternalUrl />} />
