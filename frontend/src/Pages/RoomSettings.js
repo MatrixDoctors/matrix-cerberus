@@ -48,15 +48,12 @@ export default function RoomSettings() {
       const resp = await axios.get('/api/users/room-list');
       const data = resp.data.content;
 
-      let roomData = [], index=1;
-      for(let key in data){
-        roomData.push({
-          id: index,
-          roomAlias: data[key],
-          roomId: key
-        })
-        index += 1;
-      }
+      const roomData = Object.entries(data).map( ([roomId, roomAlias], id) => ({
+        id,
+        roomAlias,
+        roomId
+      }));
+
       setRoomBodyData(roomData);
     }
     fetchRoomData();
