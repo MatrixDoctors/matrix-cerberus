@@ -19,3 +19,11 @@ async def get_room_external_urls(
     return JSONResponse(
         {"content": {"permanent": resp.permanent, "temporary": list(resp.temporary)}}
     )
+
+
+@router.post("/{room_id}/external-url/replace", dependencies=[Depends(verify_room_permissions)])
+async def delete_external_url(
+    room_id: str, url_code: str, external_url: ExternalUrlAPI = Depends(external_url_api_instance)
+):
+    new_url_code = await external_url.replace_existing_url(url_code)
+    return JSONResponse({"url_code": new_url_code})

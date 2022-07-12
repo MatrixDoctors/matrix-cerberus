@@ -3,7 +3,8 @@ import PropTypes from "prop-types"
 import { Link, useParams } from 'react-router-dom'
 import axios from '../HelperFunctions/customAxios'
 
-const PermanentUrl = ({ urlCode }) => {
+const PermanentUrl = ({ urlCode, handleReplace }) => {
+    const fullUrl = `https://matrix-cerberus/i/${urlCode}`
     return (
         <tr className="h-20 text-sm leading-none text-gray-800 bg-gray-200 border-b border-t border-gray-200">
             <td className="pl-4 cursor-pointer">
@@ -13,14 +14,14 @@ const PermanentUrl = ({ urlCode }) => {
                 <p className="font-medium"> {urlCode} </p>
             </td>
             <td className="pl-12">
-                <p className="font-medium"> {`https://matrix-cerberus/i/${urlCode}`} </p>
+                <p className="font-medium"> {fullUrl} </p>
             </td>
             <td className="pl-12">
                 <div className="flex justify-end">
-                    <button className="w-5 h-5 mx-4" title="Copy">
+                    <button className="w-5 h-5 mx-4" title="Copy" onClick={() => navigator.clipboard.writeText(fullUrl)} >
                         <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
                     </button>
-                    <button className="w-5 h-5 mx-4" title="Replace">
+                    <button className="w-5 h-5 mx-4" title="Replace" onClick={() => handleReplace(urlCode)} >
                         <img className="w-full h-full" src={require("../assets/img/arrow-rotate-right-solid.svg").default} />
                     </button>
                 </div>
@@ -30,10 +31,12 @@ const PermanentUrl = ({ urlCode }) => {
 }
 
 PermanentUrl.propTypes = {
-    urlCode: PropTypes.string
+    urlCode: PropTypes.string,
+    handleReplace: PropTypes.func
 }
 
 const TemporaryUrl = ({ urlCode }) => {
+    const fullUrl = `https://matrix-cerberus/i/${urlCode}`;
     return (
         <tr className="h-20 text-sm leading-none text-gray-800 bg-white border-b border-t border-gray-100">
             <td className="pl-4 cursor-pointer">
@@ -43,11 +46,11 @@ const TemporaryUrl = ({ urlCode }) => {
                 <p className="font-medium"> {urlCode} </p>
             </td>
             <td className="pl-12">
-                <p className="font-medium"> {`https://matrix-cerberus/i/${urlCode}`} </p>
+                <p className="font-medium"> {fullUrl} </p>
             </td>
             <td className="pl-12">
                 <div className="flex justify-end">
-                    <button className="w-5 h-5 mx-4" title="Copy">
+                    <button className="w-5 h-5 mx-4" title="Copy" onClick={() => navigator.clipboard.writeText(fullUrl)} >
                         <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
                     </button>
                     <button className="w-5 h-5 mx-4" title="Delete">
@@ -77,6 +80,15 @@ export default function RoomExternalUrl() {
         };
         fetchData();
     }, []);
+
+    async function handleReplace(urlCode) {
+        const resp = await axios.post(`/api/rooms/${roomId}/external-url/replace?url_code=${urlCode}`);
+        setPermanentUrl(resp.data.url_code);
+    };
+
+    async function handleDelete() {
+
+    };
 
   return (
     <>
@@ -119,7 +131,7 @@ export default function RoomExternalUrl() {
                             </tr>
                         </thead>
                         <tbody className="w-full">
-                            <PermanentUrl urlCode={permanentUrl} />
+                            <PermanentUrl urlCode={permanentUrl} handleReplace={handleReplace}/>
 
                             {temporaryUrl.map( (rowValue) => {
                                 return <TemporaryUrl urlCode={rowValue} key={rowValue} />
