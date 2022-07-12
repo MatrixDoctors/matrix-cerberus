@@ -15,8 +15,9 @@ from app.api.deps import (
     external_url_api_instance,
     fastapi_sessions,
     fetch_user_data,
+    verify_room_permissions,
 )
-from app.api.endpoints import external_url, github_routes, users
+from app.api.endpoints import external_url, github_routes, rooms, users
 from app.api.models import OpenIdInfo
 from app.core.app_state import app_state
 from app.core.models import ServerSessionData
@@ -32,6 +33,13 @@ api_router.include_router(
     prefix="/external-url",
     tags=["external url"],
     dependencies=[Depends(authenticate_user), Depends(external_url_api_instance)],
+)
+
+api_router.include_router(
+    rooms.router,
+    prefix="/rooms",
+    tags=["rooms"],
+    dependencies=[Depends(authenticate_user)],
 )
 
 api_router.include_router(
