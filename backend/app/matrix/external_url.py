@@ -1,7 +1,7 @@
 import string
 import secrets
 
-from app.core.app_state import app_state
+from app.core.bot import BaseBotClient
 from app.core.models import RoomSpecificExternalUrl
 
 
@@ -10,9 +10,10 @@ class ExternalUrlAPI:
     ExternalUrlAPI class which abstracts out the interactions between the Bot Client and the API routes.
     """
 
-    def __init__(self):
+    def __init__(self, bot_client: BaseBotClient):
         self._characters = string.ascii_letters + string.digits
         self._event_type = "external_url"
+        self.bot_client = bot_client
 
     def _generate_url_code(self, N: int = 8):
         return "".join([secrets.choice(self._characters) for i in range(N)])
@@ -26,10 +27,10 @@ class ExternalUrlAPI:
         Parameters:
         'use_once_only` determines if the new_url_code is permanent or single-use.
         """
-        if room_id not in app_state.bot_client.room_to_external_url_mapping:
-            app_state.bot_client.room_to_external_url_mapping[room_id] = RoomSpecificExternalUrl()
+        if room_id not in self.bot_client.room_to_external_url_mapping:
+            self.bot_client.room_to_external_url_mapping[room_id] = RoomSpecificExternalUrl()
 
-        room_specific_data = app_state.bot_client.room_to_external_url_mapping[room_id]
+        room_specific_data = self.bot_client.room_to_external_url_mapping[room_id]
 
         # If old_url_code is supplied then remove old_url_code and add new_url_code
         # Otherwise just add new_url_code to the Set.
@@ -45,7 +46,7 @@ class ExternalUrlAPI:
         """
         Method to generate a new external url invite.
         """
-        data = await app_state.bot_client.get_account_data(self._event_type)
+        data = await self.bot_client.get_account_data(self._event_type)
         external_url_data = data.content
 
         url_code = self._generate_url_code()
@@ -57,14 +58,14 @@ class ExternalUrlAPI:
 
         self.add_url_to_rooms(room_id, use_once_only, new_url_code=url_code)
 
-        await app_state.bot_client.put_account_data(self._event_type, data)
+        await self.bot_client.put_account_data(self._event_type, data)
         return url_code
 
     async def get_room_invite(self, url_code: str, user_id: str):
         """
         Method to invite users to a room based on an existing external url invite code.
         """
-        data = await app_state.bot_client.get_account_data(self._event_type)
+        data = await self.bot_client.get_account_data(self._event_type)
         external_url_data = data.content
 
         if url_code not in external_url_data:
@@ -72,16 +73,16 @@ class ExternalUrlAPI:
 
         room_url_object = external_url_data[url_code]
 
-        await app_state.bot_client.room_invite(room_url_object.room_id, user_id)
+        await self.bot_client.room_invite(room_url_object.room_id, user_id)
 
         if room_url_object.use_once_only:
-            app_state.bot_client.room_to_external_url_mapping[
-                room_url_object.room_id
-            ].temporary.remove(url_code)
+            self.bot_client.room_to_external_url_mapping[room_url_object.room_id].temporary.remove(
+                url_code
+            )
             del external_url_data[url_code]
 
         data.content = external_url_data
-        await app_state.bot_client.put_account_data(self._event_type, data)
+        await self.bot_client.put_account_data(self._event_type, data)
 
         return True
 
@@ -92,7 +93,7 @@ class ExternalUrlAPI:
 
         'url_code' is assumed to be always valid i.e. exists in the respective account data events.
         """
-        data = await app_state.bot_client.get_account_data(self._event_type)
+        data = await self.bot_client.get_account_data(self._event_type)
         external_url_data = data.content
         room_url_object = external_url_data[url_code]
 
@@ -115,9 +116,9 @@ class ExternalUrlAPI:
         del external_url_data[url_code]
 
         data.content = external_url_data
-        await app_state.bot_client.put_account_data(self._event_type, data)
+        await self.bot_client.put_account_data(self._event_type, data)
 
         return new_url_code
 
     async def get_room_external_url(self, room_id: str) -> RoomSpecificExternalUrl:
-        return app_state.bot_client.room_to_external_url_mapping[room_id]
+        return self.bot_client.room_to_external_url_mapping[room_id]

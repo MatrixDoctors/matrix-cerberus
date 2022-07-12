@@ -8,6 +8,7 @@ from fastapi import Depends, HTTPException, Request
 from app.core.app_state import app_state
 from app.core.models import ServerSessionData, UserData
 from app.github.github_api import GithubAPI
+from app.matrix.external_url import ExternalUrlAPI
 
 fastapi_sessions = app_state.server_session
 
@@ -61,3 +62,7 @@ async def github_api_instance(
         default_role=app_state.settings.github.organisation_membership,
     )
     return github_api
+
+
+async def external_url_api_instance():
+    return ExternalUrlAPI(app_state.bot_client)
