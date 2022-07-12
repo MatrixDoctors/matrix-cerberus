@@ -10,7 +10,7 @@ export default function AccountSettings() {
 	const homeServer = localStorage.getItem('homeServer');
 
 	function githubHandleClick(){
-		axios.get('api/github/login')
+		axios.get('/api/github/login')
 		.then( (resp) => {
 			localStorage.setItem('state', resp.data.state);
 			window.location.href = resp.data.url;

@@ -45,7 +45,7 @@ export default function RoomSettings() {
 
   useEffect( () => {
     async function fetchRoomData() {
-      const resp = await axios.get('api/users/room-list');
+      const resp = await axios.get('/api/users/room-list');
       const data = resp.data.content;
 
       let roomData = [], index=1;
