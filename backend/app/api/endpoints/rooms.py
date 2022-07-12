@@ -16,4 +16,6 @@ async def get_room_external_urls(
     room_id: str, external_url: ExternalUrlAPI = Depends(external_url_api_instance)
 ):
     resp = await external_url.get_room_external_url(room_id)
-    return JSONResponse({"data": {"permanent": resp.permanent, "temporary": list(resp.temporary)}})
+    return JSONResponse(
+        {"content": {"permanent": resp.permanent, "temporary": list(resp.temporary)}}
+    )

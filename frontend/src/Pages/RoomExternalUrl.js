@@ -1,8 +1,83 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import PropTypes from "prop-types"
 import { Link, useParams } from 'react-router-dom'
+import axios from '../HelperFunctions/customAxios'
+
+const PermanentUrl = ({ urlCode }) => {
+    return (
+        <tr className="h-20 text-sm leading-none text-gray-800 bg-gray-200 border-b border-t border-gray-200">
+            <td className="pl-4 cursor-pointer">
+                <p className='font-medium'> Permanent</p>
+            </td>
+            <td className="pl-12 cursor-pointer">
+                <p className="font-medium"> {urlCode} </p>
+            </td>
+            <td className="pl-12">
+                <p className="font-medium"> {`https://matrix-cerberus/i/${urlCode}`} </p>
+            </td>
+            <td className="pl-12">
+                <div className="flex justify-end">
+                    <button className="w-5 h-5 mx-4" title="Copy">
+                        <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
+                    </button>
+                    <button className="w-5 h-5 mx-4" title="Replace">
+                        <img className="w-full h-full" src={require("../assets/img/arrow-rotate-right-solid.svg").default} />
+                    </button>
+                </div>
+            </td>
+        </tr>
+    )
+}
+
+PermanentUrl.propTypes = {
+    urlCode: PropTypes.string
+}
+
+const TemporaryUrl = ({ urlCode }) => {
+    return (
+        <tr className="h-20 text-sm leading-none text-gray-800 bg-white border-b border-t border-gray-100">
+            <td className="pl-4 cursor-pointer">
+                <p className='font-medium'> Temporary</p>
+            </td>
+            <td className="pl-12 cursor-pointer">
+                <p className="font-medium"> {urlCode} </p>
+            </td>
+            <td className="pl-12">
+                <p className="font-medium"> {`https://matrix-cerberus/i/${urlCode}`} </p>
+            </td>
+            <td className="pl-12">
+                <div className="flex justify-end">
+                    <button className="w-5 h-5 mx-4" title="Copy">
+                        <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
+                    </button>
+                    <button className="w-5 h-5 mx-4" title="Delete">
+                        <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
+                    </button>
+                </div>
+            </td>
+        </tr>
+    )
+}
+
+TemporaryUrl.propTypes = {
+    urlCode: PropTypes.string
+}
 
 export default function RoomExternalUrl() {
     const { roomId } = useParams();
+    const [permanentUrl, setPermanentUrl] = useState('');
+    const [temporaryUrl, setTemporaryUrl] = useState([]);
+
+    useEffect( () => {
+        async function fetchData() {
+            const resp = await axios.get(`/api/rooms/${roomId}/external-url`);
+            const data = resp.data.content;
+            setPermanentUrl(data.permanent);
+            setTemporaryUrl(data.temporary);
+        };
+        fetchData();
+    }, []);
+
   return (
     <>
         <div className="flex flex-col sm:flex-row items-center justify-around w-full h-48 py-5 shadow-lg bg-dark-eye" >
@@ -25,7 +100,7 @@ export default function RoomExternalUrl() {
         </div>
 
         <div className="w-full sm:px-6">
-                <div className="bg-gray-200 shadow px-4 md:px-10 pt-4 md:pt-7 pb-5 overflow-y-auto">
+                <div className="bg-gray-200 shadow my-3 px-4 md:px-10 pt-4 md:pt-7 pb-5 overflow-y-auto">
                     <table className="w-full whitespace-nowrap">
                         <thead>
                             <tr className="h-16 w-full text-sm leading-none text-gray-800">
@@ -44,75 +119,11 @@ export default function RoomExternalUrl() {
                             </tr>
                         </thead>
                         <tbody className="w-full">
+                            <PermanentUrl urlCode={permanentUrl} />
 
-                            {/* Row - 1 */}
-                            <tr className="h-20 text-sm leading-none text-gray-800 bg-gray-200 border-b border-t border-gray-200">
-                                <td className="pl-4 cursor-pointer">
-                                    <p className='font-medium'> Permanent</p>
-                                </td>
-                                <td className="pl-12 cursor-pointer">
-                                    <p className="font-medium"> J2Y51YHY </p>
-                                </td>
-                                <td className="pl-12">
-                                    <p className="font-medium"> https://matrix-cerberus/i/J2Y51YHY </p>
-                                </td>
-                                <td className="pl-12">
-                                    <div className="flex justify-end">
-                                        <button className="w-5 h-5 mx-4" title="Copy">
-                                            <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
-                                        </button>
-                                        <button className="w-5 h-5 mx-4" title="Replace">
-                                            <img className="w-full h-full" src={require("../assets/img/arrow-rotate-right-solid.svg").default} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr className="h-20 text-sm leading-none text-gray-800 bg-white border-b border-t border-gray-100">
-                                <td className="pl-4 cursor-pointer">
-                                    <p className='font-medium'> Temporary</p>
-                                </td>
-                                <td className="pl-12 cursor-pointer">
-                                    <p className="font-medium"> 7U9dOGXo </p>
-                                </td>
-                                <td className="pl-12">
-                                    <p className="font-medium"> https://matrix-cerberus/i/7U9dOGXo </p>
-                                </td>
-                                <td className="pl-12">
-                                    <div className="flex justify-end">
-                                        <button className="w-5 h-5 mx-4" title="Copy">
-                                            <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
-                                        </button>
-                                        <button className="w-5 h-5 mx-4" title="Delete">
-                                            <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr className="h-20 text-sm leading-none text-gray-800 bg-white border-b border-t border-gray-100">
-                                <td className="pl-4 cursor-pointer">
-                                    <p className='font-medium'> Temporary</p>
-                                </td>
-                                <td className="pl-12 cursor-pointer">
-                                    <p className="font-medium"> iittp1SY </p>
-                                </td>
-                                <td className="pl-12">
-                                    <p className="font-medium"> https://matrix-cerberus/i/iittp1SY </p>
-                                </td>
-                                <td className="pl-12">
-                                    <div className="flex justify-end">
-                                        <button className="w-5 h-5 mx-4" title="Copy">
-                                            <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
-                                        </button>
-                                        <button className="w-5 h-5 mx-4" title="Delete">
-                                            <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-
+                            {temporaryUrl.map( (rowValue) => {
+                                return <TemporaryUrl urlCode={rowValue} key={rowValue} />
+                            })}
                         </tbody>
                     </table>
                 </div>
