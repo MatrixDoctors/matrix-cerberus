@@ -25,7 +25,10 @@ async def verify_room_permissions(request: Request, room_id: str):
 
     if room_id in app_state.bot_client.rooms:
         room_object = app_state.bot_client.rooms[room_id]
-        if room_object.power_levels.get_user_level(session_data.matrix_user) < 50:
+        if (
+            room_object.power_levels.get_user_level(session_data.matrix_user)
+            < app_state.settings.matrix_bot.min_power_level
+        ):
             raise HTTPException(status_code=400, detail="User dosen't satisfy room permissions")
     else:
         raise HTTPException(status_code=400, detail="Bot is not part of the room")

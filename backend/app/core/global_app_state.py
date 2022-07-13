@@ -25,6 +25,7 @@ class AppState:
             homeserver=self.settings.matrix_bot.homeserver,
             app_name=self.settings.app_name,
             http_client=self.http_client,
+            min_power_level=self.settings.matrix_bot.min_power_level,
         )
 
         self.matrix_bot_runner = MatrixBotBackgroundRunner(
