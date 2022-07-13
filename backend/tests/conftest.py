@@ -1,12 +1,9 @@
-from unittest import mock
-
 import gidgethub.aiohttp
 import pytest
 from aioresponses import aioresponses
 from fastapi.testclient import TestClient
 
-from app.api.api import authenticate_user
-from app.api.endpoints.rooms import verify_room_permissions
+from app.api.deps import authenticate_user, verify_room_permissions
 from app.core.global_app_state import AppState
 from app.github.github_api import GithubAPI
 from app.main import app
