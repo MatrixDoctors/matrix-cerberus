@@ -22,7 +22,7 @@ class ExternalUrlAPI:
         self, room_id: str, use_once_only: str, new_url_code: str, old_url_code: str = None
     ):
         """
-        Method to add or replace url codes in a room.
+        Method to add or replace url codes in the "room_to_external_url" mapping object.
 
         Parameters:
         'use_once_only` determines if the new_url_code is permanent or single-use.
@@ -89,7 +89,7 @@ class ExternalUrlAPI:
     async def replace_existing_url(self, url_code: str):
         """
         This method replaces the supplied url code with a new url code and updates
-        the '<app_name>.external_url` account data event and rooom to externalu url mapping object to match the same.
+        the '<app_name>.external_url` account data event and "room_to_external_url_mapping" object to match the same.
 
         'url_code' is assumed to be always valid i.e. exists in the respective account data events.
         """
@@ -119,6 +119,23 @@ class ExternalUrlAPI:
         await self.bot_client.put_account_data(self._event_type, data)
 
         return new_url_code
+
+    async def delete_url(self, url_code: str):
+        data = await self.bot_client.get_account_data(self._event_type)
+        external_url_data = data.content
+        room_url_object = external_url_data[url_code]
+
+        if room_url_object.use_once_only:
+            self.bot_client.room_to_external_url_mapping[room_url_object.room_id].temporary.remove(
+                url_code
+            )
+        else:
+            self.bot_client.room_to_external_url_mapping[room_url_object.room_id].permanent = None
+
+        del external_url_data[url_code]
+        data.content = external_url_data
+
+        await self.bot_client.put_account_data(self._event_type, data)
 
     async def get_room_external_url(self, room_id: str) -> RoomSpecificExternalUrl:
         return self.bot_client.room_to_external_url_mapping[room_id]

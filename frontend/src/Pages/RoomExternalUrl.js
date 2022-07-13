@@ -35,7 +35,7 @@ PermanentUrl.propTypes = {
     handleReplace: PropTypes.func
 }
 
-const TemporaryUrl = ({ urlCode }) => {
+const TemporaryUrl = ({ urlCode, handleDelete }) => {
     const fullUrl = `https://matrix-cerberus/i/${urlCode}`;
     return (
         <tr className="h-20 text-sm leading-none text-gray-800 bg-white border-b border-t border-gray-100">
@@ -53,7 +53,7 @@ const TemporaryUrl = ({ urlCode }) => {
                     <button className="w-5 h-5 mx-4" title="Copy" onClick={() => navigator.clipboard.writeText(fullUrl)} >
                         <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
                     </button>
-                    <button className="w-5 h-5 mx-4" title="Delete">
+                    <button className="w-5 h-5 mx-4" title="Delete" onClick={() => handleDelete(urlCode)}>
                         <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
                     </button>
                 </div>
@@ -63,7 +63,8 @@ const TemporaryUrl = ({ urlCode }) => {
 }
 
 TemporaryUrl.propTypes = {
-    urlCode: PropTypes.string
+    urlCode: PropTypes.string,
+    handleDelete: PropTypes.func
 }
 
 export default function RoomExternalUrl() {
@@ -86,9 +87,20 @@ export default function RoomExternalUrl() {
         setPermanentUrl(resp.data.url_code);
     };
 
-    async function handleDelete() {
-
+    async function handleDelete(urlCode) {
+        const resp = await axios.post(`/api/rooms/${roomId}/external-url/delete?url_code=${urlCode}`);
+        if(resp.status == 401) {
+            console.error(resp.data);
+        }
+        setTemporaryUrl(urls => urls.filter( url => {
+            return url !== urlCode;
+        }))
     };
+
+    async function handleCreateNew(useOnceOnly) {
+        const resp = await axios.post(`/api/rooms/${roomId}/external-url/new?use_once_only=${useOnceOnly}`);
+        setTemporaryUrl(urls => [...urls, resp.data.urlCode])
+    }
 
   return (
     <>
@@ -101,7 +113,7 @@ export default function RoomExternalUrl() {
             </div>
 
             <div className='flex w-full items-center justify-center sm:justify-end sm:mr-4'>
-                <Link to={`/room/${roomId}`} >
+                <Link to={`/rooms/${roomId}`} >
                     <button className="block m-3 px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded">
                         <div className="text-sm font-medium leading-none text-white">
                             Back to Room page
@@ -121,7 +133,10 @@ export default function RoomExternalUrl() {
                                 <th className="font-normal text-left pl-12">Full URL</th>
                                 <th>
                                     <div className='flex items-center justify-end'>
-                                        <button className="block m-3 px-6 py-3 bg-gray-900 hover:bg-indigo-600 focus:outline-none rounded">
+                                        <button
+                                        className="block m-3 px-6 py-3 bg-gray-900 hover:bg-indigo-600 focus:outline-none rounded"
+                                        onClick={() => handleCreateNew(true)}
+                                        >
                                             <div className="text-sm font-medium leading-none text-white">
                                                 New Temporary URL
                                             </div>
@@ -134,7 +149,7 @@ export default function RoomExternalUrl() {
                             <PermanentUrl urlCode={permanentUrl} handleReplace={handleReplace}/>
 
                             {temporaryUrl.map( (rowValue) => {
-                                return <TemporaryUrl urlCode={rowValue} key={rowValue} />
+                                return <TemporaryUrl urlCode={rowValue} handleDelete={handleDelete} key={rowValue} />
                             })}
                         </tbody>
                     </table>

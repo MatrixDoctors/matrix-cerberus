@@ -17,7 +17,7 @@ function Room() {
                 </div>
 
                 <div className='flex w-full items-center justify-center md:justify-end md:mr-4'>
-                    <Link to={`/room/${roomId}/external-url`} >
+                    <Link to={`/rooms/${roomId}/external-url`} >
                         <button className="block m-3 px-6 py-3 bg-green-600 hover:bg-indigo-600 focus:outline-none rounded">
                             <div className="text-sm font-medium leading-none text-white">
                                 External URLs

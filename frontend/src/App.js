@@ -31,8 +31,8 @@ export default function App() {
             <Route path="/room-settings" element={<RoomSettings />} />
             <Route path="/server-settings" element={<ServerSettings />} />
             <Route path="/logout" element={<Logout />} />
-            <Route path="/room/:roomId" element={<Room />} />
-            <Route path="/room/:roomId/external-url" element={<RoomExternalUrl />} />
+            <Route path="/rooms/:roomId" element={<Room />} />
+            <Route path="/rooms/:roomId/external-url" element={<RoomExternalUrl />} />
           </Route>
 
         <Route path="/i/:url_code" element={<ExternalUrl />} />
