@@ -1,0 +1,6 @@
+{
+    "access_token": "some_access_token",
+    "device_id": "GHTYAJCE",
+    "home_server": "matrix.org",
+    "user_id": "@example:matrix.org"
+}

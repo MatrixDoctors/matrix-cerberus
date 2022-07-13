@@ -1,11 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from starlette.responses import JSONResponse
 
-from app.api.deps import (
-    external_url_api_instance,
-    fastapi_sessions,
-    verify_room_permissions,
-)
+from app.api.deps import external_url_api_instance, verify_room_permissions
 from app.matrix.external_url import ExternalUrlAPI
 
 router = APIRouter()
