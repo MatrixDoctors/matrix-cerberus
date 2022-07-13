@@ -5,10 +5,13 @@ import pytest
 from aioresponses import aioresponses
 from fastapi.testclient import TestClient
 
-from app.core.config import Settings
+from app.api.api import authenticate_user
+from app.api.endpoints.rooms import verify_room_permissions
 from app.core.global_app_state import AppState
 from app.github.github_api import GithubAPI
 from app.main import app
+
+from .override_dependency import DependencyOverrider
 
 GITHUB_USER_ID = "p0tato"
 GITHUB_ACCESS_TOKEN = "some_access_token"
@@ -16,7 +19,18 @@ GITHUB_ACCESS_TOKEN = "some_access_token"
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    yield TestClient(app)
+
+
+@pytest.fixture
+def client_with_no_dependencies():
+    async def dummy_func():
+        pass
+
+    with DependencyOverrider(
+        app, overrides={verify_room_permissions: dummy_func, authenticate_user: dummy_func}
+    ) as overrider:
+        yield TestClient(app)
 
 
 @pytest.fixture
