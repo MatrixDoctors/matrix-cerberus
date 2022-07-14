@@ -11,7 +11,7 @@ from app.core.sessions import RedisSessionStorage, SessionCookie
 
 class AppState:
     def __init__(self, settings_file: str = "config.yml"):
-        # Variables which dosen't store state will be initialised here.
+        # Variables which dosen't store state will be initialised here (except for settings).
 
         self.settings = self.get_settings_from_yaml(settings_file)
         self.session_storage = RedisSessionStorage(self.settings.redis.uri)
