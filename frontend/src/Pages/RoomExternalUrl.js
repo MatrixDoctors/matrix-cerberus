@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from "prop-types"
 import { Link, useParams } from 'react-router-dom'
 import axios from '../HelperFunctions/customAxios'
+import {ToastContainer, toast} from "react-toastify"
+import 'react-toastify/dist/ReactToastify.css';
 
 const PermanentUrl = ({ urlCode, handleReplace }) => {
     const fullUrl = `https://matrix-cerberus/i/${urlCode}`
@@ -18,8 +20,17 @@ const PermanentUrl = ({ urlCode, handleReplace }) => {
             </td>
             <td className="pl-12">
                 <div className="flex justify-end">
-                    <button className="w-5 h-5 mx-4" title="Copy" onClick={() => navigator.clipboard.writeText(fullUrl)} >
+                    <button className="w-5 h-5 mx-4" title="Copy" onClick={() => {
+                        navigator.clipboard.writeText(fullUrl);
+
+                        toast.success("Copied to clipboard!", {
+                            position: toast.POSITION.TOP_CENTER,
+                            autoClose: 3000,
+                            hideProgressBar: true
+                        });
+                    }} >
                         <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
+                        <ToastContainer />
                     </button>
                     <button className="w-5 h-5 mx-4" title="Replace" onClick={() => handleReplace(urlCode)} >
                         <img className="w-full h-full" src={require("../assets/img/arrow-rotate-right-solid.svg").default} />
@@ -50,8 +61,17 @@ const TemporaryUrl = ({ urlCode, handleDelete }) => {
             </td>
             <td className="pl-12">
                 <div className="flex justify-end">
-                    <button className="w-5 h-5 mx-4" title="Copy" onClick={() => navigator.clipboard.writeText(fullUrl)} >
+                    <button className="w-5 h-5 mx-4" title="Copy" onClick={() => {
+                        navigator.clipboard.writeText(fullUrl);
+
+                        toast.success("Copied to clipboard!", {
+                            position: toast.POSITION.TOP_CENTER,
+                            autoClose: 3000,
+                            hideProgressBar: true
+                        });
+                    }}>
                         <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
+                        <ToastContainer />
                     </button>
                     <button className="w-5 h-5 mx-4" title="Delete" onClick={() => handleDelete(urlCode)}>
                         <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
