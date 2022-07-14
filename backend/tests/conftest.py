@@ -34,9 +34,11 @@ def client_with_no_dependencies():
 async def mock_app_state():
     from app.core.app_state import app_state
 
+    await app_state.setup_state()
     await app_state.http_client.start_session()
     yield app_state
     await app_state.http_client.stop_session()
+    await app_state.delete_state()
 
 
 @pytest.fixture
