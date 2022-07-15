@@ -1,8 +1,8 @@
 from urllib.parse import urljoin
 
 import aiohttp
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, encoders
-from starlette.responses import JSONResponse, RedirectResponse, Response
+from fastapi import APIRouter, HTTPException, Request
+from starlette.responses import JSONResponse, RedirectResponse
 
 from app.api.deps import fastapi_sessions
 from app.api.models import OpenIdInfo
@@ -29,7 +29,9 @@ async def verify_openid(request: Request, open_id_info: OpenIdInfo):
                 raise HTTPException(status_code=404, detail="Invalid token")
             data = await resp.json()
 
-            server_session_data = ServerSessionData(matrix_user=data["sub"])
+            server_session_data = ServerSessionData(
+                matrix_user=data["sub"], matrix_homeserver=matrix_homeserver
+            )
 
             response = JSONResponse({"message": "success"})
             # Creating a server session with the matrix username.

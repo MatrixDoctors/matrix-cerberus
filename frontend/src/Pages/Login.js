@@ -52,7 +52,7 @@ export default function Login() {
 		const fetchData = async () => {
 			try {
 				const baseUrl = validateAndReturnUrl(homeServer);
-				let response = await new MatrixApi(baseUrl).login('GET');
+				let response = await new MatrixApi(baseUrl).getLogin();
 
 				let listOfSSOProviders = [];
 				for(let flowItem of response.data.flows){
@@ -96,7 +96,7 @@ export default function Login() {
 		let hostName = new URL(server_name).hostname;
 		hostName = validateAndReturnUrl(hostName);
 
-		await new MatrixApi(hostName).wellKnown('GET')
+		await new MatrixApi(hostName).getWellKnown()
 		.then(response => {
 			let homeserver_url = response.data['m.homeserver'].base_url;
 			if (homeserver_url === undefined){
@@ -162,14 +162,16 @@ export default function Login() {
 		}
 		const baseUrl = validateAndReturnUrl(homeServer);
 
-		await new MatrixApi(baseUrl).login('POST', {
+		await new MatrixApi(baseUrl).postLogin({
 			type: "m.login.password",
 			identifier: identifier,
 			password: password
 		})
 		.then((resp) => {
-			authenticateWithOpenId(resp.data);
-			navigate('/');
+			const response = authenticateWithOpenId(resp.data);
+			response.then( () => {
+				navigate('/')
+			});
 		})
 		.catch( (err) => {
 			// Login attempt has failed. The provided authentication data was incorrect.
