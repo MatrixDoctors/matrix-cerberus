@@ -3,6 +3,7 @@ from unittest import mock
 
 from fastapi.testclient import TestClient
 from nio import LoginResponse
+from yarl import URL
 
 from app.core.global_app_state import AppState
 
@@ -71,20 +72,20 @@ async def test_replace_external_url(
 
     url_code = list(mock_app_state.bot_client.room_to_external_url_mapping[ROOM_ID].temporary)[0]
 
+    url_to_set_account_data = (
+        f"{homeserver}/_matrix/client/v3/user/{MATRIX_USER_ID}/account_data/{event_type}"
+    )
     mock_server.get(
-        url=f"{homeserver}/_matrix/client/v3/user/{MATRIX_USER_ID}/account_data/{event_type}",
+        url=url_to_set_account_data,
         status=200,
         payload=external_url_response,
     )
 
-    # To verify the data being saved in the homeserver
-    async def mock_put_account_data_for_delete(type: str, data):
-        assert url_code not in data.content
-
-        # Total number of keys in the external url data after the operation
-        assert len(data.content.keys()) == len(external_url_response["content"].keys())
-
-    mock_app_state.bot_client.put_account_data = mock_put_account_data_for_delete
+    mock_server.put(
+        url=url_to_set_account_data,
+        status=200,
+        payload=external_url_response,
+    )
 
     resp = client_with_no_dependencies.post(
         f"/api/rooms/{ROOM_ID}/external-url/replace?url_code={url_code}"
@@ -94,6 +95,14 @@ async def test_replace_external_url(
     assert resp.status_code == 200
     assert new_url_code is not None
 
+    r = mock_server.requests.get(("PUT", URL(url_to_set_account_data)))
+    put_request_data = json.loads(r[-1].kwargs["data"])
+
+    # Verify the data being stored in the external url account data event
+    assert url_code not in put_request_data["content"]
+    assert new_url_code in put_request_data["content"]
+
+    # Verify the data in room_to_external_url_object
     assert url_code not in mock_app_state.bot_client.room_to_external_url_mapping[ROOM_ID].temporary
     assert new_url_code in mock_app_state.bot_client.room_to_external_url_mapping[ROOM_ID].temporary
 
@@ -115,20 +124,20 @@ async def test_delete_external_url(
     # Selecting a random url code to delete
     url_code = list(mock_app_state.bot_client.room_to_external_url_mapping[ROOM_ID].temporary)[0]
 
+    url_to_set_account_data = (
+        f"{homeserver}/_matrix/client/v3/user/{MATRIX_USER_ID}/account_data/{event_type}"
+    )
     mock_server.get(
-        url=f"{homeserver}/_matrix/client/v3/user/{MATRIX_USER_ID}/account_data/{event_type}",
+        url=url_to_set_account_data,
         status=200,
         payload=external_url_response,
     )
 
-    # To verify the data being saved in the homeserver
-    async def mock_put_account_data_for_delete(type: str, data):
-        assert url_code not in data.content
-
-        # Total number of keys in the external url data after the operation
-        assert len(data.content.keys()) == len(external_url_response["content"].keys()) - 1
-
-    mock_app_state.bot_client.put_account_data = mock_put_account_data_for_delete
+    mock_server.put(
+        url=url_to_set_account_data,
+        status=200,
+        payload=external_url_response,
+    )
 
     resp = client_with_no_dependencies.post(
         f"/api/rooms/{ROOM_ID}/external-url/delete?url_code={url_code}"
@@ -136,6 +145,12 @@ async def test_delete_external_url(
 
     assert resp.status_code == 200
     assert resp.json() == {"msg": "success"}
+
+    r = mock_server.requests.get(("PUT", URL(url_to_set_account_data)))
+    put_request_data = json.loads(r[-1].kwargs["data"])
+
+    # Verify the data being stored in the external url account data event
+    assert url_code not in put_request_data["content"]
 
     # Verify the data in room_to_external_url_object
     assert url_code not in mock_app_state.bot_client.room_to_external_url_mapping[ROOM_ID].temporary
@@ -156,21 +171,22 @@ async def test_create_new_url(
         mock_app_state, mock_server, homeserver, event_type, external_url_response
     )
 
-    use_once_only = True
-
+    url_to_set_account_data = (
+        f"{homeserver}/_matrix/client/v3/user/{MATRIX_USER_ID}/account_data/{event_type}"
+    )
     mock_server.get(
-        url=f"{homeserver}/_matrix/client/v3/user/{MATRIX_USER_ID}/account_data/{event_type}",
+        url=url_to_set_account_data,
         status=200,
         payload=external_url_response,
     )
 
-    # To verify the data being saved in the homeserver
-    async def mock_put_account_data_for_delete(type: str, data):
-        # Total number of keys in the external url data after the operation
-        assert len(data.content.keys()) == len(external_url_response["content"].keys()) + 1
+    mock_server.put(
+        url=url_to_set_account_data,
+        status=200,
+        payload=external_url_response,
+    )
 
-    mock_app_state.bot_client.put_account_data = mock_put_account_data_for_delete
-
+    use_once_only = True
     resp = client_with_no_dependencies.post(
         f"/api/rooms/{ROOM_ID}/external-url/new?use_once_only={use_once_only}"
     )
@@ -178,4 +194,11 @@ async def test_create_new_url(
     assert resp.status_code == 200
     url_code = resp.json()["urlCode"]
 
+    r = mock_server.requests.get(("PUT", URL(url_to_set_account_data)))
+    put_request_data = json.loads(r[-1].kwargs["data"])
+
+    # Verify the data being stored in the external url account data event
+    assert url_code in put_request_data["content"]
+
+    # Verify the data in room_to_external_url_object
     assert url_code in mock_app_state.bot_client.room_to_external_url_mapping[ROOM_ID].temporary
