@@ -232,14 +232,13 @@ export default function Login() {
 									<div className="w-full mb-3">
 										<label
 										className="block text-gray-700 text-sm font-bold mb-2"
-										htmlFor="grid-password"
+										htmlFor="homeserver"
 										>
-										Homeserver
-										{/* border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full disabled:opacity-50 */}
+											Homeserver
 										</label>
 										<div className='flex items-center justify-between w-full no-overflow'>
 											<input
-											type="homeserver"
+											id="homeserver"
 											className="field-input w-3/4"
 											value={inputHomeServer}
 											style={styles}
@@ -265,12 +264,13 @@ export default function Login() {
 									<div className="flex items-center justify-between w-full my-4">
 										<label
 											className="block text-gray-700 text-xs"
-											htmlFor="grid-password"
+											htmlFor="select-user-field"
 										>
 											Sign in with
 										</label>
 										<div className="">
 											<select
+											id="select-user-field"
 											disabled={disableFields}
 											value={fieldType}
 											onChange={(e) => setFieldType(e.target.value)}
@@ -289,6 +289,7 @@ export default function Login() {
 									<div className="w-full mb-3">
 										<input
 										disabled={disableFields}
+										data-testid="password"
 										type="password"
 										className='field-input w-full'
 										placeholder="Password"
