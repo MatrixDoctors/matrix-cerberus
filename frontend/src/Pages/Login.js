@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import {Helmet} from "react-helmet"
 
 import UserField from '../Components/UserField'
 import SSOLogin from '../Components/SSOLogin'
@@ -183,6 +184,10 @@ export default function Login() {
 
     return (
 	<div>
+		<Helmet>
+			<title>Login - MatrixCerberus</title>
+        </Helmet>
+
 		<section className="fixed w-full h-full top-0 bg-dark-ash" >
 
 			<div className="text-gray-300 hover:text-white px-4 py-4 font-bold">
