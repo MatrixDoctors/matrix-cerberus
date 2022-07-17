@@ -4,18 +4,19 @@ from typing import Set, Dict, List
 import gidgethub.aiohttp
 from nio import ErrorResponse, RoomGetStateEventError, RoomInviteError, RoomKickError
 
-from app.core.app_state import app_state
+from app.core.bot import BaseBotClient
+from app.core.http_client import HttpClient
 from app.core.models import RoomSpecificData, UserData
 from app.github.github_api import GithubAPI
 
 
 class RegisteredUser:
-    def __init__(self, user_data: UserData):
+    def __init__(self, user_data: UserData, http_client: HttpClient, default_role: str):
         self.github_username = user_data.content.github.username
 
         if self.github_username is not None:
             gh = gidgethub.aiohttp.GitHubAPI(
-                app_state.http_client.session,
+                http_client.session,
                 requester=self.github_username,
                 oauth_token=user_data.content.github.access_token,
             )
@@ -23,13 +24,18 @@ class RegisteredUser:
             self.github_api = GithubAPI(
                 gh=gh,
                 username=self.github_username,
-                default_role=app_state.settings.github.organisation_membership,
+                default_role=default_role,
             )
 
 
 class BackgroundValidater:
-    def __init__(self):
-        self.client = app_state.bot_client
+    def __init__(
+        self, bot_client: BaseBotClient, http_client: HttpClient, github_default_role: str
+    ):
+        self.client = bot_client
+        self.http_client = http_client
+        self.github_default_role = github_default_role
+
         self.registered_users: Dict[str, RegisteredUser] = dict()
 
         # List of rooms registered under the application and has "room membership" conditions.
@@ -49,6 +55,7 @@ class BackgroundValidater:
 
     async def start_task(self):
         while True:
+            print("running")
             await self.fetch_rooms_and_users()
 
             for room_id in self.rooms_with_conditions:
@@ -91,7 +98,11 @@ class BackgroundValidater:
 
         for user_id in resp.content.users:
             user_data = await self.client.get_account_data("user", user_id=user_id)
-            self.registered_users[user_id] = RegisteredUser(user_data)
+            self.registered_users[user_id] = RegisteredUser(
+                user_data=user_data,
+                http_client=self.http_client,
+                default_role=self.github_default_role,
+            )
 
         self.rooms_with_permissions = await self.client.get_rooms_with_mod_permissions(
             self.client.user_id
@@ -237,6 +248,3 @@ class BackgroundValidater:
                 ignore_members.add(room_member.state_key)
 
         return ignore_members
-
-
-background_validator = BackgroundValidater()

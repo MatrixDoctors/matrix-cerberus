@@ -47,6 +47,7 @@ class BaseBotClient(AsyncClient):
         homeserver: str,
         app_name: str,
         http_client: HttpClient,
+        min_power_level: int,
         user: str = "",
         device_id: Optional[str] = "",
         store_path: Optional[str] = "",
@@ -64,6 +65,7 @@ class BaseBotClient(AsyncClient):
 
         self.app_name: str = app_name
         self.http_client: HttpClient = http_client
+        self.min_power_level = min_power_level
         self.room_to_external_url_mapping: Dict[str, RoomSpecificExternalUrl] = defaultdict(
             RoomSpecificExternalUrl
         )
@@ -187,6 +189,6 @@ class BaseBotClient(AsyncClient):
             ) and room_object.power_levels.can_user_kick(self.user_id):
                 # Check if user is a member of the room
                 if user_id in room_object.users and not room_object.users[user_id].invited:
-                    if room_object.power_levels.get_user_level(user_id) >= 50:
+                    if room_object.power_levels.get_user_level(user_id) >= self.min_power_level:
                         rooms_with_mod_permissions[room_id] = room_object.named_room_name()
         return rooms_with_mod_permissions

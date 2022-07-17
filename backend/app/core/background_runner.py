@@ -24,7 +24,6 @@ class MatrixBotBackgroundRunner:
 
     async def initialise_bot(self):
         await self.client.login(access_token=self.access_token)
-
         await self.client.sync(
             30000, since=self.session_storage["next_batch_token"], full_state=True
         )

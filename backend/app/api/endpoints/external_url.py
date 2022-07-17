@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 
-from app.api.deps import fastapi_sessions
+from app.api.deps import external_url_api_instance, fastapi_sessions
 from app.api.models import ExternalUrlInfo
 from app.matrix.external_url import ExternalUrlAPI
 
@@ -11,7 +11,7 @@ router = APIRouter()
 @router.post("/generate-url")
 async def generate_url(
     external_url_info: ExternalUrlInfo,
-    external_url: ExternalUrlAPI = Depends(ExternalUrlAPI),
+    external_url: ExternalUrlAPI = Depends(external_url_api_instance),
 ):
     url_code = await external_url.generate_url(
         room_id=external_url_info.room_id,
@@ -22,7 +22,7 @@ async def generate_url(
 
 @router.post("/replace-url")
 async def replace_existing_url(
-    url_code: str, external_url: ExternalUrlAPI = Depends(ExternalUrlAPI)
+    url_code: str, external_url: ExternalUrlAPI = Depends(external_url_api_instance)
 ):
     new_url_code = await external_url.replace_existing_url(url_code=url_code)
     return JSONResponse({"url_code": new_url_code})
@@ -30,7 +30,9 @@ async def replace_existing_url(
 
 @router.get("/i/{url_code}")
 async def get_invite(
-    request: Request, url_code: str, external_url: ExternalUrlAPI = Depends(ExternalUrlAPI)
+    request: Request,
+    url_code: str,
+    external_url: ExternalUrlAPI = Depends(external_url_api_instance),
 ):
     session_data = fastapi_sessions.get_session(request)
 

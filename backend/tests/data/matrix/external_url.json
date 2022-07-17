@@ -1,0 +1,16 @@
+{
+    "content": {
+      "8dfYxp6s": {
+        "room_id": "@example:matrix.org",
+        "use_once_only": false
+      },
+      "iittp1SY": {
+        "room_id": "@example:matrix.org",
+        "use_once_only": true
+      },
+      "JzN6dbCm": {
+        "room_id": "@example:matrix.org",
+        "use_once_only": true
+      }
+    }
+  }

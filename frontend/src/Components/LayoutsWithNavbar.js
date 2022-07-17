@@ -10,7 +10,7 @@ export default function LayoutsWithNavbar() {
 
   useEffect( () => {
       const fetchCurrentUser = async () => {
-        const resp = await axios.get('api/current-user');
+        const resp = await axios.get('/api/current-user');
         console.log(resp.data);
         if(resp.data.matrix_user_id !== null){
             const matrix_user_id = resp.data.matrix_user_id;
