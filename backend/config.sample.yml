@@ -19,6 +19,11 @@ matrix_bot:
   access_token: some_access_token
 
 github:
+# GitHub config which consists of the registered OAuth app credentials
+  # 'organisation_membership' can be set to 'admin' or 'member'.
+  # A room admin can change conditions for an organisation only if they satisfy this membership.
+  #
   client_id: client_id_token
   client_secret: client_secret_token
   redirect_uri: http://localhost:80/oauth2/github
+  organisation_membership: "member"

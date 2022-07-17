@@ -1,3 +1,9 @@
+"""
+Background task that provides classes and methods required to start and stop a matrix bot client.
+
+Any methods that are requried to be run before bot startup or after bot shutdown go here.
+"""
+
 import asyncio
 
 from app.core.bot import BaseBotClient

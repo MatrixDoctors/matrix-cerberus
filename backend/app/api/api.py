@@ -1,3 +1,9 @@
+"""
+Module that connects the routers of all endpoints to the main router.
+
+Endpoints which does not require the user to be authenticated go here.
+"""
+
 from urllib.parse import urljoin
 
 import aiohttp
