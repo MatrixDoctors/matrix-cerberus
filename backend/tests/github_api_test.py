@@ -67,7 +67,7 @@ class TestClass:
 
     async def test_get_individual_repos(self, mock_server, github_api):
         mock_server.get(
-            url=f"https://api.github.com/user/repos?affliation=owner",
+            url=f"https://api.github.com/user/repos?affiliation=owner",
             status=200,
             payload=self.repos_response,
         )

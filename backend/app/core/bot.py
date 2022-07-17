@@ -2,22 +2,43 @@
 Module which provides classes and methods that interact with a matrix homeserver as a bot client.
 """
 
-from typing import Dict, Optional
+from typing import Any, Dict, Union, Optional
 from asyncio import exceptions
 from collections import defaultdict
+from dataclasses import field, dataclass
 from urllib.parse import urljoin
 
-from nio import AsyncClient, AsyncClientConfig, InviteEvent, MatrixRoom, RoomMessageText
+from nio import (
+    Api,
+    AsyncClient,
+    AsyncClientConfig,
+    ErrorResponse,
+    InviteEvent,
+    MatrixRoom,
+    Response,
+    RoomMessageText,
+)
 from nio.responses import WhoamiResponse
+from pydantic import ValidationError
 
 from app.core.http_client import HttpClient
 from app.core.models import (
     BotGlobalData,
     ExternalUrlData,
+    RoomMembersData,
     RoomSpecificData,
     RoomSpecificExternalUrl,
     UserData,
 )
+
+
+@dataclass
+class CustomResponse(Response):
+    content: Any = field()
+
+    @classmethod
+    def from_dict(cls, parsed_dict: Dict[Any, Any]):
+        return cls(parsed_dict)
 
 
 class BaseBotClient(AsyncClient):
@@ -130,6 +151,22 @@ class BaseBotClient(AsyncClient):
             self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{event_type}"
         )
         await self.http_client.session.put(url=url, headers=headers, data=data.json())
+
+    async def get_room_members(self, room_id: str) -> Union[RoomMembersData, ErrorResponse]:
+        access_token = self.access_token
+        query_parameters = {"access_token": access_token, "membership": "leave"}
+        path = ["rooms", room_id, "members"]
+
+        method = "GET"
+        url_path = Api._build_path(path, query_parameters)
+
+        resp = await self._send(CustomResponse, method, url_path)
+
+        try:
+            data = RoomMembersData.parse_obj(resp.content)
+            return data
+        except ValidationError:
+            return ErrorResponse.from_dict(resp.content)
 
     async def create_room_to_external_url_mapping(self):
         data = await self.get_account_data("external_url")
