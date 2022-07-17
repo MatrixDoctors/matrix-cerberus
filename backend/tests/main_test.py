@@ -17,12 +17,11 @@ def test_message_users(client):
 
 
 @pytest.mark.asyncio
-async def test_user_session_flow(mocker, client, mock_server, mock_http_client, settings):
-    # mock_http_client is imported to start the aiohttp session.
-
+async def test_user_session_flow(mocker, client, mock_server, mock_app_state):
     mock_fetch_user_data = mocker.patch("app.api.api.fetch_user_data")
 
     matrix_user = "@example_user:matrix.org"
+    session_key = mock_app_state.settings.server_sessions.session_key
 
     mock_server.get(
         url="https://matrix.org/_matrix/federation/v1/openid/userinfo?access_token=some_access_token",
@@ -40,7 +39,7 @@ async def test_user_session_flow(mocker, client, mock_server, mock_http_client, 
     session_cookie = response.cookies.get_dict()
 
     assert response.status_code == 200
-    assert session_cookie[settings.server_sessions.session_key] is not None
+    assert session_cookie[session_key] is not None
     assert response.json() == {"message": "success"}
     assert mock_fetch_user_data.call_count == 1
 
@@ -56,5 +55,5 @@ async def test_user_session_flow(mocker, client, mock_server, mock_http_client, 
 
     assert response.status_code == 200
     session_cookie = response.cookies.get_dict()
-    assert settings.server_sessions.session_key not in session_cookie
+    assert session_key not in session_cookie
     assert response.json() == {"message": "success"}

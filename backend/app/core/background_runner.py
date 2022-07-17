@@ -7,20 +7,26 @@ Any methods that are requried to be run before bot startup or after bot shutdown
 import asyncio
 
 from app.core.bot import BaseBotClient
-from app.core.config import settings
-from app.core.sessions import session_storage
+from app.core.sessions import RedisSessionStorage
 
 
 class MatrixBotBackgroundRunner:
-    def __init__(self):
-        self.client = BaseBotClient(homeserver=settings.matrix_bot.homeserver)
+    def __init__(
+        self,
+        client: BaseBotClient,
+        access_token: str,
+        session_storage: RedisSessionStorage,
+    ):
+        self.client = client
         self.background_task = None
+        self.session_storage = session_storage
+        self.access_token = access_token
 
     async def start_bot(self):
         try:
             # Fetch next batch token stored in redis
-            self.client.next_batch = session_storage["next_batch_token"]
-            await self.client.login()
+            self.client.next_batch = self.session_storage["next_batch_token"]
+            await self.client.login(access_token=self.access_token)
             await self.client.create_room_to_external_url_mapping()
             await self.client.sync_forever(
                 30000,
@@ -42,10 +48,7 @@ class MatrixBotBackgroundRunner:
 
     async def cancel_background_task(self):
         # Store next batch token in redis, returns None if not found.
-        session_storage["next_batch_token"] = self.client.next_batch
+        self.session_storage["next_batch_token"] = self.client.next_batch
 
         self.background_task.cancel()
         print(f"Background Task is cancelled")
-
-
-matrix_bot_runner = MatrixBotBackgroundRunner()
