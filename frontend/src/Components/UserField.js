@@ -14,7 +14,7 @@ export default function UserField({ type, setUserField, disableFields, phoneNumb
 				<div className="w-full mb-3">
 					<input
 					disabled={disableFields}
-					data-testid="email"
+					aria-label="email"
 					type="email"
 					className="field-input w-full"
 					placeholder="Email"
@@ -31,7 +31,7 @@ export default function UserField({ type, setUserField, disableFields, phoneNumb
 					<div className='px-2 py-2 w-full'>
 						<PhoneInput
 							disabled={disableFields}
-							data-testid="phone"
+							aria-label="phone-number"
 							placeholder="Enter phone number"
 							value={phoneNumber}
 							onChange={setPhoneNumber}
@@ -46,7 +46,7 @@ export default function UserField({ type, setUserField, disableFields, phoneNumb
 				<div className="w-full mb-3">
 					<input
 					disabled={disableFields}
-					data-testid="username"
+					aria-label='Username'
 					className="field-input w-full"
 					placeholder="Username"
 					style={styles}

@@ -54,7 +54,6 @@ export default function Login() {
 			try {
 				const baseUrl = validateAndReturnUrl(homeServer);
 				let response = await new MatrixApi(baseUrl).getLogin();
-
 				let listOfSSOProviders = [];
 				for(let flowItem of response.data.flows){
 					if(flowItem.type === 'm.login.sso'){
@@ -208,7 +207,7 @@ export default function Login() {
 
 								{/* Error Message Display */}
 								<div className="text-center mb-3">
-									<p className="text-red-600 text-sm">
+									<p className="text-red-600 text-sm" aria-label='Error Message'>
 										{errorMessage}
 									</p>
 								</div>
