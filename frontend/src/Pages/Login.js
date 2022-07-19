@@ -206,8 +206,8 @@ export default function Login() {
 								</div>
 
 								{/* Error Message Display */}
-								<div className="text-center mb-3">
-									<p className="text-red-600 text-sm" aria-label='Error Message'>
+								<div className="text-center mb-3" aria-label={errorMessage !== '' ? 'Error' : "No Error"}>
+									<p className="text-red-600 text-sm">
 										{errorMessage}
 									</p>
 								</div>

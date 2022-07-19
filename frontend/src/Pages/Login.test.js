@@ -59,9 +59,11 @@ test('When SSO Providers are not available', async () => {
   const user = userEvent.setup();
   server.use(
     rest.get("https://matrix.org/_matrix/client/v3/login", async (req, res, ctx) => {
-      let data = getLoginResponse;
-      data["flows"] = data["flows"].filter(item => item["type"] !== "m.login.sso");
-      return res(ctx.status(200), ctx.json(data));
+      const data = getLoginResponse;
+      const data_with_no_flows = {
+        "flows": data["flows"].filter(item => item["type"] !== "m.login.sso")
+      };
+      return res(ctx.status(200), ctx.json(data_with_no_flows));
     }),
   )
 
@@ -73,6 +75,8 @@ test('When SSO Providers are not available', async () => {
 
   // to prevent the no-wrapped-in-act warning.
   await user.click(document.body);
+
+  expect(await screen.findByLabelText(/no error/i)).toBeInTheDocument();
 
   // Checking SSO Providers
   expect(await screen.queryByRole('button', {name: /Google/i})).not.toBeInTheDocument();
@@ -128,5 +132,32 @@ test('When complete username is entered', async () => {
   // This is kind of a hackish way to trigger the input field update of homserver url.
   await user.click(homeserver);
   expect(screen.getByLabelText(/Homeserver/i)).toHaveValue(shortenedHomeserverUrl);
+
+});
+
+
+test('When homeserver url is changed', async () => {
+  const user = userEvent.setup();
+  const exampleHomeserver = "https://example.org";
+
+  server.use(
+    rest.get(`${exampleHomeserver}/_matrix/client/v3/login`, async (req, res, ctx) => {
+        const data = getLoginResponse;
+        return res(ctx.status(200), ctx.json(data));
+    }),
+  )
+
+  render(
+    <CustomRouter history={history}>
+      <Login />
+    </CustomRouter>
+  );
+
+  let field = screen.getByLabelText(/homeserver/i);
+  await user.clear(field);
+  await user.type(field, exampleHomeserver);
+  await user.click(screen.getByRole('button', {name: /save/i}));
+
+  expect(screen.getByLabelText(/homeserver/i)).toHaveValue(exampleHomeserver);
 
 });
