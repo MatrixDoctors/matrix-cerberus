@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { server, rest } from '../mocks/server';
 import getLoginResponse from "../mocks/data/getLoginResponse"
+import getWellKnown from "../mocks/data/getWellKnown"
 
 
 import Login from './Login';
@@ -36,6 +37,7 @@ test('Render all the input fields and buttons', async () => {
 
 test('Check input field change', async () => {
   const user = userEvent.setup();
+
   render(
     <CustomRouter history={history}>
       <Login />
@@ -54,6 +56,7 @@ test('Check input field change', async () => {
 });
 
 test('When SSO Providers are not available', async () => {
+  const user = userEvent.setup();
   server.use(
     rest.get("https://matrix.org/_matrix/client/v3/login", async (req, res, ctx) => {
       let data = getLoginResponse;
@@ -67,6 +70,9 @@ test('When SSO Providers are not available', async () => {
       <Login />
     </CustomRouter>
   );
+
+  // to prevent the no-wrapped-in-act warning.
+  await user.click(document.body);
 
   // Checking SSO Providers
   expect(await screen.queryByRole('button', {name: /Google/i})).not.toBeInTheDocument();
@@ -83,5 +89,44 @@ test('When SSO Providers are not available', async () => {
   expect(await screen.getByTestId(/password/i)).toBeInTheDocument();
 
   expect(await screen.getByRole("button", {name: /sign in/i} )).toBeInTheDocument();
+
+});
+
+test('When complete username is entered', async () => {
+  const user = userEvent.setup();
+  const exampleHomeserver = "https://example.org";
+
+  server.use(
+    rest.get(`${exampleHomeserver}/_matrix/client/v3/login`, async (req, res, ctx) => {
+        const data = getLoginResponse;
+        return res(ctx.status(200), ctx.json(data));
+    }),
+    rest.get(`${exampleHomeserver}/.well-known/matrix/client`, async (req, res, ctx) => {
+        let data = getWellKnown;
+        data["m.homeserver"]["base_url"] = exampleHomeserver;
+        return res(ctx.status(200), ctx.json(data));
+    }),
+  )
+
+  render(
+    <CustomRouter history={history}>
+      <Login />
+    </CustomRouter>
+  );
+
+  // Focus on user field, enter the full username and go out of focus (blur)
+  let field = screen.getByLabelText(/username/i);
+  field.focus();
+  await user.type(field, "@Hello:example.org");
+  await user.click(document.body);
+
+  expect(screen.getByLabelText(/username/i)).toHaveValue("@Hello:example.org");
+
+  let homeserver = screen.getByLabelText(/homeserver/i);
+  const shortenedHomeserverUrl = exampleHomeserver.replace('https://', '');
+
+  // This is kind of a hackish way to trigger the input field update of homserver url.
+  await user.click(homeserver);
+  expect(screen.getByLabelText(/Homeserver/i)).toHaveValue(shortenedHomeserverUrl);
 
 });
