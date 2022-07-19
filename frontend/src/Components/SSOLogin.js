@@ -29,6 +29,7 @@ function AuthButton({ idp, homeServer }){
 	return (
 		<button
 			title={idp.name}
+			aria-label={idp.name}
 			className="block h-7 w-7 mx-4 rounded-full overflow-hidden border-2 border-gray-300 hover:border-white"
 			type="button"
 			onClick={handleClick}

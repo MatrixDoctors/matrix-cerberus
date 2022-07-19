@@ -8,8 +8,6 @@ import Login from './Pages/Login';
 import LoginSuccess from './Pages/LoginSuccess';
 import ErrorPage from './Pages/ErrorPage';
 import ExternalUrl from './Pages/ExternalUrl';
-import CustomRouter from './Components/CustomRouter';
-import history from './HelperFunctions/customHistory';
 import { GlobalContext } from './GlobalContext';
 import LayoutsWithNavbar from './Components/LayoutsWithNavbar';
 import Logout from './Pages/Logout';
@@ -22,7 +20,6 @@ export default function App() {
   const [githubUserId, setGithubUserId] = useState('');
 
   return (
-    <CustomRouter history={history}>
     <GlobalContext.Provider
           value = {{matrixUserId, setMatrixUserId, githubUserId, setGithubUserId}}>
       <Routes>
@@ -42,6 +39,5 @@ export default function App() {
         <Route path="*" element={<ErrorPage/>} />
       </Routes>
     </GlobalContext.Provider>
-    </CustomRouter>
   )
 };

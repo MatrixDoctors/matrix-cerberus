@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import axios from '../HelperFunctions/customAxios'
 import {ToastContainer, toast} from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
+import Helmet from 'react-helmet'
 
 const PermanentUrl = ({ urlCode, handleReplace }) => {
     const fullUrl = `https://matrix-cerberus/i/${urlCode}`
@@ -124,6 +125,10 @@ export default function RoomExternalUrl() {
 
   return (
     <>
+        <Helmet>
+			<title>External URLs - MatrixCerberus</title>
+        </Helmet>
+
         <div className="flex flex-col sm:flex-row items-center justify-around w-full h-48 py-5 shadow-lg bg-dark-eye" >
             <div className='flex w-full justify-center'>
                 <div className="hidden sm:w-1/4 sm:block"/>

@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import Helmet from "react-helmet";
 import { Link, useParams } from "react-router-dom";
 import SelectThirdPartyAccountModal from "../Components/SelectThirdPartyAccountModal";
 
@@ -8,6 +9,10 @@ function Room() {
 
     return (
         <>
+            <Helmet>
+			    <title>Room - MatrixCerberus</title>
+            </Helmet>
+
             <div className="flex flex-col md:flex-row items-center justify-around w-full h-48 py-5 shadow-lg bg-dark-eye" >
                 <div className='flex w-full justify-center'>
                     <div className="hidden md:w-1/4 sm:block"/>

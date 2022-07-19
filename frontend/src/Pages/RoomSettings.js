@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from "prop-types"
 import axios from '../HelperFunctions/customAxios'
 import { useNavigate } from 'react-router-dom'
+import Helmet from 'react-helmet'
 
 const TableHeader = ({ colValue }) => {
   return (
@@ -66,6 +67,10 @@ export default function RoomSettings() {
 
   return (
     <div>
+      <Helmet>
+			  <title>Room List - MatrixCerberus</title>
+      </Helmet>
+
 			<div className="flex items-center w-full h-48 py-5 shadow-lg bg-dark-eye" >
 				<div className='flex items-center justify-center w-full sm:w-1/3'>
 					<div className='relative bottom-5 font-bold text-3xl my-5 px-3 sm:px-0 text-gray-200'>
