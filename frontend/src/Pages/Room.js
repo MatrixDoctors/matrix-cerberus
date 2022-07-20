@@ -1,11 +1,99 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Helmet from "react-helmet";
+import PropTypes from "prop-types"
 import { Link, useParams } from "react-router-dom";
 import SelectThirdPartyAccountModal from "../Components/SelectThirdPartyAccountModal";
+import axios from "../HelperFunctions/customAxios";
+
+const Images = {
+    'github': require('../assets/img/github.svg').default,
+    'patreon': require('../assets/img/patreon.svg').default,
+}
+
+const TableRows = ({thirdPartyAccount, owner, conditionType}) => {
+    const image = Images[thirdPartyAccount.toLowerCase()];
+
+    return (
+        <tr className="h-20 text-sm leading-none text-gray-800 bg-white hover:bg-gray-100 border-b border-t border-gray-100">
+            <td className="pl-4 cursor-pointer">
+                <div className="flex items-center">
+                    <div className="w-6 h-6">
+                        <img className="w-full h-full" src={image} />
+                    </div>
+                    <div className="pl-4">
+                        <p className="font-medium">{thirdPartyAccount}</p>
+                    </div>
+                </div>
+            </td>
+
+            <td className="pl-12 cursor-pointer">
+                <p className="font-medium"> {owner.parent} </p>
+                { owner.child
+                    ? <p className="text-xs leading-3 text-gray-600 mt-2">{owner.child}</p>
+                    : <></>}
+            </td>
+
+            <td className="pl-12 ">
+                <p className="text-sm font-medium leading-none text-gray-800"> {conditionType} </p>
+            </td>
+            <td className="pl-12">
+                <div className="flex justify-end">
+                    <button className="w-5 h-5 mx-4" title="Show">
+                        <img className="w-full h-full" src={require("../assets/img/eye-regular.svg").default} />
+                    </button>
+                    <button className="w-5 h-5 mx-4" title="Edit">
+                        <img className="w-full h-full" src={require("../assets/img/pen-to-square.svg").default} />
+                    </button>
+                    <button className="w-5 h-5 mx-4" title="Delete">
+                        <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
+                    </button>
+                </div>
+            </td>
+        </tr>
+    )
+}
+
+TableRows.propTypes = {
+    thirdPartyAccount: PropTypes.string,
+    owner: PropTypes.object,
+    conditionType: PropTypes.string,
+}
 
 function Room() {
     const { roomId } = useParams();
-    const [showModal, setShowModal] = React.useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [roomConditions, setRoomConditions] = useState([]);
+
+    useEffect( () => {
+        async function fetchRoomConditions() {
+            const resp = await axios.get(`/api/rooms/${roomId}`);
+            const data = resp.data.map( (item) => {
+                let key = item.third_party_account + item.owner.parent + item.condition_type;
+                if(item.owner.child) {
+                    key += item.owner.child;
+                }
+                return {
+                    thirdPartyAccount: item.third_party_account,
+                    owner: item.owner,
+                    conditionType: item.condition_type,
+                    data: item.data,
+                    key: key
+                };
+            });
+            setRoomConditions([
+                ...data,
+                {
+                    thirdPartyAccount: "Patreon",
+                    owner: {
+                        parent: "Kuries"
+                    },
+                    conditionType: "Sponsorship Tiers",
+                    key: 3
+                }
+            ]);
+        };
+        fetchRoomConditions();
+    }, [])
 
     return (
         <>
@@ -55,104 +143,16 @@ function Room() {
                         <tbody className="w-full">
 
                             {/* Row - 1 */}
-                            <tr className="h-20 text-sm leading-none text-gray-800 bg-white hover:bg-gray-100 border-b border-t border-gray-100">
-                                <td className="pl-4 cursor-pointer">
-                                    <div className="flex items-center">
-                                        <div className="w-6 h-6">
-                                            <img className="w-full h-full" src={require("../assets/img/github.svg").default} />
-                                        </div>
-                                        <div className="pl-4">
-                                            <p className="font-medium">GitHub</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="pl-12 cursor-pointer">
-                                    <p className="font-medium"> TestOrgForCerberus </p>
-                                    <p className="text-xs leading-3 text-gray-600 mt-2">SampleRepo</p>
-                                </td>
-                                <td className="pl-12 ">
-                                    <p className="text-sm font-medium leading-none text-gray-800"> Repository </p>
-                                </td>
-                                <td className="pl-12">
-                                    <div className="flex justify-end">
-                                        <button className="w-5 h-5 mx-4" title="Show">
-                                            <img className="w-full h-full" src={require("../assets/img/eye-regular.svg").default} />
-                                        </button>
-                                        <button className="w-5 h-5 mx-4" title="Edit">
-                                            <img className="w-full h-full" src={require("../assets/img/pen-to-square.svg").default} />
-                                        </button>
-                                        <button className="w-5 h-5 mx-4" title="Delete">
-                                            <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr className="h-20 text-sm leading-none text-gray-800 border-b border-t bg-white hover:bg-gray-100 border-gray-100">
-                                <td className="pl-4 cursor-pointer">
-                                    <div className="flex items-center">
-                                        <div className="w-6 h-6">
-                                            <img className="w-full h-full" src={require("../assets/img/github.svg").default} />
-                                        </div>
-                                        <div className="pl-4">
-                                            <p className="font-medium">GitHub</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="pl-12 cursor-pointer">
-                                    <p className="font-medium"> TestOrgForCerberus </p>
-                                </td>
-                                <td className="pl-12 ">
-                                    <p className="text-sm font-medium leading-none text-gray-800"> Teams</p>
-                                </td>
-                                <td className="pl-12">
-                                    <div className="flex justify-end">
-                                        <button className="w-5 h-5 mx-4" title="Show">
-                                            <img className="w-full h-full" src={require("../assets/img/eye-regular.svg").default} />
-                                        </button>
-                                        <button className="w-5 h-5 mx-4" title="Edit">
-                                            <img className="w-full h-full" src={require("../assets/img/pen-to-square.svg").default} />
-                                        </button>
-                                        <button className="w-5 h-5 mx-4" title="Delete">
-                                            <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            {/* Row - 3 */}
-                            <tr className="h-20 text-sm leading-none text-gray-800 border-b border-t bg-white hover:bg-gray-100 border-gray-100">
-                                <td className="pl-4 cursor-pointer">
-                                    <div className="flex items-center">
-                                        <div className="w-6 h-6">
-                                            <img className="w-full h-full" src={require("../assets/img/patreon.svg").default} />
-                                        </div>
-                                        <div className="pl-4">
-                                            <p className="font-medium">Patreon</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="pl-12 cursor-pointer">
-                                    <p className="font-medium"> Kuries </p>
-                                </td>
-                                <td className="pl-12 ">
-                                    <p className="text-sm font-medium leading-none text-gray-800"> Sponsorship Tiers </p>
-                                </td>
-                                <td className="pl-12">
-                                    <div className="flex justify-end">
-                                        <button className="w-5 h-5 mx-4" title="Show">
-                                            <img className="w-full h-full" src={require("../assets/img/eye-regular.svg").default} />
-                                        </button>
-                                        <button className="w-5 h-5 mx-4" title="Edit">
-                                            <img className="w-full h-full" src={require("../assets/img/pen-to-square.svg").default} />
-                                        </button>
-                                        <button className="w-5 h-5 mx-4" title="Delete">
-                                            <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
+                            {roomConditions.map( (rowValue) => {
+                                return (
+                                    <TableRows
+                                        thirdPartyAccount={rowValue.thirdPartyAccount}
+                                        owner={rowValue.owner}
+                                        conditionType={rowValue.conditionType}
+                                        key={rowValue.key}
+                                    />
+                                )
+                            })}
 
                         </tbody>
                     </table>

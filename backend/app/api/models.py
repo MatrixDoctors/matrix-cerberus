@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import BaseModel
 
 
@@ -25,3 +27,15 @@ class ExternalUrlInfo(BaseModel):
 class GithubCode(BaseModel):
 
     code: str
+
+
+class OwnerField(BaseModel):
+    parent: str
+    child: str = None
+
+
+class RoomConditions(BaseModel):
+    third_party_account: str
+    owner: OwnerField
+    condition_type: str
+    data: Any = None
