@@ -3,6 +3,7 @@ import Helmet from "react-helmet";
 import PropTypes from "prop-types"
 import { Link, useParams } from "react-router-dom";
 import SelectThirdPartyAccountModal from "../Components/SelectThirdPartyAccountModal";
+import PreviewConditions from "../Components/PreviewConditions";
 import axios from "../HelperFunctions/customAxios";
 
 const Images = {
@@ -10,8 +11,9 @@ const Images = {
     'patreon': require('../assets/img/patreon.svg').default,
 }
 
-const TableRows = ({thirdPartyAccount, owner, conditionType}) => {
-    const image = Images[thirdPartyAccount.toLowerCase()];
+const TableRows = ({rowValue, setShowPreview, setModalData}) => {
+    const owner= rowValue.owner;
+    const image = Images[rowValue.thirdPartyAccount.toLowerCase()];
 
     return (
         <tr className="h-20 text-sm leading-none text-gray-800 bg-white hover:bg-gray-100 border-b border-t border-gray-100">
@@ -21,7 +23,7 @@ const TableRows = ({thirdPartyAccount, owner, conditionType}) => {
                         <img className="w-full h-full" src={image} />
                     </div>
                     <div className="pl-4">
-                        <p className="font-medium">{thirdPartyAccount}</p>
+                        <p className="font-medium">{rowValue.thirdPartyAccount}</p>
                     </div>
                 </div>
             </td>
@@ -34,13 +36,21 @@ const TableRows = ({thirdPartyAccount, owner, conditionType}) => {
             </td>
 
             <td className="pl-12 ">
-                <p className="text-sm font-medium leading-none text-gray-800"> {conditionType} </p>
+                <p className="text-sm font-medium leading-none text-gray-800"> {rowValue.conditionType} </p>
             </td>
             <td className="pl-12">
                 <div className="flex justify-end">
-                    <button className="w-5 h-5 mx-4" title="Show">
+                    <button
+                    className="w-5 h-5 mx-4"
+                    title="Show"
+                    onClick={() => {
+                        setModalData(rowValue);
+                        setShowPreview(true);
+                    }}
+                    >
                         <img className="w-full h-full" src={require("../assets/img/eye-regular.svg").default} />
                     </button>
+
                     <button className="w-5 h-5 mx-4" title="Edit">
                         <img className="w-full h-full" src={require("../assets/img/pen-to-square.svg").default} />
                     </button>
@@ -54,15 +64,18 @@ const TableRows = ({thirdPartyAccount, owner, conditionType}) => {
 }
 
 TableRows.propTypes = {
-    thirdPartyAccount: PropTypes.string,
-    owner: PropTypes.object,
-    conditionType: PropTypes.string,
+    rowValue: PropTypes.object,
+    setShowPreview: PropTypes.func,
+    setModalData: PropTypes.func
 }
 
 function Room() {
     const { roomId } = useParams();
     const [showModal, setShowModal] = useState(false);
     const [roomConditions, setRoomConditions] = useState([]);
+
+    const [showPreview, setShowPreview] = useState(false);
+    const [modalData, setModalData] = useState({});
 
     useEffect( () => {
         async function fetchRoomConditions() {
@@ -132,6 +145,7 @@ function Room() {
 
             <div className="w-full sm:px-6">
                 <div className="bg-gray-200 shadow px-4 md:px-10 pt-4 md:pt-7 pb-5 overflow-y-auto">
+                    <PreviewConditions modalData={modalData} showPreview={showPreview} setShowPreview={setShowPreview} />
                     <table className="w-full whitespace-nowrap">
                         <thead>
                             <tr className="h-16 w-full text-sm leading-none text-gray-800">
@@ -141,15 +155,14 @@ function Room() {
                             </tr>
                         </thead>
                         <tbody className="w-full">
-
                             {/* Row - 1 */}
                             {roomConditions.map( (rowValue) => {
                                 return (
                                     <TableRows
-                                        thirdPartyAccount={rowValue.thirdPartyAccount}
-                                        owner={rowValue.owner}
-                                        conditionType={rowValue.conditionType}
+                                        rowValue={rowValue}
                                         key={rowValue.key}
+                                        setShowPreview={setShowPreview}
+                                        setModalData={setModalData}
                                     />
                                 )
                             })}
