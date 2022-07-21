@@ -5,13 +5,14 @@ import { Link, useParams } from "react-router-dom";
 import SelectThirdPartyAccountModal from "../Components/SelectThirdPartyAccountModal";
 import PreviewConditions from "../Components/PreviewConditions";
 import axios from "../HelperFunctions/customAxios";
+import EditConditions from "../Components/EditConditions";
 
 const Images = {
     'github': require('../assets/img/github.svg').default,
     'patreon': require('../assets/img/patreon.svg').default,
 }
 
-const TableRows = ({rowValue, setShowPreview, setModalData}) => {
+const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData}) => {
     const owner= rowValue.owner;
     const image = Images[rowValue.thirdPartyAccount.toLowerCase()];
 
@@ -51,7 +52,14 @@ const TableRows = ({rowValue, setShowPreview, setModalData}) => {
                         <img className="w-full h-full" src={require("../assets/img/eye-regular.svg").default} />
                     </button>
 
-                    <button className="w-5 h-5 mx-4" title="Edit">
+                    <button
+                    className="w-5 h-5 mx-4"
+                    title="Edit"
+                    onClick={() => {
+                        setModalData(rowValue);
+                        setShowEditable(true);
+                    }}
+                    >
                         <img className="w-full h-full" src={require("../assets/img/pen-to-square.svg").default} />
                     </button>
                     <button className="w-5 h-5 mx-4" title="Delete">
@@ -66,6 +74,7 @@ const TableRows = ({rowValue, setShowPreview, setModalData}) => {
 TableRows.propTypes = {
     rowValue: PropTypes.object,
     setShowPreview: PropTypes.func,
+    setShowEditable: PropTypes.func,
     setModalData: PropTypes.func
 }
 
@@ -75,6 +84,7 @@ function Room() {
     const [roomConditions, setRoomConditions] = useState([]);
 
     const [showPreview, setShowPreview] = useState(false);
+    const [showEditable, setShowEditable] = useState(false);
     const [modalData, setModalData] = useState({});
 
     useEffect( () => {
@@ -146,6 +156,7 @@ function Room() {
             <div className="w-full sm:px-6">
                 <div className="bg-gray-200 shadow px-4 md:px-10 pt-4 md:pt-7 pb-5 overflow-y-auto">
                     <PreviewConditions modalData={modalData} showPreview={showPreview} setShowPreview={setShowPreview} />
+                    <EditConditions modalData={modalData} setModalData={setModalData} showEditable={showEditable} setShowEditable={setShowEditable} />
                     <table className="w-full whitespace-nowrap">
                         <thead>
                             <tr className="h-16 w-full text-sm leading-none text-gray-800">
@@ -162,6 +173,7 @@ function Room() {
                                         rowValue={rowValue}
                                         key={rowValue.key}
                                         setShowPreview={setShowPreview}
+                                        setShowEditable={setShowEditable}
                                         setModalData={setModalData}
                                     />
                                 )
