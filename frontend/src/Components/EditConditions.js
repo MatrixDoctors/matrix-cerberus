@@ -11,8 +11,25 @@ export default function EditConditions({modalData, setModalData, roomConditions,
         });
     }
 
-    function handleClose(e){
+    function handleClose(){
         setCurrentData(modalData.data ? {...modalData.data} : {});
+        setShowEditable(false);
+    }
+
+    function handleSave(e){
+        setModalData(previousData => ({...previousData, data: currentData}));
+
+        setRoomConditions(previousData => {
+            return previousData.map(item => {
+                if (item.key === modalData.key) {
+                    return {...modalData, data: currentData};
+                }
+                else {
+                    return item;
+                }
+            });
+        });
+
         setShowEditable(false);
     }
 
@@ -108,7 +125,10 @@ export default function EditConditions({modalData, setModalData, roomConditions,
 
 
                         <div className='flex justify-end items-center mt-3'>
-                            <button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none font-medium rounded-lg text-sm px-4 py-2 text-center mr-2">
+                            <button
+                            className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none font-medium rounded-lg text-sm px-4 py-2 text-center mr-2"
+                            onClick={handleSave}
+                            >
                                 Save
                             </button>
 
