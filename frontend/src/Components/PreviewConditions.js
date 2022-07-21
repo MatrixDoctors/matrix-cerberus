@@ -67,7 +67,7 @@ export default function PreviewConditions({ modalData, showPreview, setShowPrevi
                             Conditions
                         </p>
 
-                        <div className='p-2'>
+                        <div className='p-2 w-full'>
                             { modalData.data
                                 ? Object.entries(modalData.data).map( ([key, value]) => {
                                     return (

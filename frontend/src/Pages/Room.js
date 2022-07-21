@@ -96,6 +96,7 @@ function Room() {
                     key += item.owner.child;
                 }
                 return {
+                    type: item.type,
                     thirdPartyAccount: item.third_party_account,
                     owner: item.owner,
                     conditionType: item.condition_type,
@@ -156,7 +157,7 @@ function Room() {
             <div className="w-full sm:px-6">
                 <div className="bg-gray-200 shadow px-4 md:px-10 pt-4 md:pt-7 pb-5 overflow-y-auto">
                     <PreviewConditions modalData={modalData} showPreview={showPreview} setShowPreview={setShowPreview} />
-                    <EditConditions modalData={modalData} setModalData={setModalData} showEditable={showEditable} setShowEditable={setShowEditable} />
+                    <EditConditions modalData={modalData} setModalData={setModalData} roomConditions={roomConditions} setRoomConditions={setRoomConditions} showEditable={showEditable} setShowEditable={setShowEditable} />
                     <table className="w-full whitespace-nowrap">
                         <thead>
                             <tr className="h-16 w-full text-sm leading-none text-gray-800">

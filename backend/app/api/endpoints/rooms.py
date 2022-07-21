@@ -12,10 +12,12 @@ router = APIRouter()
 
 async def parse_github_org_data(github_conditions: GithubConditions):
     orgs = github_conditions.orgs
+    owner_type = "org"
     list_of_conditions = []
     for org_name, org_data in orgs.items():
         for repo_name, repo_data in org_data.repos.items():
             repo_condition = RoomConditions(
+                type=owner_type,
                 third_party_account="Github",
                 owner={"parent": org_name, "child": repo_name},
                 condition_type="Repository",
@@ -26,6 +28,7 @@ async def parse_github_org_data(github_conditions: GithubConditions):
         if org_data.teams:
             list_of_conditions.append(
                 RoomConditions(
+                    type=owner_type,
                     third_party_account="Github",
                     owner={
                         "parent": org_name,
@@ -38,6 +41,7 @@ async def parse_github_org_data(github_conditions: GithubConditions):
         if org_data.sponsorship_tiers:
             list_of_conditions.append(
                 RoomConditions(
+                    type=owner_type,
                     third_party_account="Github",
                     owner={
                         "parent": org_name,
@@ -52,10 +56,12 @@ async def parse_github_org_data(github_conditions: GithubConditions):
 
 async def parse_github_user_data(github_conditions: GithubConditions):
     users = github_conditions.users
+    owner_type = "user"
     list_of_conditions = []
     for user_name, user_data in users.items():
         for repo_name, repo_data in user_data.repos.items():
             repo_condition = RoomConditions(
+                type=owner_type,
                 third_party_account="Github",
                 owner={"parent": user_name, "child": repo_name},
                 condition_type="Repository",
@@ -66,6 +72,7 @@ async def parse_github_user_data(github_conditions: GithubConditions):
         if user_data.sponsorship_tiers:
             list_of_conditions.append(
                 RoomConditions(
+                    type=owner_type,
                     third_party_account="Github",
                     owner={
                         "parent": user_name,

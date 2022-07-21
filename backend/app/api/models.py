@@ -35,6 +35,7 @@ class OwnerField(BaseModel):
 
 
 class RoomConditions(BaseModel):
+    type: str
     third_party_account: str
     owner: OwnerField
     condition_type: str

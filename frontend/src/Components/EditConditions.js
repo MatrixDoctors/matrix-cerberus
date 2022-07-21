@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types'
 
-export default function EditConditions({modalData, setModalData, showEditable, setShowEditable}) {
-  return (
+export default function EditConditions({modalData, setModalData, roomConditions, setRoomConditions, showEditable, setShowEditable}) {
+    const [currentData, setCurrentData] = useState(modalData);
+
+    return (
     <>
         {showEditable ? (
             <>
@@ -21,7 +23,7 @@ export default function EditConditions({modalData, setModalData, showEditable, s
                             </div>
 
                             <h3 className="text-xl font-semibold">
-                                {modalData.thirdPartyAccount} - {modalData.conditionType}
+                                {currentData.thirdPartyAccount} - {currentData.conditionType}
                             </h3>
                         </div>
 
@@ -46,17 +48,17 @@ export default function EditConditions({modalData, setModalData, showEditable, s
                                     Owner:
                                 </p>
                                 <p className="ml-auto text-md font-normal text-black">
-                                    {modalData.owner.parent}
+                                    {currentData.owner.parent}
                                 </p>
                             </div>
 
-                            { modalData.owner.child
+                            { currentData.owner.child
                                 ? <div className='flex justify-start'>
                                     <p className="text-md font-medium text-black">
                                         Repository:
                                     </p>
                                     <p className="ml-auto text-md font-normal text-black">
-                                        {modalData.owner.child}
+                                        {currentData.owner.child}
                                     </p>
                                 </div>
                                 : <></>
@@ -67,9 +69,9 @@ export default function EditConditions({modalData, setModalData, showEditable, s
                             Conditions
                         </p>
 
-                        <div className='p-2'>
-                            { modalData.data
-                                ? Object.entries(modalData.data).map( ([key, value]) => {
+                        <div className='p-2 w-full'>
+                            { currentData.data
+                                ? Object.entries(currentData.data).map( ([key, value]) => {
                                     return (
                                         <div key={key}>
                                             <input
@@ -79,12 +81,26 @@ export default function EditConditions({modalData, setModalData, showEditable, s
                                             name={key}
                                             checked={value}
                                             />
-                                            <label htmlFor={`checkbox-${key}`}>{key}</label>
+                                            <label className='w-full' htmlFor={`checkbox-${key}`}>{key}</label>
                                         </div>
                                     )
                                 })
                                 : <></>
                             }
+                        </div>
+
+
+                        <div className='flex justify-end items-center mt-3'>
+                            <button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none font-medium rounded-lg text-sm px-4 py-2 text-center mr-2">
+                                Save
+                            </button>
+
+                            <button
+                            className="text-white bg-red-700 hover:bg-red-800 focus:outline-none font-medium rounded-lg text-sm px-4 py-2 text-center "
+                            onClick={() => setShowEditable(false)}
+                            >
+                                Cancel
+                            </button>
                         </div>
 
                     </div>
@@ -101,6 +117,8 @@ export default function EditConditions({modalData, setModalData, showEditable, s
 EditConditions.propTypes = {
     modalData: PropTypes.object,
     setModalData: PropTypes.func,
+    roomConditions: PropTypes.array,
+    setRoomConditions: PropTypes.func,
     showEditable: PropTypes.bool,
     setShowEditable: PropTypes.func
 }
