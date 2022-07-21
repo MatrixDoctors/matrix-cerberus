@@ -1,8 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types'
 
 export default function EditConditions({modalData, setModalData, roomConditions, setRoomConditions, showEditable, setShowEditable}) {
-    const [currentData, setCurrentData] = useState(modalData);
+    const [currentData, setCurrentData] = useState([]);
+
+    function handleCheckboxChange(e){
+        const key = e.target.name;
+        setCurrentData((previousData) => {
+            return {...previousData, [key]: !previousData[key]};
+        });
+    }
+
+    function handleClose(e){
+        setCurrentData(modalData.data ? {...modalData.data} : {});
+        setShowEditable(false);
+    }
+
+    useEffect( () => {
+        setCurrentData(modalData.data ? {...modalData.data} : {});
+    }, [modalData]);
 
     return (
     <>
@@ -23,13 +39,13 @@ export default function EditConditions({modalData, setModalData, roomConditions,
                             </div>
 
                             <h3 className="text-xl font-semibold">
-                                {currentData.thirdPartyAccount} - {currentData.conditionType}
+                                {modalData.thirdPartyAccount} - {modalData.conditionType}
                             </h3>
                         </div>
 
                         <button
                             className="p-1 ml-auto"
-                            onClick={() => setShowEditable(false)}
+                            onClick={handleClose}
                         >
                             <svg
                             className="w-6 h-6"
@@ -48,17 +64,17 @@ export default function EditConditions({modalData, setModalData, roomConditions,
                                     Owner:
                                 </p>
                                 <p className="ml-auto text-md font-normal text-black">
-                                    {currentData.owner.parent}
+                                    {modalData.owner.parent}
                                 </p>
                             </div>
 
-                            { currentData.owner.child
+                            { modalData.owner.child
                                 ? <div className='flex justify-start'>
                                     <p className="text-md font-medium text-black">
                                         Repository:
                                     </p>
                                     <p className="ml-auto text-md font-normal text-black">
-                                        {currentData.owner.child}
+                                        {modalData.owner.child}
                                     </p>
                                 </div>
                                 : <></>
@@ -70,8 +86,8 @@ export default function EditConditions({modalData, setModalData, roomConditions,
                         </p>
 
                         <div className='p-2 w-full'>
-                            { currentData.data
-                                ? Object.entries(currentData.data).map( ([key, value]) => {
+                            { modalData.data
+                                ? Object.entries(currentData).map( ([key, value]) => {
                                     return (
                                         <div key={key}>
                                             <input
@@ -80,6 +96,7 @@ export default function EditConditions({modalData, setModalData, roomConditions,
                                             id={`checkbox-${key}`}
                                             name={key}
                                             checked={value}
+                                            onChange={(e) => handleCheckboxChange(e)}
                                             />
                                             <label className='w-full' htmlFor={`checkbox-${key}`}>{key}</label>
                                         </div>
@@ -97,7 +114,7 @@ export default function EditConditions({modalData, setModalData, roomConditions,
 
                             <button
                             className="text-white bg-red-700 hover:bg-red-800 focus:outline-none font-medium rounded-lg text-sm px-4 py-2 text-center "
-                            onClick={() => setShowEditable(false)}
+                            onClick={handleClose}
                             >
                                 Cancel
                             </button>
