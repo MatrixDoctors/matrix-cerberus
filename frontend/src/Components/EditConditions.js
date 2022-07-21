@@ -1,8 +1,9 @@
+import axios from '../HelperFunctions/customAxios';
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types'
 
-export default function EditConditions({modalData, setModalData, roomConditions, setRoomConditions, showEditable, setShowEditable}) {
-    const [currentData, setCurrentData] = useState([]);
+export default function EditConditions({roomId, modalData, setModalData, roomConditions, setRoomConditions, showEditable, setShowEditable}) {
+    const [currentData, setCurrentData] = useState({});
 
     function handleCheckboxChange(e){
         const key = e.target.name;
@@ -16,21 +17,54 @@ export default function EditConditions({modalData, setModalData, roomConditions,
         setShowEditable(false);
     }
 
-    function handleSave(e){
-        setModalData(previousData => ({...previousData, data: currentData}));
+    function handleSave(){
 
-        setRoomConditions(previousData => {
-            return previousData.map(item => {
-                if (item.key === modalData.key) {
-                    return {...modalData, data: currentData};
+        async function saveData(roomId, modalData, currentData){
+            const thirdPartyAccount = modalData.thirdPartyAccount.toLowerCase();
+            const conditionType = modalData.conditionType.toLowerCase();
+            const ownerType = modalData.type;
+
+            let url;
+            if(thirdPartyAccount === 'github') {
+                if(conditionType === 'repository') {
+                    url = `/api/rooms/${roomId}/github/${ownerType}/${conditionType}`;
                 }
-                else {
-                    return item;
-                }
+            }
+
+            // Excludes the 'key' and updates the 'data' property.
+            let dataToBeSent = {
+                "type": ownerType,
+                "third_party_account": thirdPartyAccount,
+                "owner": modalData.owner,
+                "condition_type": conditionType,
+                "data": currentData
+            }
+
+            return axios.post(url, dataToBeSent);
+        }
+
+        const resp = saveData(roomId, modalData, currentData);
+
+        resp.then( (resp) => {
+            setModalData(previousData => ({...previousData, data: currentData}));
+
+            setRoomConditions(previousData => {
+                return previousData.map(item => {
+                    if (item.key === modalData.key) {
+                        return {...modalData, data: currentData};
+                    }
+                    else {
+                        return item;
+                    }
+                });
             });
-        });
 
-        setShowEditable(false);
+            setShowEditable(false);
+        })
+        .catch( (err) => {
+            console.error("Failed to save data", err);
+            handleClose();
+        })
     }
 
     useEffect( () => {
@@ -152,6 +186,7 @@ export default function EditConditions({modalData, setModalData, roomConditions,
 }
 
 EditConditions.propTypes = {
+    roomId: PropTypes.string,
     modalData: PropTypes.object,
     setModalData: PropTypes.func,
     roomConditions: PropTypes.array,

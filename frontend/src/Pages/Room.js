@@ -157,7 +157,7 @@ function Room() {
             <div className="w-full sm:px-6">
                 <div className="bg-gray-200 shadow px-4 md:px-10 pt-4 md:pt-7 pb-5 overflow-y-auto">
                     <PreviewConditions modalData={modalData} showPreview={showPreview} setShowPreview={setShowPreview} />
-                    <EditConditions modalData={modalData} setModalData={setModalData} roomConditions={roomConditions} setRoomConditions={setRoomConditions} showEditable={showEditable} setShowEditable={setShowEditable} />
+                    <EditConditions roomId={roomId} modalData={modalData} setModalData={setModalData} roomConditions={roomConditions} setRoomConditions={setRoomConditions} showEditable={showEditable} setShowEditable={setShowEditable} />
                     <table className="w-full whitespace-nowrap">
                         <thead>
                             <tr className="h-16 w-full text-sm leading-none text-gray-800">

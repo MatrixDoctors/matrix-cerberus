@@ -95,6 +95,24 @@ async def get_room_conditions(room_id: str):
     return JSONResponse(list_of_conditions)
 
 
+@router.post(
+    "/{room_id}/github/{owner_type}/repository", dependencies=[Depends(verify_room_permissions)]
+)
+async def put_github_repo_data(room_id: str, owner_type: str, room_conditions: RoomConditions):
+    resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+
+    if owner_type == "org":
+        github_data = resp.content.github.orgs
+    else:
+        github_data = resp.content.github.users
+
+    owner_name, repo_name = room_conditions.owner.parent, room_conditions.owner.child
+    github_data[owner_name].repos[repo_name] = room_conditions.data
+
+    resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
+    return JSONResponse({"msg": "success"})
+
+
 @router.get("/{room_id}/external-url", dependencies=[Depends(verify_room_permissions)])
 async def get_room_external_urls(
     room_id: str, external_url: ExternalUrlAPI = Depends(external_url_api_instance)
