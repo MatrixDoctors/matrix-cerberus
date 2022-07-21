@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 export default function PreviewConditions({ modalData, showPreview, setShowPreview }) {
-
     return (
         <>
         {showPreview ? (
@@ -38,6 +37,7 @@ export default function PreviewConditions({ modalData, showPreview, setShowPrevi
                             </svg>
                         </button>
                     </div>
+
                     {/*body*/}
                     <div className="relative p-6 flex-auto">
                         <div className='mb-4 pb-4 border-b border-solid border-slate-200 rounded-t'>
@@ -67,14 +67,26 @@ export default function PreviewConditions({ modalData, showPreview, setShowPrevi
                             Conditions
                         </p>
 
-                        <ul className="my-4 space-y-3">
-                            <li>
-                                Option 1
-                            </li>
-                            <li>
-                                Option 2
-                            </li>
-                        </ul>
+                        <div className='p-2'>
+                            { modalData.data
+                                ? Object.entries(modalData.data).map( ([key, value]) => {
+                                    return (
+                                        <div key={key}>
+                                            <input
+                                            className='mr-2'
+                                            type="checkbox"
+                                            id={`checkbox-${key}`}
+                                            name={key}
+                                            disabled={true}
+                                            checked={value}
+                                            />
+                                            <label htmlFor={`checkbox-${key}`}>{key}</label>
+                                        </div>
+                                    )
+                                })
+                                : <></>
+                            }
+                        </div>
 
                     </div>
                 </div>
