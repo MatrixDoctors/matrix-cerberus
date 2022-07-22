@@ -125,6 +125,37 @@ async def put_github_repo_data(
     return JSONResponse({"msg": "success"})
 
 
+@router.post(
+    "/{room_id}/github/{owner_type}/{condition_type}/delete",
+    dependencies=[Depends(verify_room_permissions)],
+)
+async def put_github_repo_data(
+    room_id: str, owner_type: str, condition_type: str, room_conditions: RoomConditions
+):
+    resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+
+    if owner_type == "org":
+        github_data = resp.content.github.orgs
+    else:
+        github_data = resp.content.github.users
+
+    owner_name = room_conditions.owner.parent
+
+    if condition_type == "repository":
+        repo_name = room_conditions.owner.child
+        del github_data[owner_name].repos[repo_name]
+    elif condition_type == "teams":
+        github_data[owner_name].teams = dict()
+    elif condition_type == "sponsorship tiers":
+        github_data[owner_name].sponsorship_tiers = dict()
+    else:
+        raise HTTPException(status_code=400, detail="Invalid condition type sent.")
+
+    # resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
+    print(resp)
+    return JSONResponse({"msg": "success"})
+
+
 @router.get("/{room_id}/external-url", dependencies=[Depends(verify_room_permissions)])
 async def get_room_external_urls(
     room_id: str, external_url: ExternalUrlAPI = Depends(external_url_api_instance)

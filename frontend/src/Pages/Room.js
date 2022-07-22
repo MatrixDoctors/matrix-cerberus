@@ -12,7 +12,7 @@ const Images = {
     'patreon': require('../assets/img/patreon.svg').default,
 }
 
-const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData}) => {
+const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData, handleDelete}) => {
     const owner= rowValue.owner;
     const image = Images[rowValue.thirdPartyAccount.toLowerCase()];
 
@@ -62,7 +62,10 @@ const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData}) =>
                     >
                         <img className="w-full h-full" src={require("../assets/img/pen-to-square.svg").default} />
                     </button>
-                    <button className="w-5 h-5 mx-4" title="Delete">
+                    <button
+                    className="w-5 h-5 mx-4"
+                    title="Delete"
+                    onClick={() => handleDelete(rowValue)}>
                         <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
                     </button>
                 </div>
@@ -75,7 +78,8 @@ TableRows.propTypes = {
     rowValue: PropTypes.object,
     setShowPreview: PropTypes.func,
     setShowEditable: PropTypes.func,
-    setModalData: PropTypes.func
+    setModalData: PropTypes.func,
+    handleDelete: PropTypes.func
 }
 
 function Room() {
@@ -86,6 +90,38 @@ function Room() {
     const [showPreview, setShowPreview] = useState(false);
     const [showEditable, setShowEditable] = useState(false);
     const [modalData, setModalData] = useState({});
+
+    function handleDelete(rowData) {
+        async function deleteData(roomId, rowData){
+            const thirdPartyAccount = rowData.thirdPartyAccount.toLowerCase();
+            const conditionType = rowData.conditionType.toLowerCase();
+            const ownerType = rowData.type;
+
+            let url;
+            if(thirdPartyAccount === 'github') {
+                url = `/api/rooms/${roomId}/github/${ownerType}/${conditionType}/delete`;
+            }
+
+            // Excludes the 'key' and updates the 'data' property.
+            let dataToBeSent = {
+                "type": ownerType,
+                "third_party_account": thirdPartyAccount,
+                "owner": rowData.owner,
+                "condition_type": conditionType,
+                "data": rowData.data
+            }
+
+            return axios.post(url, dataToBeSent);
+        }
+
+        deleteData(roomId, rowData)
+        .then(() => {
+            setRoomConditions(previousData => previousData.filter(item => item.key !== rowData.key) );
+        })
+        .catch((err) => {
+            console.error("Could not delete the room condition ", err);
+        });
+    }
 
     useEffect( () => {
         async function fetchRoomConditions() {
@@ -176,6 +212,7 @@ function Room() {
                                         setShowPreview={setShowPreview}
                                         setShowEditable={setShowEditable}
                                         setModalData={setModalData}
+                                        handleDelete={handleDelete}
                                     />
                                 )
                             })}
