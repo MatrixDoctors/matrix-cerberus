@@ -26,9 +26,7 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
 
             let url;
             if(thirdPartyAccount === 'github') {
-                if(conditionType === 'repository') {
-                    url = `/api/rooms/${roomId}/github/${ownerType}/${conditionType}`;
-                }
+                url = `/api/rooms/${roomId}/github/${ownerType}/${conditionType}`;
             }
 
             // Excludes the 'key' and updates the 'data' property.
@@ -40,7 +38,7 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
                 "data": currentData
             }
 
-            return axios.post(url, dataToBeSent);
+            return axios.put(url, dataToBeSent);
         }
 
         const resp = saveData(roomId, modalData, currentData);

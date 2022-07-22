@@ -95,10 +95,13 @@ async def get_room_conditions(room_id: str):
     return JSONResponse(list_of_conditions)
 
 
-@router.post(
-    "/{room_id}/github/{owner_type}/repository", dependencies=[Depends(verify_room_permissions)]
+@router.put(
+    "/{room_id}/github/{owner_type}/{condition_type}",
+    dependencies=[Depends(verify_room_permissions)],
 )
-async def put_github_repo_data(room_id: str, owner_type: str, room_conditions: RoomConditions):
+async def put_github_repo_data(
+    room_id: str, owner_type: str, condition_type: str, room_conditions: RoomConditions
+):
     resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
 
     if owner_type == "org":
@@ -106,8 +109,17 @@ async def put_github_repo_data(room_id: str, owner_type: str, room_conditions: R
     else:
         github_data = resp.content.github.users
 
-    owner_name, repo_name = room_conditions.owner.parent, room_conditions.owner.child
-    github_data[owner_name].repos[repo_name] = room_conditions.data
+    owner_name = room_conditions.owner.parent
+
+    if condition_type == "repository":
+        repo_name = room_conditions.owner.child
+        github_data[owner_name].repos[repo_name] = room_conditions.data
+    elif condition_type == "teams":
+        github_data[owner_name].teams = room_conditions.data
+    elif condition_type == "sponsorship tiers":
+        github_data[owner_name].sponsorship_tiers = room_conditions.data
+    else:
+        raise HTTPException(status_code=400, detail="Invalid condition type sent.")
 
     resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
     return JSONResponse({"msg": "success"})
