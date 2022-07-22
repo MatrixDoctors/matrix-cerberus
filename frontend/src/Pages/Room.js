@@ -184,7 +184,7 @@ function Room() {
                     >
                         <p className="text-sm font-medium leading-none text-white">Add Condition</p>
                     </button>
-                    <SelectThirdPartyAccountModal showModal={showModal} setShowModal={() => setShowModal()}/>
+                    <SelectThirdPartyAccountModal roomId={roomId} showModal={showModal} setShowModal={() => setShowModal()}/>
                 </div>
 
                 {/* <div className='hidden sm:w-2/3 sm:block'/> */}
