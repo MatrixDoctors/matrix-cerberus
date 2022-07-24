@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "./HelperFunctions/customAxios";
 
 export class MatrixApi {
     constructor(baseUrl) {

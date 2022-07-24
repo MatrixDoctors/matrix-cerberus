@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse
 
 from app.api.deps import fastapi_sessions
 from app.api.models import ExternalUrlInfo
@@ -38,6 +38,5 @@ async def get_invite(
         url_code=url_code,
         user_id=session_data.matrix_user,
     )
-    if not is_invited:
-        return RedirectResponse("/login")
-    return RedirectResponse("/")
+
+    return JSONResponse({"is_invited": is_invited})

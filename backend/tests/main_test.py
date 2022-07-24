@@ -24,9 +24,10 @@ def test_main():
 
 
 def test_message_users():
+    # Verify authentication checks
     response = client.get("api/users")
-    assert response.status_code == 200
-    assert response.json() == {"message": "Hello User!!!"}
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Not authorized"}
 
 
 @pytest.mark.asyncio
@@ -46,7 +47,7 @@ async def test_user_session_flow(mock_server):
         "matrix_server_name": "matrix.org",
         "token_type": "Bearer",
     }
-    response = client.post("api/users/verify-openid", data=json.dumps(open_id_data))
+    response = client.post("api/verify-openid", data=json.dumps(open_id_data))
     session_cookie = response.cookies.get_dict()
     assert response.status_code == 200
     assert session_cookie[settings.server_sessions.session_key] is not None
