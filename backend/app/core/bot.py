@@ -9,7 +9,7 @@ from nio.responses import WhoamiResponse
 from app.core.config import settings
 from app.core.http_client import http_client
 from app.core.models import RoomSpecificExternalUrl
-from app.core.parse_events import parse_events
+from app.core.parse_events import parse_event_data, parse_event_type
 
 
 class BaseBotClient(AsyncClient):
@@ -66,25 +66,31 @@ class BaseBotClient(AsyncClient):
     async def get_account_data(self, type: str, **additional_type_data):
         access_token = self.access_token
         headers = {"Authorization": f"Bearer {access_token}"}
+        event_type = parse_event_type(type, settings.app_name, **additional_type_data)
+
         url = urljoin(
-            self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{type}"
+            self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{event_type}"
         )
+
         async with http_client.session.get(url=url, headers=headers) as resp:
             data = await resp.json()
-            data = parse_events(type, data, **additional_type_data)
+            data = parse_event_data(type, data)
             return data
 
     async def put_account_data(self, type: str, data, **additional_type_data):
         access_token = self.access_token
-        data = parse_events(type, data, **additional_type_data)
         headers = {"Authorization": f"Bearer {access_token}"}
+
+        event_type = parse_event_type(type, settings.app_name, **additional_type_data)
+        data = parse_event_data(type, data)
+
         url = urljoin(
-            self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{type}"
+            self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{event_type}"
         )
         await http_client.session.put(url=url, headers=headers, data=data.json())
 
     async def create_room_to_external_url_mapping(self):
-        data = await self.get_account_data("matrix-cerberus.external_url")
+        data = await self.get_account_data("external_url")
         external_url_data = data.content
 
         for url_code, value in external_url_data.items():

@@ -13,14 +13,16 @@ import history from './HelperFunctions/customHistory';
 import { GlobalContext } from './GlobalContext';
 import LayoutsWithNavbar from './Components/LayoutsWithNavbar';
 import Logout from './Pages/Logout';
+import GithubOauth from './Pages/GithubOauth';
 
 export default function App() {
   const [matrixUserId, setMatrixUserId] = useState('');
+  const [githubUserId, setGithubUserId] = useState('');
 
   return (
     <CustomRouter history={history}>
     <GlobalContext.Provider
-          value = {{matrixUserId, setMatrixUserId}}>
+          value = {{matrixUserId, setMatrixUserId, githubUserId, setGithubUserId}}>
       <Routes>
           <Route element={<LayoutsWithNavbar/>}>
             <Route path="/" element={<AccountSettings />} />
@@ -30,6 +32,7 @@ export default function App() {
           </Route>
 
         <Route path="/i/:url_code" element={<ExternalUrl />} />
+        <Route path="/oauth2/github" element={<GithubOauth />} />
         <Route path="/login" element={<Login />} />
         <Route path="/login-success" element={<LoginSuccess/>} />
         <Route path="*" element={<ErrorPage/>} />

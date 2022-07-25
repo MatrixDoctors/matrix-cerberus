@@ -5,7 +5,7 @@ import { GlobalContext } from '../GlobalContext';
 import NavBar from './NavBar';
 
 export default function LayoutsWithNavbar() {
-  const {setMatrixUserId} = useContext(GlobalContext);
+  const {setMatrixUserId, setGithubUserId} = useContext(GlobalContext);
   const navigate = useNavigate();
 
   useEffect( () => {
@@ -13,8 +13,10 @@ export default function LayoutsWithNavbar() {
         const resp = await axios.get('api/current-user');
         console.log(resp.data);
         if(resp.data.matrix_user_id !== null){
-            const user_id = resp.data.matrix_user_id;
-            setMatrixUserId(user_id);
+            const matrix_user_id = resp.data.matrix_user_id;
+            const github_user_id = resp.data.github_user_id ? resp.data.github_user_id : "";
+            setMatrixUserId(matrix_user_id);
+            setGithubUserId(github_user_id);
         }
         else {
           navigate('/login');

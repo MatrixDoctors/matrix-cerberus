@@ -1,6 +1,9 @@
+app_name: matrix-cerberus
+
 redis:
   # Used to construct redis database URL
   # 'uri' is in the form "redis :// [[username :] password@] host [:port][/database] [?[timeout=timeout[d|h|m|s|ms|us|ns]]"
+  # replace 'uri' with "redis://redis_service/" when runnning with docker.
   #
   uri: redis://127.0.0.1:6379/
 
@@ -12,5 +15,10 @@ server_sessions:
   expires_in: 3600
 
 matrix_bot:
-  homeserver: "https://matrix.org"
+  homeserver: "https://example.org"
   access_token: some_access_token
+
+github:
+  client_id: client_id_token
+  client_secret: client_secret_token
+  redirect_uri: http://localhost:80/oauth2/github

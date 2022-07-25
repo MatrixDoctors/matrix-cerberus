@@ -12,7 +12,7 @@ class ExternalUrlAPI:
 
     def __init__(self):
         self._characters = string.ascii_letters + string.digits
-        self._event_type = "matrix-cerberus.external_url"
+        self._event_type = "external_url"
 
     def _generate_url_code(self, N: int = 8):
         return "".join([secrets.choice(self._characters) for i in range(N)])
