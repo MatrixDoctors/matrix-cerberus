@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { GlobalContext } from '../GlobalContext';
 
 /**
  * The default web page where an authorized matrix user can edit their third-party account connections.
  */
 export default function AccountSettings() {
-
+	const {matrixUserId} = useContext(GlobalContext);
+	const homeServer = localStorage.getItem('homeServer');
 	return (
 		<div>
 			<div className="flex items-center w-full h-48 py-5 shadow-lg bg-dark-eye" >
@@ -30,7 +32,7 @@ export default function AccountSettings() {
 									Matrix ID
 								</div>
 								<div className='w-2/3 px-2 text-gray-600'>
-									Kuries
+									{matrixUserId}
 								</div>
 							</div>
 
@@ -41,7 +43,7 @@ export default function AccountSettings() {
 									Homeserver
 								</div>
 								<div className='w-2/3 px-2 text-gray-600'>
-									matrix.org
+									{homeServer}
 								</div>
 							</div>
 
@@ -69,7 +71,7 @@ export default function AccountSettings() {
 									</div>
 								</div>
 								<div className='inline-block px-2 w-1/3 text-gray-600'>
-									Connected as kuries
+									Connected as GitHub user.
 								</div>
 								<div className='flex justify-end mx-2 w-1/3'>
 									<span className='px-2 text-blue-600 hover:shadow-md'>
@@ -99,7 +101,7 @@ export default function AccountSettings() {
 									</div>
 								</div>
 								<div className='w-1/3 px-2 text-gray-600'>
-									Connected as Binesh
+									Connected as Patreon user
 								</div>
 								<div className='flex justify-end mx-2 w-1/3'>
 									<span className='px-2 text-blue-600 hover:shadow-md'>
