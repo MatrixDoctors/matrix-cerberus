@@ -108,12 +108,14 @@ export default function RoomExternalUrl() {
 
     async function handleDelete(urlCode) {
         const resp = await axios.post(`/api/rooms/${roomId}/external-url/delete?url_code=${urlCode}`);
-        if(resp.status == 401) {
+        if(resp.status == 400) {
             console.error(resp.data);
+            toast.error(`Cannot delete ${urlCode}`);
         }
         setTemporaryUrl(urls => urls.filter( url => {
             return url !== urlCode;
         }))
+        toast.success(`Successfully deleted ${urlCode}`);
     };
 
     async function handleCreateNew(useOnceOnly) {
