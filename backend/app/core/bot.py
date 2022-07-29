@@ -113,25 +113,36 @@ class BaseBotClient(AsyncClient):
         elif type == "global_data":
             return BotGlobalData.parse_obj(data)
 
+        else:
+            raise ValueError("Invalid event type.")
+
     def parse_event_type(self, type: str, app_name, **additional_type_data):
         if type == f"external_url":
             event_type = f"{app_name}.external_url"
 
-        elif type == "rooms":
+        elif type == "rooms" and "room_id" in additional_type_data:
             event_type = f"{app_name}.rooms.{additional_type_data['room_id']}"
 
-        elif type == "user":
+        elif type == "user" and "user_id" in additional_type_data:
             event_type = f"{app_name}.user.{additional_type_data['user_id']}"
 
         elif type == "global_data":
             event_type = f"{app_name}.global_data"
+
+        else:
+            raise ValueError("Invalid event type or data.")
 
         return event_type
 
     async def get_account_data(self, type: str, **additional_type_data):
         access_token = self.access_token
         headers = {"Authorization": f"Bearer {access_token}"}
-        event_type = self.parse_event_type(type, self.app_name, **additional_type_data)
+
+        try:
+            event_type = self.parse_event_type(type, self.app_name, **additional_type_data)
+        except ValueError as err:
+            print(err)
+            return None
 
         url = urljoin(
             self.homeserver, f"/_matrix/client/v3/user/{self.user_id}/account_data/{event_type}"
@@ -146,7 +157,12 @@ class BaseBotClient(AsyncClient):
         access_token = self.access_token
         headers = {"Authorization": f"Bearer {access_token}"}
 
-        event_type = self.parse_event_type(type, self.app_name, **additional_type_data)
+        try:
+            event_type = self.parse_event_type(type, self.app_name, **additional_type_data)
+        except ValueError as err:
+            print(err)
+            return None
+
         data = self.parse_event_data(type, data)
 
         url = urljoin(
