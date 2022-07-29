@@ -38,12 +38,17 @@ async def get_login():
 
     # remove trailing '&'
     url = url[:-1]
-    print(state)
     return JSONResponse({"url": url, "state": state})
 
 
 @router.post("/login")
 async def authenticate_user(request: Request, body: GithubCode, background_tasks: BackgroundTasks):
+    """
+    Route for the GitHub Oauth login.
+
+    This method exchanges the secret code with an access token and saves it in the current user's session.
+    """
+
     client_id = app_state.settings.github.client_id
     client_secret = app_state.settings.github.client_secret
 
@@ -62,7 +67,7 @@ async def authenticate_user(request: Request, body: GithubCode, background_tasks
 
             session_data.github_user_id = await get_github_user_id(data["access_token"])
             session_data.github_access_token = data["access_token"]
-            print(data["access_token"])
+
             fastapi_sessions.set_session(request, session_data)
 
             background_tasks.add_task(save_user_data, session_data)
