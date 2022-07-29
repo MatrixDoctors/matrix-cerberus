@@ -1,0 +1,13 @@
+{
+    "access_token": "abc123",
+    "device_id": "GHTYAJCE",
+    "user_id": "@Hello:matrix.org",
+    "well_known": {
+      "m.homeserver": {
+        "base_url": "https://matrix.org"
+      },
+      "m.identity_server": {
+        "base_url": "https://id.matrix.org"
+      }
+    }
+}

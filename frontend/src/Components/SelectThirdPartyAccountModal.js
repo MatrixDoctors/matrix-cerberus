@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom';
 
-export default function SelectThirdPartyAccountModal({ showModal, setShowModal }) {
+export default function SelectThirdPartyAccountModal({ roomId, showModal, setShowModal }) {
   return (
     <>
       {showModal ? (
@@ -38,6 +39,7 @@ export default function SelectThirdPartyAccountModal({ showModal, setShowModal }
 
                     <ul className="my-4 space-y-3">
                         <li>
+                          <Link to={`/rooms/${roomId}/github-conditions`} >
                             <button className='flex justify-start items-center w-full p-2 border bg-gray-200 hover:bg-gray-300 rounded-md'>
                                 <div className="w-4 h-4">
                                     <img className="w-full h-full" src={require("../assets/img/github.svg").default} />
@@ -46,6 +48,7 @@ export default function SelectThirdPartyAccountModal({ showModal, setShowModal }
                                     <p className="font-medium">GitHub</p>
                                 </div>
                             </button>
+                          </Link>
                         </li>
                         <li>
                             <button className='flex justify-start items-center w-full p-2 border bg-gray-200 hover:bg-gray-300 rounded-md'>
@@ -71,6 +74,7 @@ export default function SelectThirdPartyAccountModal({ showModal, setShowModal }
 }
 
 SelectThirdPartyAccountModal.propTypes = {
-    showModal: PropTypes.bool,
-    setShowModal: PropTypes.func
+  roomId: PropTypes.string,
+  showModal: PropTypes.bool,
+  setShowModal: PropTypes.func
 }

@@ -55,7 +55,6 @@ class BackgroundValidater:
 
     async def start_task(self):
         while True:
-            print("running")
             await self.fetch_rooms_and_users()
 
             for room_id in self.rooms_with_conditions:
@@ -71,18 +70,22 @@ class BackgroundValidater:
                         continue
 
                     current_state = await self.get_current_room_membership(user_id, room_id)
+
+                    # Avoid checking the conditions if the user is to be ignored
+                    # or the user is already part of the room or invited and the room has disabled bot kicks.
                     if current_state == "ignore":
                         continue
-                    print(user_id, current_state)
+
+                    if room_specific_data.content.disable_room_kick:
+                        if current_state == "join" or current_state == "invite":
+                            continue
 
                     is_permitted_through_github = await self.check_github_conditions(
                         user_id, room_specific_data
                     )
                     is_permitted = is_permitted_through_github
 
-                    next_state = await self.decide_next_state_of_user(
-                        current_state, is_permitted, room_specific_data.content.disable_room_kick
-                    )
+                    next_state = await self.decide_next_state_of_user(current_state, is_permitted)
 
                     if current_state == next_state:
                         continue
@@ -197,9 +200,7 @@ class BackgroundValidater:
 
         return False
 
-    async def decide_next_state_of_user(
-        self, current_state: str, is_permitted: bool, disable_room_kick: str
-    ) -> str:
+    async def decide_next_state_of_user(self, current_state: str, is_permitted: bool) -> str:
         """
         Returns the next state of the user (str).
         """
@@ -209,8 +210,6 @@ class BackgroundValidater:
                 return current_state
             else:
                 return "invite"
-        elif disable_room_kick:
-            return current_state
         else:
             return "leave"
 

@@ -2,6 +2,7 @@
 import { rest } from 'msw'
 import getLoginResponse from "./data/getLoginResponse"
 import getWellKnown from "./data/getWellKnown"
+import openIdTokenResponse from "./data/openIdTokenResponse"
 
 export const handlers = [
     rest.get("https://matrix.org/_matrix/client/v3/login", async (req, res, ctx) => {
@@ -10,7 +11,21 @@ export const handlers = [
     }),
     rest.get("https://matrix.org/.well-known/matrix/client", async (req, res, ctx) => {
         const data = getWellKnown;
-        console.log(data);
         return res(ctx.status(200), ctx.json(data));
     }),
+    rest.post("https://matrix.org/_matrix/client/v3/user/:userId/openid/request_token", async (req, res, ctx) => {
+        const { userId } = req.params;
+        const data = openIdTokenResponse;
+        return res(ctx.status(200), ctx.json(data));
+    }),
+    rest.post("/api/verify-openid", async (req, res, ctx) => {
+        const loginBody = await req.json();
+        try{
+            expect(loginBody).toStrictEqual(openIdTokenResponse);
+        }
+        catch (err) {
+            console.log(err);
+        }
+        return res(ctx.status(200), ctx.json({}));
+    })
 ]

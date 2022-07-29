@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { server, rest } from '../mocks/server';
 import getLoginResponse from "../mocks/data/getLoginResponse"
 import getWellKnown from "../mocks/data/getWellKnown"
+import postLoginResponse from "../mocks/data/postLoginResponse"
 
 
 import Login from './Login';
@@ -106,8 +107,11 @@ test('When complete username is entered', async () => {
         return res(ctx.status(200), ctx.json(data));
     }),
     rest.get(`${exampleHomeserver}/.well-known/matrix/client`, async (req, res, ctx) => {
-        let data = getWellKnown;
-        data["m.homeserver"]["base_url"] = exampleHomeserver;
+        const data = {
+          ...getWellKnown, 'm.homeserver': {
+            "base_url": exampleHomeserver
+          }
+        };
         return res(ctx.status(200), ctx.json(data));
     }),
   )
@@ -160,4 +164,82 @@ test('When homeserver url is changed', async () => {
 
   expect(screen.getByLabelText(/homeserver/i)).toHaveValue(exampleHomeserver);
 
+});
+
+test('On login with username', async () => {
+  const user = userEvent.setup();
+
+  const userId = "@Hello:matrix.org";
+  const password = 'password321';
+
+  const postData = {
+    type: 'm.login.password',
+    identifier: { type: 'm.id.user', user: userId },
+    password: password
+  };
+
+  server.use(
+    rest.post(`https://matrix.org/_matrix/client/v3/login`, async (req, res, ctx) => {
+      const loginBody = await req.json();
+
+      expect(loginBody).toStrictEqual(postData);
+
+      const data = postLoginResponse;
+      return res(ctx.status(200), ctx.json(data));
+    }),
+  )
+
+  render(
+    <CustomRouter history={history}>
+      <Login />
+    </CustomRouter>
+  );
+
+  //Test login with username field.
+  await user.type(screen.getByLabelText(/username/i), userId);
+  await user.type(screen.getByTestId(/password/i), password);
+
+  await user.click(screen.getByRole('button', {name: /sign in/i}));
+});
+
+test('On login with email', async () => {
+  const user = userEvent.setup();
+
+  const emailId = "Hello@example.com";
+  const password = 'password321';
+
+  const postData = {
+    type: 'm.login.password',
+    identifier: {
+      type: 'm.id.thirdparty',
+      medium: 'email',
+      address: emailId
+    },
+    password: password
+  }
+
+  server.use(
+    rest.post(`https://matrix.org/_matrix/client/v3/login`, async (req, res, ctx) => {
+      const loginBody = await req.json();
+
+      expect(loginBody).toStrictEqual(postData);
+
+      const data = postLoginResponse;
+      return res(ctx.status(200), ctx.json(data));
+    }),
+  )
+
+  render(
+    <CustomRouter history={history}>
+      <Login />
+    </CustomRouter>
+  );
+
+  await user.selectOptions(screen.getByRole('combobox'), 'Email address');
+
+  //Test login with email field.
+  await user.type(screen.getByLabelText(/email/i), emailId);
+  await user.type(screen.getByTestId(/password/i), password);
+
+  await user.click(screen.getByRole('button', {name: /sign in/i}));
 });
