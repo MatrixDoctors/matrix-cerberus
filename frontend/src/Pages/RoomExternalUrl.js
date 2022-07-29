@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from "prop-types"
 import { Link, useParams } from 'react-router-dom'
 import axios from '../HelperFunctions/customAxios'
-import {ToastContainer, toast} from "react-toastify"
+import { toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 import Helmet from 'react-helmet'
 
@@ -31,7 +31,6 @@ const PermanentUrl = ({ urlCode, handleReplace }) => {
                         });
                     }} >
                         <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
-                        <ToastContainer />
                     </button>
                     <button className="w-5 h-5 mx-4" title="Replace" onClick={() => handleReplace(urlCode)} >
                         <img className="w-full h-full" src={require("../assets/img/arrow-rotate-right-solid.svg").default} />
@@ -72,7 +71,6 @@ const TemporaryUrl = ({ urlCode, handleDelete }) => {
                         });
                     }}>
                         <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
-                        <ToastContainer />
                     </button>
                     <button className="w-5 h-5 mx-4" title="Delete" onClick={() => handleDelete(urlCode)}>
                         <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
