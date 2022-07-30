@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Helmet from 'react-helmet'
 import { Link, useParams } from 'react-router-dom'
 import PropTypes from "prop-types"
@@ -45,10 +45,14 @@ InsideButton.propTypes = {
   isTableOpen: PropTypes.bool
 }
 
-function UserConditionsDropdown({isOpen, userName}) {
+function UserConditionsDropdown({userName}) {
+  const [isOpen, setIsOpen] = useState(false);
 
   const buttonUI = (
-    <button className="flex justify-start items-center w-full h-10 border-b border-dark-eye text-black">
+    <button
+    className="flex justify-start items-center w-full h-10 border-b border-dark-eye text-black"
+    onClick={() => setIsOpen(!isOpen)}
+    >
       <div className='flex justify-start items-center w-1/2'>
         <div className='px-4 py-1 mr-2 bg-gray-900 text-white rounded-lg font-medium'>
           User
@@ -79,14 +83,17 @@ function UserConditionsDropdown({isOpen, userName}) {
 }
 
 UserConditionsDropdown.propTypes = {
-  isOpen: PropTypes.bool,
   userName: PropTypes.string
 }
 
-function OrgConditionsDropdown({isOpen, orgName}) {
+function OrgConditionsDropdown({orgName}) {
+  const [isOpen, setIsOpen] = useState(false);
 
   const buttonUI = (
-    <button className="flex justify-start items-center w-full h-10 border-b border-dark-eye text-black">
+    <button
+    className="flex justify-start items-center w-full h-10 border-b border-dark-eye text-black"
+    onClick={() => setIsOpen(!isOpen)}
+    >
       <div className='flex justify-start items-center w-1/2'>
         <div className='px-4 py-1 mr-2 bg-gray-900 text-white rounded-lg font-medium'>
           Org
@@ -118,7 +125,6 @@ function OrgConditionsDropdown({isOpen, orgName}) {
 }
 
 OrgConditionsDropdown.propTypes = {
-  isOpen: PropTypes.bool,
   orgName: PropTypes.string
 }
 
@@ -152,9 +158,9 @@ export default function RoomGitubConditions() {
 
       <div className="w-full px-6 lg:mx-auto lg:w-10/12">
         <div className="w-full my-3 px-4 pt-4 pb-5 overflow-y-auto">
-          <UserConditionsDropdown isOpen={true} userName='kuries'/>
-          <OrgConditionsDropdown isOpen={false} orgName='TestingOrgCeberus'/>
-          <OrgConditionsDropdown isOpen={true} orgName='TestingOrgCeberus'/>
+          <UserConditionsDropdown userName='kuries'/>
+          <OrgConditionsDropdown orgName='TestingOrgCeberus'/>
+          <OrgConditionsDropdown orgName='TestingOrgCeberus'/>
         </div>
       </div>
     </>
