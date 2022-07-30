@@ -3,7 +3,7 @@ import PropTypes from "prop-types"
 import Repositories from "./Repositories"
 import SponsorshipTiers from './SponsorrshipTiers';
 
-export default function UserConditionsDropdown({userName}) {
+export default function UserConditionsDropdown({userName, roomId}) {
   const [isOpen, setIsOpen] = useState(false);
 
   const buttonUI = (
@@ -32,7 +32,7 @@ export default function UserConditionsDropdown({userName}) {
       {buttonUI}
       {isOpen
       ? <div className='flex-col items-center w-full bg-white'>
-          <Repositories ownerIsUser={true} owner={userName} />
+          <Repositories ownerIsUser={true} owner={userName} roomId={roomId}/>
           <SponsorshipTiers ownerIsUser={true} owner={userName} />
         </div>
       : <></>}
@@ -41,5 +41,6 @@ export default function UserConditionsDropdown({userName}) {
 }
 
 UserConditionsDropdown.propTypes = {
-    userName: PropTypes.string
+  userName: PropTypes.string,
+  roomId: PropTypes.string,
 }

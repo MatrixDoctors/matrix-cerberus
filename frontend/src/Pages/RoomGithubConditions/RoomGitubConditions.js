@@ -46,9 +46,9 @@ export default function RoomGitubConditions() {
 
       <div className="w-full px-6 lg:mx-auto lg:w-10/12">
         <div className="w-full my-3 px-4 pt-4 pb-5 overflow-y-auto">
-          <UserConditionsDropdown userName='kuries'/>
+          <UserConditionsDropdown userName='kuries' roomId={roomId}/>
           {orgsList.map((org) => {
-            return <OrgConditionsDropdown orgName={org} key={org}/>
+            return <OrgConditionsDropdown orgName={org} roomId={roomId} key={org}/>
           })}
         </div>
       </div>

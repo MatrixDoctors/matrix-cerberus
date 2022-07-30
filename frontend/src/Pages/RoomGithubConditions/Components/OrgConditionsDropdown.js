@@ -4,7 +4,7 @@ import Repositories from './Repositories';
 import SponsorshipTiers from './SponsorrshipTiers';
 import Teams from './Teams';
 
-export default function OrgConditionsDropdown({orgName}) {
+export default function OrgConditionsDropdown({orgName, roomId}) {
   const [isOpen, setIsOpen] = useState(false);
 
   const buttonUI = (
@@ -33,7 +33,7 @@ export default function OrgConditionsDropdown({orgName}) {
       {buttonUI}
       {isOpen
       ? <div className='flex-col items-center w-full bg-white'>
-          <Repositories ownerIsUser={false} owner={orgName} />
+          <Repositories ownerIsUser={false} owner={orgName} roomId={roomId}/>
           <Teams ownerIsUser={false} owner={orgName} />
           <SponsorshipTiers ownerIsUser={false} owner={orgName} />
         </div>
@@ -43,5 +43,6 @@ export default function OrgConditionsDropdown({orgName}) {
 }
 
 OrgConditionsDropdown.propTypes = {
-    orgName: PropTypes.string
+  orgName: PropTypes.string,
+  roomId: PropTypes.string
 }

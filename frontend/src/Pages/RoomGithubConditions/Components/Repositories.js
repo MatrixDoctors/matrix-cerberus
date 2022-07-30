@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from "prop-types"
+import axios from '../../../HelperFunctions/customAxios';
 
 function TableRow({repoName}) {
   return (
@@ -13,9 +14,25 @@ TableRow.propTypes = {
   repoName: PropTypes.string
 };
 
-export default function Repositories({ownerIsUser, owner}) {
+export default function Repositories({ownerIsUser, owner, roomId}) {
   const [isTableOpen, setIsTableOpen] = useState(false);
-  const repoList = ['SampleRepo 1', 'SampleRepo 2'];
+  const [repoList, setRepoList] = useState([]);
+
+  useEffect( () => {
+    async function fetchRepositories(){
+      let url;
+      if (ownerIsUser){
+        url = `api/github/${roomId}/user/repos`;
+      }
+      else {
+        url = `api/github/${roomId}/org/repos?org_name=${owner}`;
+      }
+      const resp = await axios.get(url);
+
+      setRepoList(resp.data.content);
+    };
+    fetchRepositories();
+  }, []);
 
   return (
     <div className='w-full my-4 p-2 rounded-md bg-gray-300'>
@@ -49,6 +66,7 @@ export default function Repositories({ownerIsUser, owner}) {
 };
 
 Repositories.propTypes = {
-    ownerIsUser: PropTypes.bool,
-    owner: PropTypes.string
+  ownerIsUser: PropTypes.bool,
+  owner: PropTypes.string,
+  roomId: PropTypes.string
 }
