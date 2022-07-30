@@ -16,6 +16,9 @@ export default function AccountSettings() {
 			localStorage.setItem('state', resp.data.state);
 			window.location.href = resp.data.url;
 		})
+		.catch(err => {
+			console.error(err);
+		});
 	}
 
 	return (

@@ -25,6 +25,9 @@ class ExternalUrlInfo(BaseModel):
 
 
 class GithubCode(BaseModel):
+    """
+    Validates the POST body for the /api/github/login endpoint.
+    """
 
     code: str
 
@@ -35,6 +38,10 @@ class OwnerField(BaseModel):
 
 
 class RoomConditions(BaseModel):
+    """
+    Pydantic model used to parse data received from 'room' account data event before it is sent to the client-side.
+    """
+
     type: str
     third_party_account: str
     owner: OwnerField

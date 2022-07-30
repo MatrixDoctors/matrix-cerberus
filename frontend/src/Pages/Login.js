@@ -19,7 +19,7 @@ export default function Login() {
 		transition: "all .15s ease"
 	};
 
-	const default_homeserver = 'https://matrix.org';
+	const default_homeserver = process.env.REACT_APP_DEFAULT_HOMESERVER;
 
 	// Used to set the Identifier type for password based login
 	const [fieldType, setFieldType] = useState('Username');
