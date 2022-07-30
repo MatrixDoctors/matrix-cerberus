@@ -19,17 +19,43 @@ function Table() {
   )
 }
 
-function ConditionsDropdown({isUser, isOpen}) {
+function InsideButton({type, isTableOpen}) {
+  return (
+    <div className='w-full my-4 p-2 rounded-md bg-gray-300'>
+      <button className="flex justify-start items-center w-full h-10 text-black">
+        <div className='flex justify-start w-1/3'>
+          <div className='px-4 py-1 mr-2 rounded-lg font-medium'>
+            {type}
+          </div>
+        </div>
+
+        <div className='flex justify-end w-2/3'>
+          <svg className="w-4 h-4 ml-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" fillRule="evenodd"></path></svg>
+        </div>
+      </button>
+
+      {isTableOpen ? <Table /> : <></>}
+
+    </div>
+  )
+}
+
+InsideButton.propTypes = {
+  type: PropTypes.string,
+  isTableOpen: PropTypes.bool
+}
+
+function UserConditionsDropdown({isOpen, userName}) {
 
   const buttonUI = (
     <button className="flex justify-start items-center w-full h-10 border-b border-dark-eye text-black">
       <div className='flex justify-start items-center w-1/2'>
         <div className='px-4 py-1 mr-2 bg-gray-900 text-white rounded-lg font-medium'>
-          {isUser ? 'User': 'Org'}
+          User
         </div>
 
         <div className='mx-2 font-medium'>
-          {isUser ? 'Kuries': 'TestOrgForCerberus'}
+          {userName}
         </div>
       </div>
 
@@ -39,50 +65,61 @@ function ConditionsDropdown({isUser, isOpen}) {
     </button>
   );
 
-  function InsideButton({type, isTableOpen}) {
-    return (
-      <div className='w-full my-4 p-2 rounded-md bg-gray-300'>
-        <button className="flex justify-start items-center w-full h-10 text-black">
-          <div className='flex justify-start w-1/3'>
-            <div className='px-4 py-1 mr-2 rounded-lg font-medium'>
-              {type}
-            </div>
-          </div>
-
-          <div className='flex justify-end w-2/3'>
-            <svg className="w-4 h-4 ml-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" fillRule="evenodd"></path></svg>
-          </div>
-        </button>
-
-        {isTableOpen ? <Table /> : <></>}
-
-      </div>
-    )
-  }
-
-  InsideButton.propTypes = {
-    type: PropTypes.string,
-    isTableOpen: PropTypes.bool
-  }
-
-  const internalUI = (
-    <div className='flex-col items-center w-full bg-white'>
-      <InsideButton type={'Repositories'} isTableOpen={true}/>
-      <InsideButton type={'Teams'} isTableOpen={false}/>
-    </div>
-  )
-
   return (
     <div className='my-4 p-2 rounded-md'>
       {buttonUI}
-      {isOpen ? internalUI : <></>}
+      {isOpen
+      ? <div className='flex-col items-center w-full bg-white'>
+          <InsideButton type={'Repositories'} isTableOpen={true}/>
+          <InsideButton type={'Sponsorship Tiers'} isTableOpen={false}/>
+        </div>
+      : <></>}
     </div>
   )
 }
 
-ConditionsDropdown.propTypes = {
-  isUser: PropTypes.bool,
-  isOpen: PropTypes.bool
+UserConditionsDropdown.propTypes = {
+  isOpen: PropTypes.bool,
+  userName: PropTypes.string
+}
+
+function OrgConditionsDropdown({isOpen, orgName}) {
+
+  const buttonUI = (
+    <button className="flex justify-start items-center w-full h-10 border-b border-dark-eye text-black">
+      <div className='flex justify-start items-center w-1/2'>
+        <div className='px-4 py-1 mr-2 bg-gray-900 text-white rounded-lg font-medium'>
+          Org
+        </div>
+
+        <div className='mx-2 font-medium'>
+          {orgName}
+        </div>
+      </div>
+
+      <div className='flex justify-end w-1/2'>
+        <svg className="w-4 h-4 ml-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" fillRule="evenodd"></path></svg>
+      </div>
+    </button>
+  );
+
+  return (
+    <div className='my-4 p-2 rounded-md'>
+      {buttonUI}
+      {isOpen
+      ? <div className='flex-col items-center w-full bg-white'>
+          <InsideButton type={'Repositories'} isTableOpen={true}/>
+          <InsideButton type={'Teams'} isTableOpen={false}/>
+          <InsideButton type={'Sponsorship Tiers'} isTableOpen={false}/>
+        </div>
+      : <></>}
+    </div>
+  )
+}
+
+OrgConditionsDropdown.propTypes = {
+  isOpen: PropTypes.bool,
+  orgName: PropTypes.string
 }
 
 export default function RoomGitubConditions() {
@@ -115,9 +152,9 @@ export default function RoomGitubConditions() {
 
       <div className="w-full px-6 lg:mx-auto lg:w-10/12">
         <div className="w-full my-3 px-4 pt-4 pb-5 overflow-y-auto">
-          <ConditionsDropdown isUser={true} isOpen={true}/>
-          <ConditionsDropdown isUser={false} isOpen={false}/>
-          <ConditionsDropdown isUser={false} isOpen={false}/>
+          <UserConditionsDropdown isOpen={true} userName='kuries'/>
+          <OrgConditionsDropdown isOpen={false} orgName='TestingOrgCeberus'/>
+          <OrgConditionsDropdown isOpen={true} orgName='TestingOrgCeberus'/>
         </div>
       </div>
     </>
