@@ -1,24 +1,21 @@
 import React, { useState } from 'react'
 import PropTypes from "prop-types"
 
-function Table() {
+function TableRow({repoName}) {
   return (
-    <div className='w-full my-2 p-2 bg-gray-300'>
-      <div className='flex-col items-center bg-white rounded-md'>
-        <div className='w-full p-3 rounded-md border-b border-gray-200 bg-white hover:bg-gray-100'>
-          SampleRepo 1
-        </div>
-
-        <div className='w-full p-3 rounded-md border-b border-gray-200 bg-white hover:bg-gray-100'>
-          SampleRepo 2
-        </div>
-      </div>
+    <div className='w-full p-3 border-b border-gray-500 bg-gray-300 hover:bg-gray-500 hover:text-white'>
+      {repoName}
     </div>
-  )
+  );
 }
+
+TableRow.propTypes = {
+  repoName: PropTypes.string
+};
 
 export default function Repositories({ownerIsUser, owner}) {
   const [isTableOpen, setIsTableOpen] = useState(false);
+  const repoList = ['SampleRepo 1', 'SampleRepo 2'];
 
   return (
     <div className='w-full my-4 p-2 rounded-md bg-gray-300'>
@@ -37,7 +34,15 @@ export default function Repositories({ownerIsUser, owner}) {
         </div>
       </button>
 
-      {isTableOpen ? <Table /> : <></>}
+      {isTableOpen
+      ? <div className='w-full my-2 p-2 bg-gray-300'>
+          <div className='flex-col items-center bg-gray-300 rounded-md'>
+            {repoList.map((repo) => {
+              return (<TableRow repoName={repo} key={repo} />)
+            })}
+          </div>
+        </div>
+      : <></>}
 
     </div>
   )
