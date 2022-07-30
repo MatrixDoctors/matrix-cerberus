@@ -3,7 +3,7 @@ import history from "./customHistory";
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from "react-toastify";
 
-const axiosInstance = axios.create({baseURL: "http://localhost:80"});
+const axiosInstance = axios.create({baseURL: process.env.REACT_APP_BASE_URL});
 
 axiosInstance.interceptors.response.use(
   function (response) {

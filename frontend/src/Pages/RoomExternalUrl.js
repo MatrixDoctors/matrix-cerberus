@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Helmet from 'react-helmet'
 
 const PermanentUrl = ({ urlCode, handleReplace }) => {
-    const fullUrl = `https://matrix-cerberus/i/${urlCode}`
+    const fullUrl = `${process.env.REACT_APP_BASE_URL}/i/${urlCode}`;
     return (
         <tr className="h-20 text-sm leading-none text-gray-800 bg-gray-200 border-b border-t border-gray-200">
             <td className="pl-4 cursor-pointer">
@@ -47,7 +47,7 @@ PermanentUrl.propTypes = {
 }
 
 const TemporaryUrl = ({ urlCode, handleDelete }) => {
-    const fullUrl = `https://matrix-cerberus/i/${urlCode}`;
+    const fullUrl = `${process.env.REACT_APP_BASE_URL}/i/${urlCode}`;
     return (
         <tr className="h-20 text-sm leading-none text-gray-800 bg-white border-b border-t border-gray-100">
             <td className="pl-4 cursor-pointer">
