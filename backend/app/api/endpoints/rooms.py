@@ -1,10 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from starlette.responses import JSONResponse
 
-from app.api.deps import external_url_api_instance, verify_room_permissions
-from app.api.models import RoomConditions
+from app.api.deps import (
+    external_url_api_instance,
+    github_api_instance,
+    verify_room_permissions,
+)
+from app.api.models import OwnerField, RoomConditions
 from app.core.app_state import app_state
-from app.core.models import GithubConditions
+from app.core.models import GithubConditions, GithubRepositoryConditions
+from app.github.github_api import GithubAPI
 from app.matrix.external_url import ExternalUrlAPI
 
 router = APIRouter()
@@ -95,11 +100,63 @@ async def get_room_conditions(room_id: str):
     return JSONResponse(list_of_conditions)
 
 
+@router.post(
+    "/{room_id}/github/{owner_type}/{condition_type}",
+    dependencies=[Depends(verify_room_permissions)],
+)
+async def get_github_room_condition(
+    room_id: str,
+    owner_type: str,
+    condition_type: str,
+    owner: OwnerField,
+    github_api: GithubAPI = Depends(github_api_instance),
+):
+    """
+    API Route to fetch github conditions of a specific type under a particular owner (user/org).
+    """
+    resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+
+    if owner_type == "org":
+        github_data = resp.content.github.orgs
+    elif owner_type == "user":
+        github_data = resp.content.github.users
+    else:
+        raise HTTPException(status_code=400, detail="Invalid owner type")
+
+    data_to_be_sent = None
+
+    if condition_type == "repository":
+        if owner.child in github_data[owner.parent].repos:
+            data_to_be_sent = github_data[owner.parent].repos[owner.child]
+        else:
+            data_to_be_sent = GithubRepositoryConditions()
+        data_to_be_sent = data_to_be_sent.dict()
+    elif condition_type == "teams" and owner_type == "org":
+        if github_data[owner.parent].teams:
+            data_to_be_sent = github_data[owner.parent].teams
+        else:
+            teams = await github_api.get_teams_in_an_org(owner.parent)
+            data_to_be_sent = {team_slug: False for team_slug in teams.keys()}
+    elif condition_type == "sponsorship tiers":
+        if github_data[owner.parent].sponsorship_tiers:
+            data_to_be_sent = github_data[owner.parent].sponsorship_tiers
+        else:
+            if owner_type == "org":
+                tiers = await github_api.get_sponsorship_tiers_for_org(owner.parent)
+            else:
+                tiers = await github_api.get_sponsorship_tiers_for_org(owner.parent)
+            data_to_be_sent = {tier_name: False for tier_name in tiers}
+    else:
+        raise HTTPException(status_code=400, detail="Invalid condition type sent.")
+
+    return JSONResponse({"content": data_to_be_sent})
+
+
 @router.put(
     "/{room_id}/github/{owner_type}/{condition_type}",
     dependencies=[Depends(verify_room_permissions)],
 )
-async def put_github_repo_data(
+async def put_github_room_condition(
     room_id: str, owner_type: str, condition_type: str, room_conditions: RoomConditions
 ):
     resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
@@ -129,7 +186,7 @@ async def put_github_repo_data(
     "/{room_id}/github/{owner_type}/{condition_type}/delete",
     dependencies=[Depends(verify_room_permissions)],
 )
-async def put_github_repo_data(
+async def delete_github_room_condition(
     room_id: str, owner_type: str, condition_type: str, room_conditions: RoomConditions
 ):
     resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)

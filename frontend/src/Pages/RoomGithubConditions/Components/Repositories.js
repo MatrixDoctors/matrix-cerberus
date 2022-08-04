@@ -3,11 +3,23 @@ import PropTypes from "prop-types"
 import axios from '../../../HelperFunctions/customAxios';
 import EditConditions from './EditConditions';
 
-function TableRow({repoName, setShowEditable}) {
+function TableRow({repoName, owner, ownerIsUser, setShowEditable, setModalData}) {
   return (
     <button
     className='w-full flex justify-start p-3 border-b border-gray-500 bg-gray-300 hover:bg-gray-500 hover:text-white'
-    onClick={() => {setShowEditable(previousState => !previousState)}}
+    onClick={() => {
+      const modalData = {
+        type: ownerIsUser ? 'user' : 'org',
+        thirdPartyAccount: "Github",
+        owner: {
+            parent: owner,
+            child: repoName
+        },
+        conditionType: "Repository",
+      }
+      setModalData(modalData);
+      setShowEditable(previousState => !previousState);
+    }}
     >
       {repoName}
     </button>
@@ -16,7 +28,10 @@ function TableRow({repoName, setShowEditable}) {
 
 TableRow.propTypes = {
   repoName: PropTypes.string,
-  setShowEditable: PropTypes.func
+  owner: PropTypes.string,
+  ownerIsUser: PropTypes.bool,
+  setShowEditable: PropTypes.func,
+  setModalData: PropTypes.func
 };
 
 export default function Repositories({ownerIsUser, owner, roomId}) {
@@ -24,6 +39,7 @@ export default function Repositories({ownerIsUser, owner, roomId}) {
   const [repoList, setRepoList] = useState([]);
 
   const [showEditable, setShowEditable] = useState(false);
+  const [modalData, setModalData] = useState({});
 
   useEffect( () => {
     async function fetchRepositories(){
@@ -43,14 +59,9 @@ export default function Repositories({ownerIsUser, owner, roomId}) {
 
   return (
     <div className='w-full my-4 p-2 rounded-md bg-gray-300'>
-      <EditConditions roomId={roomId} modalData={{
-                    thirdPartyAccount: "Patreon",
-                    owner: {
-                        parent: "Kuries"
-                    },
-                    conditionType: "Sponsorship Tiers",
-                    key: 3
-                }}  showEditable={showEditable} setShowEditable={setShowEditable} />
+      {showEditable
+      ? <EditConditions roomId={roomId} modalData={modalData} showEditable={showEditable} setShowEditable={setShowEditable} />
+      : <></>}
 
       <button
       className="flex justify-start items-center w-full h-10 text-black"
@@ -71,7 +82,7 @@ export default function Repositories({ownerIsUser, owner, roomId}) {
       ? <div className='w-full my-2 p-2 bg-gray-300'>
           <div className='flex-col items-center bg-gray-300 rounded-md'>
             {repoList.map((repo) => {
-              return (<TableRow repoName={repo} setShowEditable={setShowEditable} key={repo} />)
+              return (<TableRow repoName={repo} owner={owner} setShowEditable={setShowEditable} setModalData={setModalData} key={repo} />)
             })}
           </div>
         </div>
