@@ -89,6 +89,10 @@ class GithubAPI:
         """
 
         resp = await self.gh.graphql(query=query, user=user, number_of_tiers_to_fetch=10)
+
+        if resp["organization"]["sponsorsListing"] is None:
+            return []
+
         sponsor_tiers = []
         for tier in resp["user"]["sponsorsListing"]["tiers"]["nodes"]:
             sponsor_tiers.append(tier["name"])
@@ -97,7 +101,7 @@ class GithubAPI:
 
     async def get_sponsorship_tiers_for_org(self, org):
         query = """
-        query ($org:String!)
+        query ($org:String!, $number_of_tiers_to_fetch:Int!)
         {
             organization(login: $org) {
                 sponsorsListing {
@@ -112,6 +116,10 @@ class GithubAPI:
         """
 
         resp = await self.gh.graphql(query=query, org=org, number_of_tiers_to_fetch=10)
+
+        if resp["organization"]["sponsorsListing"] is None:
+            return []
+
         sponsor_tiers = []
         for tier in resp["organization"]["sponsorsListing"]["tiers"]["nodes"]:
             sponsor_tiers.append(tier["name"])

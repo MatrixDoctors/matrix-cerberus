@@ -34,8 +34,8 @@ export default function OrgConditionsDropdown({orgName, roomId}) {
       {isOpen
       ? <div className='flex-col items-center w-full bg-white'>
           <Repositories ownerIsUser={false} owner={orgName} roomId={roomId}/>
-          <Teams ownerIsUser={false} owner={orgName} />
-          <SponsorshipTiers ownerIsUser={false} owner={orgName} />
+          <Teams ownerIsUser={false} owner={orgName} roomId={roomId}/>
+          <SponsorshipTiers ownerIsUser={false} owner={orgName} roomId={roomId}/>
         </div>
       : <></>}
     </div>

@@ -33,7 +33,7 @@ export default function UserConditionsDropdown({userName, roomId}) {
       {isOpen
       ? <div className='flex-col items-center w-full bg-white'>
           <Repositories ownerIsUser={true} owner={userName} roomId={roomId}/>
-          <SponsorshipTiers ownerIsUser={true} owner={userName} />
+          <SponsorshipTiers ownerIsUser={true} owner={userName} roomId={roomId}/>
         </div>
       : <></>}
     </div>
