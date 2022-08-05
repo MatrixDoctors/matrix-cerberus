@@ -1,6 +1,7 @@
 import axios from '../HelperFunctions/customAxios';
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types'
+import { toast } from 'react-toastify';
 
 export default function EditConditions({roomId, modalData, setModalData, roomConditions, setRoomConditions, showEditable, setShowEditable}) {
     const [currentData, setCurrentData] = useState({});
@@ -56,13 +57,12 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
                     }
                 });
             });
-
-            setShowEditable(false);
+            toast.success("Succesfully updated!");
         })
-        .catch( (err) => {
-            console.error("Failed to save data", err);
-            handleClose();
+        .catch( () => {
+            toast.error("Failed to save data");
         })
+        handleClose();
     }
 
     useEffect( () => {
