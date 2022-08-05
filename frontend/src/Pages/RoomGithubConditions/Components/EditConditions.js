@@ -1,6 +1,7 @@
 import axios from '../../../HelperFunctions/customAxios';
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 
 export default function EditConditions({roomId, modalData, showEditable, setShowEditable}) {
 
@@ -14,8 +15,39 @@ export default function EditConditions({roomId, modalData, showEditable, setShow
     }
 
     function handleClose(){
-        setCurrentData(modalData.data ? {...modalData.data} : {});
         setShowEditable(false);
+    }
+
+    function handleSave(){
+        async function saveData(){
+            const thirdPartyAccount = modalData.thirdPartyAccount.toLowerCase();
+            const conditionType = modalData.conditionType.toLowerCase();
+            const ownerType = modalData.type;
+
+            let url;
+            if(thirdPartyAccount === 'github') {
+                url = `/api/rooms/${roomId}/github/${ownerType}/${conditionType}`;
+            }
+
+            // Excludes the 'key' and updates the 'data' property.
+            let dataToBeSent = {
+                "type": ownerType,
+                "third_party_account": thirdPartyAccount,
+                "owner": modalData.owner,
+                "condition_type": conditionType,
+                "data": currentData
+            }
+
+            await axios.put(url, dataToBeSent)
+            .then(() => {
+                toast.success('Successfully updated!');
+            })
+            .catch((err) => {
+                toast.error("Failed to save data");
+            });
+            handleClose();
+        }
+        saveData();
     }
 
     useEffect( () => {
@@ -120,6 +152,7 @@ export default function EditConditions({roomId, modalData, showEditable, setShow
                         <div className='flex justify-end items-center mt-3'>
                             <button
                             className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none font-medium rounded-lg text-sm px-4 py-2 text-center mr-2"
+                            onClick={handleSave}
                             >
                                 Save
                             </button>

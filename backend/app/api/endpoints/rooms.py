@@ -159,6 +159,11 @@ async def get_github_room_condition(
 async def put_github_room_condition(
     room_id: str, owner_type: str, condition_type: str, room_conditions: RoomConditions
 ):
+    """
+    API Route to save github conditions of a specific type under a particular owner (user/org).
+
+    It stores the updated data in the 'rooms' bot account data event.
+    """
     resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
 
     if owner_type == "org":
@@ -189,6 +194,9 @@ async def put_github_room_condition(
 async def delete_github_room_condition(
     room_id: str, owner_type: str, condition_type: str, room_conditions: RoomConditions
 ):
+    """
+    API Route to delete a github condition in the 'rooms' bot account data event.
+    """
     resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
 
     if owner_type == "org":
@@ -208,8 +216,7 @@ async def delete_github_room_condition(
     else:
         raise HTTPException(status_code=400, detail="Invalid condition type sent.")
 
-    # resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
-    print(resp)
+    resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
     return JSONResponse({"msg": "success"})
 
 
