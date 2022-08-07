@@ -5,6 +5,7 @@ ii) Data required by other core modules.
 """
 
 from typing import Any, Set, Dict, List, Optional
+from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
 
@@ -133,6 +134,7 @@ class PatreonUserData(BaseModel):
     email: Optional[EmailStr] = None
     access_token: Optional[str] = None
     refresh_token: Optional[str] = None
+    last_fetched: Optional[datetime] = None
 
 
 class UserMappedData(BaseModel):

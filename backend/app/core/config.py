@@ -37,6 +37,12 @@ class GitHubAppCredentials(BaseSettings):
     organisation_membership: str
 
 
+class PatreonAppCredentials(BaseSettings):
+    client_id: str
+    client_secret: str
+    redirect_uri: str
+
+
 class Settings(BaseSettings):
 
     app_name: str
@@ -44,6 +50,7 @@ class Settings(BaseSettings):
     server_sessions: ServerSessionsSettings
     matrix_bot: MatrixBotSettings
     github: GitHubAppCredentials
+    patreon: PatreonAppCredentials
 
     # Used to convert the dicitonary received from the root_validator of MatrixBotSettings class to an instance of the latter.
     @validator("matrix_bot")
