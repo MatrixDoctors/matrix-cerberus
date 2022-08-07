@@ -17,7 +17,7 @@ from app.api.deps import (
     fetch_user_data,
     verify_room_permissions,
 )
-from app.api.endpoints import external_url, github_routes, rooms, users
+from app.api.endpoints import external_url, github_routes, patreon_routes, rooms, users
 from app.api.models import OpenIdInfo
 from app.core.app_state import app_state
 from app.core.models import ServerSessionData
@@ -46,6 +46,13 @@ api_router.include_router(
     github_routes.router,
     prefix="/github",
     tags=["github"],
+    dependencies=[Depends(authenticate_user)],
+)
+
+api_router.include_router(
+    patreon_routes.router,
+    prefix="/patreon",
+    tags=["patreon"],
     dependencies=[Depends(authenticate_user)],
 )
 
