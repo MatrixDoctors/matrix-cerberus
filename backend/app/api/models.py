@@ -24,7 +24,7 @@ class ExternalUrlInfo(BaseModel):
     use_once_only: bool
 
 
-class GithubCode(BaseModel):
+class OAuthCode(BaseModel):
     """
     Validates the POST body for the /api/github/login endpoint.
     """

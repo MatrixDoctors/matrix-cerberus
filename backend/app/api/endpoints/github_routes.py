@@ -11,7 +11,7 @@ from app.api.deps import (
     save_user_data,
     verify_room_permissions,
 )
-from app.api.models import GithubCode
+from app.api.models import OAuthCode
 from app.core.app_state import app_state
 from app.github.github_api import GithubAPI
 
@@ -47,7 +47,7 @@ async def get_login():
 
 
 @router.post("/login")
-async def authenticate_user(request: Request, body: GithubCode, background_tasks: BackgroundTasks):
+async def authenticate_user(request: Request, body: OAuthCode, background_tasks: BackgroundTasks):
     """
     Route for the GitHub Oauth login.
 

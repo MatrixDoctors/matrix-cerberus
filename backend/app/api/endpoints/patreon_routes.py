@@ -1,8 +1,9 @@
 from uuid import uuid4
 
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks, Request
 from fastapi.responses import JSONResponse
 
+from app.api.models import OAuthCode
 from app.core.app_state import app_state
 
 router = APIRouter()
@@ -28,3 +29,9 @@ async def get_login():
     # remove trailing '&'
     url = url[:-1]
     return JSONResponse({"url": url, "state": state})
+
+
+@router.post("/login")
+async def authenticate_user(request: Request, body: OAuthCode, background_tasks: BackgroundTasks):
+    print(body)
+    return JSONResponse({"message": "success"})
