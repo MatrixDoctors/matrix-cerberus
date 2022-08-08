@@ -22,6 +22,8 @@ class ServerSessionData(BaseModel):
     github_access_token: Optional[str] = None
     patreon_user_id: Optional[str] = None
     patreon_access_token: Optional[str] = None
+    patreon_refresh_token: Optional[str] = None
+    patreon_expire_date: Optional[str] = None
 
 
 class RoomUrlObject(BaseModel):
@@ -134,7 +136,7 @@ class PatreonUserData(BaseModel):
     email: Optional[EmailStr] = None
     access_token: Optional[str] = None
     refresh_token: Optional[str] = None
-    last_fetched: Optional[datetime] = None
+    expire_date: Optional[datetime] = None
 
 
 class UserMappedData(BaseModel):
