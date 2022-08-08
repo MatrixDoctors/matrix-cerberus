@@ -10,8 +10,8 @@ export default function AccountSettings() {
 	const {matrixUserId, githubUserId} = useContext(GlobalContext);
 	const homeServer = localStorage.getItem('homeServer');
 
-	function githubHandleClick(){
-		axios.get('/api/github/login')
+	function oauthHandleClick(accountType){
+		axios.get(`/api/${accountType}/login`)
 		.then( (resp) => {
 			localStorage.setItem('state', resp.data.state);
 			window.location.href = resp.data.url;
@@ -93,7 +93,7 @@ export default function AccountSettings() {
 								</div>
 								<div className='flex justify-end mx-2 w-1/3'>
 									<button
-									onClick={githubHandleClick}
+									onClick={() => oauthHandleClick('github')}
 									className='px-2 inline text-blue-600 hover:shadow-md'>
 										{githubUserId == "" ? "Connect" : "Edit"}
 									</button>
@@ -124,9 +124,11 @@ export default function AccountSettings() {
 									Connected as Patreon user
 								</div>
 								<div className='flex justify-end mx-2 w-1/3'>
-									<span className='px-2 text-blue-600 hover:shadow-md'>
+								<button
+									onClick={() => oauthHandleClick('patreon')}
+									className='px-2 inline text-blue-600 hover:shadow-md'>
 										Edit
-									</span>
+									</button>
 								</div>
 							</div>
 
