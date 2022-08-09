@@ -62,7 +62,7 @@ class BackgroundValidater:
                 if room_id not in self.rooms_with_permissions or room_id not in self.client.rooms:
                     continue
 
-                ignore_members = await self.get_users_not_removed_by_bot(room_id)
+                ignore_members = await self.get_ignored_users_for_a_room(room_id)
                 room_specific_data = await self.client.get_account_data("rooms", room_id=room_id)
 
                 for user_id in self.registered_users.keys():
@@ -155,7 +155,6 @@ class BackgroundValidater:
 
         # Organisation conditions
         for org_name, org_conditions in room_github_conditions.orgs.items():
-
             # Repository conditions
             for repo_name, repo_conditions in org_conditions.repos.items():
                 resp = await gh_api.repo_permissions(org_name, repo_name, gh_username)
@@ -179,7 +178,7 @@ class BackgroundValidater:
             if sponsoring_tier and org_conditions.sponsorship_tiers[sponsoring_tier]:
                 return True
 
-        # Organisation conditions
+        # User conditions
         for user_name, user_conditions in room_github_conditions.users.items():
 
             # Repository conditions
@@ -230,13 +229,22 @@ class BackgroundValidater:
             if isinstance(resp, RoomKickError):
                 print(f"Error: {resp}")
 
-    async def get_users_not_removed_by_bot(self, room_id: str) -> Set[str]:
+    async def get_ignored_users_for_a_room(self, room_id: str) -> Set[str]:
         """
-        Method that returns the set of users whose 'leave' state is not a result of the bot's actions.
+        Method that returns the set of users to ignore.
         """
 
         ignore_members = set()
 
+        # Users whose power level exceeds the bot's current power level.
+        power_levels = self.client.rooms[room_id].power_levels
+        for room_member_id in self.registered_users.keys():
+            if power_levels.get_user_level(room_member_id) >= power_levels.get_user_level(
+                self.client.user_id
+            ):
+                ignore_members.add(room_member_id)
+
+        # Set of users whose 'leave' state is not a result of the bot's actions.
         resp = await self.client.get_room_members(room_id)
         if isinstance(resp, ErrorResponse):
             print(f"Error: {resp}")

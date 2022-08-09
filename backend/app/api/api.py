@@ -60,7 +60,7 @@ api_router.include_router(
 @api_router.get("/current-user")
 async def current_user(request: Request):
     session_data = fastapi_sessions.get_session(request)
-    matrix_user_id, github_user_id = None, None
+    matrix_user_id, github_user_id, patreon_user_id = None, None, None
     if session_data is not None:
         matrix_user_id = session_data.matrix_user
         github_user_id = session_data.github_user_id
