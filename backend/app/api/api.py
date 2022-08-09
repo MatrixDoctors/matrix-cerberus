@@ -64,8 +64,15 @@ async def current_user(request: Request):
     if session_data is not None:
         matrix_user_id = session_data.matrix_user
         github_user_id = session_data.github_user_id
+        patreon_user_id = session_data.patreon_user_id
 
-    return JSONResponse({"matrix_user_id": matrix_user_id, "github_user_id": github_user_id})
+    return JSONResponse(
+        {
+            "matrix_user_id": matrix_user_id,
+            "github_user_id": github_user_id,
+            "patreon_user_id": patreon_user_id,
+        }
+    )
 
 
 @api_router.post("/verify-openid")

@@ -19,10 +19,11 @@ import RoomGitubConditions from './Pages/RoomGithubConditions/RoomGitubCondition
 export default function App() {
   const [matrixUserId, setMatrixUserId] = useState('');
   const [githubUserId, setGithubUserId] = useState('');
+  const [patreonUserId, setPatreonUserId] = useState('');
 
   return (
     <GlobalContext.Provider
-          value = {{matrixUserId, setMatrixUserId, githubUserId, setGithubUserId}}>
+          value = {{matrixUserId, setMatrixUserId, githubUserId, setGithubUserId, patreonUserId, setPatreonUserId}}>
       <Routes>
           <Route element={<LayoutsWithNavbar/>}>
             <Route path="/" element={<AccountSettings />} />

@@ -4,5 +4,7 @@ export const GlobalContext = createContext({
     matrixUserId: "",
     setMatrixUserId: () => {},
     githubUserId: "",
-    setGithubUserId: () => {}
+    setGithubUserId: () => {},
+    patreonUserId: "",
+    setPatreonUserId: () => {}
 });
