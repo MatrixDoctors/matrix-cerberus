@@ -82,7 +82,7 @@ export default function Repositories({ownerIsUser, owner, roomId}) {
       ? <div className='w-full my-2 p-2 bg-gray-300'>
           <div className='flex-col items-center bg-gray-300 rounded-md'>
             {repoList.map((repo) => {
-              return (<TableRow repoName={repo} owner={owner} setShowEditable={setShowEditable} setModalData={setModalData} key={repo} />)
+              return (<TableRow repoName={repo} owner={owner} ownerIsUser={ownerIsUser} setShowEditable={setShowEditable} setModalData={setModalData} key={repo} />)
             })}
           </div>
         </div>
