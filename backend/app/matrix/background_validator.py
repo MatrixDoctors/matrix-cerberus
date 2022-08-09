@@ -38,6 +38,8 @@ class BackgroundValidater:
 
         self.registered_users: Dict[str, RegisteredUser] = dict()
 
+        self.github_id_to_matrix_id = dict()
+
         # List of rooms registered under the application and has "room membership" conditions.
         self.rooms_with_conditions: List[str] = []
 
@@ -107,6 +109,9 @@ class BackgroundValidater:
                 default_role=self.github_default_role,
             )
 
+            # Cache the mapping github id and matrix id
+            self.github_id_to_matrix_id[user_data.content.github.username] = user_id
+
         self.rooms_with_permissions = await self.client.get_rooms_with_mod_permissions(
             self.client.user_id
         )
@@ -159,6 +164,9 @@ class BackgroundValidater:
             for repo_name, repo_conditions in org_conditions.repos.items():
                 resp = await gh_api.repo_permissions(org_name, repo_name, gh_username)
 
+                if resp is None:
+                    continue
+
                 if resp == "admin" and repo_conditions.admin:
                     return True
                 elif resp == "write" and repo_conditions.write:
@@ -180,10 +188,13 @@ class BackgroundValidater:
 
         # User conditions
         for user_name, user_conditions in room_github_conditions.users.items():
+            # Using access token of the owner
+            owner_matrix_id = self.github_id_to_matrix_id[user_name]
+            owner_gh_api = self.registered_users[owner_matrix_id].github_api
 
             # Repository conditions
             for repo_name, repo_conditions in user_conditions.repos.items():
-                resp = await gh_api.repo_permissions(user_name, repo_name, gh_username)
+                resp = await owner_gh_api.repo_permissions(user_name, repo_name, gh_username)
 
                 if resp == "admin" and repo_conditions.admin:
                     return True
