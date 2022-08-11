@@ -64,7 +64,6 @@ async def authenticate_user(request: Request, body: GithubCode, background_tasks
 
             session_data.github_user_id = await get_github_user_id(data["access_token"])
             session_data.github_access_token = data["access_token"]
-            print(data["access_token"])
             fastapi_sessions.set_session(request, session_data)
 
             background_tasks.add_task(save_user_data, session_data)
