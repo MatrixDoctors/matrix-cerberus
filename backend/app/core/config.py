@@ -49,16 +49,11 @@ class Settings(BaseSettings):
     def validate_matrix_bot(cls, v, values):
         return MatrixBotSettings.parse_obj(v)
 
-    @classmethod
     def from_yaml(cls, path_to_file):
         absolute_path_to_file = Path(path_to_file).absolute()
-
         try:
             with open(absolute_path_to_file) as f:
                 yaml_settings = yaml.safe_load(f)
                 return Settings.parse_obj(yaml_settings)
         except (IOError, ImportError) as err:
             print(f"Couldn't load config from file. Error: {err}")
-
-
-settings = Settings.from_yaml("config.yml")

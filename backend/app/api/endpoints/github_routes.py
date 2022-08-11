@@ -7,9 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.deps import fastapi_sessions, github_api_instance, save_user_data
 from app.api.models import GithubCode
-from app.core.background_runner import matrix_bot_runner
-from app.core.config import settings
-from app.core.http_client import http_client
+from app.core.app_state import app_state
 from app.github.github_api import GithubAPI
 
 router = APIRouter()
@@ -17,7 +15,7 @@ router = APIRouter()
 
 async def get_github_user_id(access_token):
     gh = gidgethub.aiohttp.GitHubAPI(
-        http_client.session, requester="matrix-cerberus", oauth_token=access_token
+        app_state.http_client.session, requester="matrix-cerberus", oauth_token=access_token
     )
     user_object = await gh.getitem("/user")
     return user_object["login"]
@@ -26,10 +24,10 @@ async def get_github_user_id(access_token):
 @router.get("/login")
 async def get_login():
 
-    client_id = settings.github.client_id
+    client_id = app_state.settings.github.client_id
     scope = ["read:org", "repo", "user"]
     scope = "%20".join(scope)
-    redirect_uri = settings.github.redirect_uri
+    redirect_uri = app_state.settings.github.redirect_uri
     state = uuid4().hex
 
     params = {"scope": scope, "client_id": client_id, "redirect_uri": redirect_uri, "state": state}
@@ -46,8 +44,8 @@ async def get_login():
 
 @router.post("/login")
 async def authenticate_user(request: Request, body: GithubCode, background_tasks: BackgroundTasks):
-    client_id = settings.github.client_id
-    client_secret = settings.github.client_secret
+    client_id = app_state.settings.github.client_id
+    client_secret = app_state.settings.github.client_secret
 
     params = {"code": body.code, "client_secret": client_secret, "client_id": client_id}
 
@@ -55,7 +53,7 @@ async def authenticate_user(request: Request, body: GithubCode, background_tasks
     headers = {"Accept": "application/json"}
 
     try:
-        async with http_client.session.post(url, params=params, headers=headers) as resp:
+        async with app_state.http_client.session.post(url, params=params, headers=headers) as resp:
             if resp.status != 200:
                 raise HTTPException(status_code=422, detail="Invalid code")
             data = await resp.json()

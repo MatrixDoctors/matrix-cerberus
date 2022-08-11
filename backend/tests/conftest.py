@@ -6,23 +6,26 @@ from aioresponses import aioresponses
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings
-from app.core.http_client import http_client
+from app.core.global_app_state import AppState
+from app.github.github_api import GithubAPI
+from app.main import app
 
 GITHUB_USER_ID = "p0tato"
 GITHUB_ACCESS_TOKEN = "some_access_token"
 
 
 @pytest.fixture
-def settings():
-    return Settings.from_yaml("config.sample.yml")
+def client():
+    return TestClient(app)
 
 
 @pytest.fixture
-@mock.patch("app.core.config.settings", Settings.from_yaml("config.sample.yml"))
-def client():
-    from app.main import app
+async def mock_app_state():
+    from app.core.app_state import app_state
 
-    return TestClient(app)
+    await app_state.http_client.start_session()
+    yield app_state
+    await app_state.http_client.stop_session()
 
 
 @pytest.fixture
@@ -32,23 +35,18 @@ def mock_server():
 
 
 @pytest.fixture
-async def mock_http_client():
-    await http_client.start_session()
-    yield http_client
-
-
-@pytest.fixture
-async def gidgethub_instance(mock_http_client):
-    return gidgethub.aiohttp.GitHubAPI(
-        mock_http_client.session,
+async def gidgethub_instance(mock_app_state):
+    yield gidgethub.aiohttp.GitHubAPI(
+        mock_app_state.http_client.session,
         requester=GITHUB_USER_ID,
         oauth_token=GITHUB_ACCESS_TOKEN,
     )
 
 
 @pytest.fixture
-@mock.patch("app.core.config.settings", Settings.from_yaml("config.sample.yml"))
-async def github_api(gidgethub_instance):
-    from app.github.github_api import GithubAPI
-
-    return GithubAPI(gidgethub_instance, GITHUB_USER_ID)
+async def github_api(mock_app_state: AppState, gidgethub_instance):
+    return GithubAPI(
+        gh=gidgethub_instance,
+        username=GITHUB_USER_ID,
+        default_role=mock_app_state.settings.github.organisation_membership,
+    )
