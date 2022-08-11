@@ -33,6 +33,7 @@ class GitHubAppCredentials(BaseSettings):
     client_id: str
     client_secret: str
     redirect_uri: str
+    organisation_membership: str
 
 
 class Settings(BaseSettings):

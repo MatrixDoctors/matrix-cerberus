@@ -30,7 +30,7 @@ export default function GithubOauth() {
         resp.then( (resp) => {
             navigate('/');
         });
-    });
+    }, []);
     return (
     <></>
     )
