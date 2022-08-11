@@ -1,6 +1,6 @@
 from typing import Set, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class ServerSessionData(BaseModel):
@@ -11,7 +11,9 @@ class ServerSessionData(BaseModel):
 
     matrix_user: Optional[str] = None
     matrix_homeserver: Optional[str] = None
+    github_user_id: Optional[str] = None
     github_access_token: Optional[str] = None
+    patreon_user_id: Optional[str] = None
     patreon_access_token: Optional[str] = None
 
 
@@ -59,3 +61,32 @@ class RoomSpecificData(BaseModel):
     """
 
     content: RoomConditionsData = RoomConditionsData()
+
+
+class GlobalData(BaseModel):
+    users: List[str] = []
+    rooms: List[str] = []
+
+
+class BotGlobalData(BaseModel):
+    content: GlobalData = dict(GlobalData())
+
+
+class GithubUserData(BaseModel):
+    username: Optional[str] = None
+    access_token: Optional[str] = None
+
+
+class PatreonUserData(BaseModel):
+    email: Optional[EmailStr] = None
+    access_token: Optional[str] = None
+    refresh_token: Optional[str] = None
+
+
+class UserMappedData(BaseModel):
+    github: GithubUserData = GithubUserData()
+    patreon: PatreonUserData = PatreonUserData()
+
+
+class UserData(BaseModel):
+    content: UserMappedData = UserMappedData()

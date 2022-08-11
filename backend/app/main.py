@@ -9,7 +9,7 @@ app = FastAPI(docs_url="/api/docs", redoc_url="/api/redoc", openapi_url="/api/op
 
 @app.on_event("startup")
 async def app_startup():
-    http_client.start_session()
+    await http_client.start_session()
     matrix_bot_runner.create_background_task()
 
 

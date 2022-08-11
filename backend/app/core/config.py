@@ -18,8 +18,7 @@ class MatrixBotSettings(BaseSettings):
     homeserver: str
     access_token: str
 
-    # This checks if the user_id and homeserver match the rules set by the matrix spec.
-    # This returns a dictionary instead of a MatrixBotSettings object
+    # This checks if the homeserver url is valid or not.
     @root_validator(pre=True)
     def validate(cls, values):
         homeserver = values.get("homeserver")
@@ -30,11 +29,19 @@ class MatrixBotSettings(BaseSettings):
         return values
 
 
+class GitHubAppCredentials(BaseSettings):
+    client_id: str
+    client_secret: str
+    redirect_uri: str
+
+
 class Settings(BaseSettings):
 
+    app_name: str
     redis: RedisSettings
     server_sessions: ServerSessionsSettings
     matrix_bot: MatrixBotSettings
+    github: GitHubAppCredentials
 
     # Used to convert the dicitonary received from the root_validator of MatrixBotSettings class to an instance of the latter.
     @validator("matrix_bot")
