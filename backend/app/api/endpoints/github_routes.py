@@ -83,7 +83,7 @@ async def authenticate_user(request: Request, body: OAuthCode, background_tasks:
 
 
 @router.get("/{room_id}/user/repos", dependencies=[Depends(verify_room_permissions)])
-async def get_orgs(room_id: str, github_api: GithubAPI = Depends(github_api_instance)):
+async def get_user_repos(room_id: str, github_api: GithubAPI = Depends(github_api_instance)):
     resp = await github_api.get_individual_repos()
     return JSONResponse({"content": resp})
 
@@ -101,7 +101,7 @@ async def get_orgs(room_id: str, github_api: GithubAPI = Depends(github_api_inst
 
 
 @router.get("/{room_id}/org/repos", dependencies=[Depends(verify_room_permissions)])
-async def get_orgs(
+async def get_org_repos(
     room_id: str, org_name: str, github_api: GithubAPI = Depends(github_api_instance)
 ):
     resp = await github_api.get_repos_in_an_org(org_name)

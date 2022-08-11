@@ -160,12 +160,14 @@ class BackgroundValidater:
 
         # Organisation conditions
         for org_name, org_conditions in room_github_conditions.orgs.items():
+
+            # Using access token of the admin who last edited the github condition.
+            admin_matrix_id = org_conditions.last_edited_by
+            admin_gh_api = self.registered_users[admin_matrix_id].github_api
+
             # Repository conditions
             for repo_name, repo_conditions in org_conditions.repos.items():
-                resp = await gh_api.repo_permissions(org_name, repo_name, gh_username)
-
-                if resp is None:
-                    continue
+                resp = await admin_gh_api.repo_permissions(org_name, repo_name, gh_username)
 
                 if resp == "admin" and repo_conditions.admin:
                     return True
@@ -183,7 +185,11 @@ class BackgroundValidater:
 
             # Sponsorship tier conditions
             sponsoring_tier = await gh_api.org_sponsored_at_tier(org_name)
-            if sponsoring_tier and org_conditions.sponsorship_tiers[sponsoring_tier]:
+            if (
+                sponsoring_tier
+                and org_conditions.sponsorship_tiers
+                and org_conditions.sponsorship_tiers[sponsoring_tier]
+            ):
                 return True
 
         # User conditions
@@ -205,7 +211,11 @@ class BackgroundValidater:
 
             # Sponsorship tier conditions
             sponsoring_tier = await gh_api.user_sponsored_at_tier(user_name)
-            if sponsoring_tier and user_conditions.sponsorship_tiers[sponsoring_tier]:
+            if (
+                sponsoring_tier
+                and user_conditions.sponsorship_tiers
+                and user_conditions.sponsorship_tiers[sponsoring_tier]
+            ):
                 return True
 
         return False

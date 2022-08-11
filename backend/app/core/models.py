@@ -66,6 +66,7 @@ class GithubOrganisationConditions(BaseModel):
     repos: Dict[str, GithubRepositoryConditions] = dict()
     teams: Dict[str, bool] = dict()
     sponsorship_tiers: Dict[str, bool] = dict()
+    last_edited_by: str = None
 
 
 class GithubConditions(BaseModel):
