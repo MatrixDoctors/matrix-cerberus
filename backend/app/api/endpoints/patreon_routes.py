@@ -1,3 +1,4 @@
+import urllib
 from uuid import uuid4
 from datetime import datetime, timedelta
 
@@ -27,6 +28,11 @@ async def get_patreon_user_id(access_token):
 async def get_login():
     client_id = app_state.settings.patreon.client_id
     redirect_uri = app_state.settings.patreon.redirect_uri
+
+    scope = ["identity", "identity[email]", "identity.memberships", "campaigns"]
+    scope = " ".join(scope)
+    scope = urllib.parse.quote(scope)
+
     state = uuid4().hex
 
     params = {
@@ -34,6 +40,7 @@ async def get_login():
         "client_id": client_id,
         "redirect_uri": redirect_uri,
         "state": state,
+        "scope": scope,
     }
 
     url = f"https://www.patreon.com/oauth2/authorize?"
