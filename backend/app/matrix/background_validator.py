@@ -45,59 +45,89 @@ class BackgroundValidater:
 
         # Set of rooms where the bot has invite and kick permissions.
         self.rooms_with_permissions: Set[str] = {}
+
+        # Queue to keep track of rooms whose permissions are recently modified.
+        self.queue = asyncio.Queue()
+
         self.background_validator_task = None
+
+        self.queue_processor_task = None
 
     async def create_background_task(self):
         print("Background validator has started")
-        self.background_validator_task = asyncio.create_task(self.start_task())
+        self.background_validator_task = asyncio.create_task(self.main_task())
+        self.queue_processor_task = asyncio.create_task(self.process_queue())
 
     async def cancel_background_task(self):
         self.background_validator_task.cancel()
+        self.queue_processor_task.cancel()
         print("Background validator has stopped")
 
-    async def start_task(self):
+    async def main_task(self):
+        """
+        The main background validator task which validates the room memberships of registered users for all the rooms with conditions.
+        """
         while True:
             await self.fetch_rooms_and_users()
 
             for room_id in self.rooms_with_conditions:
-                # When the bot is either not part of the room or dosen't have the required permissions.
-                if room_id not in self.rooms_with_permissions or room_id not in self.client.rooms:
-                    continue
-
-                ignore_members = await self.get_ignored_users_for_a_room(room_id)
-                room_specific_data = await self.client.get_account_data("rooms", room_id=room_id)
-
-                for user_id in self.registered_users.keys():
-                    if user_id in ignore_members:
-                        continue
-
-                    current_state = await self.get_current_room_membership(user_id, room_id)
-
-                    # Avoid checking the conditions if the user is to be ignored
-                    # or the user is already part of the room or invited and the room has disabled bot kicks.
-                    if current_state == "ignore":
-                        continue
-
-                    if room_specific_data.content.disable_room_kick:
-                        if current_state == "join" or current_state == "invite":
-                            continue
-
-                    is_permitted_through_github = await self.check_github_conditions(
-                        user_id, room_specific_data
-                    )
-                    is_permitted = is_permitted_through_github
-
-                    next_state = await self.decide_next_state_of_user(current_state, is_permitted)
-
-                    if current_state == next_state:
-                        continue
-
-                    await self.send_next_state_event(room_id, user_id, next_state)
-
-                await asyncio.sleep(1)
+                await self.validate_room_memberships_for_a_room(room_id)
             await asyncio.sleep(1)
 
+    async def process_queue(self):
+        """
+        Method which validates room memberships for all recently modified rooms in the queue.
+        """
+        while True:
+            # Blocks until the queue is not empty
+            room_id = await self.queue.get()
+            await self.validate_room_memberships_for_a_room(room_id)
+
+    async def add_room_to_queue(self, room_id: str):
+        await self.queue.put(room_id)
+
+    async def validate_room_memberships_for_a_room(self, room_id: str):
+        ignore_members = await self.get_ignored_users_for_a_room(room_id)
+        room_specific_data = await self.client.get_account_data("rooms", room_id=room_id)
+
+        for user_id in self.registered_users.keys():
+            if user_id in ignore_members:
+                continue
+
+            current_state = await self.get_current_room_membership(user_id, room_id)
+
+            # Avoid checking the conditions if the user is to be ignored
+            # or the user is already part of the room or invited and the room has disabled bot kicks.
+            if current_state == "ignore":
+                continue
+
+            if room_specific_data.content.disable_room_kick:
+                if current_state == "join" or current_state == "invite":
+                    continue
+
+            is_permitted_through_github = await self.check_github_conditions(
+                user_id, room_specific_data
+            )
+            is_permitted = is_permitted_through_github
+            print(is_permitted, user_id)
+
+            next_state = await self.decide_next_state_of_user(current_state, is_permitted)
+
+            if current_state == next_state:
+                continue
+
+            await self.send_next_state_event(room_id, user_id, next_state)
+
+        await asyncio.sleep(1)
+
     async def fetch_rooms_and_users(self):
+        """
+        Fetch the list of all registered users and rooms with conditions.
+
+        Update the room list if any room doesn't satisfy the following conditions:
+            1) Bot is not a member of the room
+            2) Bot doesn't have necessary permissions to invite and kick.
+        """
         resp = await self.client.get_account_data("global_data")
         self.rooms_with_conditions = resp.content.rooms
 
@@ -115,6 +145,22 @@ class BackgroundValidater:
         self.rooms_with_permissions = await self.client.get_rooms_with_mod_permissions(
             self.client.user_id
         )
+
+        # Remove rooms where the bot is not a member/dosen't have kick and invite permissions
+
+        # Clear room conditions in bot state
+        rooms_to_be_removed = set()
+        for room_id in self.rooms_with_conditions:
+            if room_id not in self.rooms_with_permissions:
+                await self.client.put_account_data(type="rooms", data={}, room_id=room_id)
+                rooms_to_be_removed.add(room_id)
+
+        # Update room list in bot state
+        filtered_rooms = set(self.rooms_with_conditions) - rooms_to_be_removed
+        resp.content.rooms = list(filtered_rooms)
+        await self.client.put_account_data(type="global_data", data=resp)
+
+        self.rooms_with_conditions = filtered_rooms
 
     async def get_current_room_membership(self, user_id: str, room_id: str) -> str:
         matrix_room_object = self.client.rooms[room_id]
@@ -142,7 +188,7 @@ class BackgroundValidater:
         self, user_id: str, room_specific_data: RoomSpecificData
     ) -> bool:
         """
-        Method which validates a user's room membership based on a list of github conditions set by the room admin.
+        Method to validate a user's room membership based on a list of github conditions set by the room admin.
         """
 
         room_github_conditions = room_specific_data.content.github
