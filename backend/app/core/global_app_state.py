@@ -41,8 +41,6 @@ class AppState:
             session_storage=self.session_storage,
         )
 
-        await self.matrix_bot_runner.initialise_bot()
-
     async def delete_state(self):
         """
         Clears the variables and their states
@@ -54,6 +52,8 @@ class AppState:
         """
         All the background running tasks and session variables will be managed here.
         """
+        await self.matrix_bot_runner.initialise_bot()
+
         await self.http_client.start_session()
         await self.matrix_bot_runner.create_background_task()
 
