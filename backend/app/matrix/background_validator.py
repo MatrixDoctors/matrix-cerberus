@@ -87,14 +87,27 @@ class BackgroundValidater:
         Method which validates room memberships for all recently modified rooms in the queue.
         """
         while True:
-            await self.fetch_rooms_and_users()
 
             # Blocks until the queue is not empty
             type, id = await self.queue.get()
             if type == "room":
+                room_specific_data = await self.client.get_account_data(type="rooms", room_id=id)
+                ignored_users = await self.get_ignored_users_for_a_room(id)
+                self.rooms_with_conditions[id] = RegisteredRoom(
+                    room_data=room_specific_data, ignored_users=ignored_users
+                )
+
                 for user_id in self.registered_users.keys():
                     await self.validate_room_membership_of_user(room_id=id, user_id=user_id)
+
             elif type == "user":
+                user_data = await self.client.get_account_data("user", user_id=id)
+                self.registered_users[id] = RegisteredUser(
+                    user_data=user_data,
+                    http_client=self.http_client,
+                    default_role=self.github_default_role,
+                )
+
                 for room_id in self.rooms_with_conditions.keys():
                     await self.validate_room_membership_of_user(room_id=room_id, user_id=id)
 
@@ -167,6 +180,11 @@ class BackgroundValidater:
         rooms_to_be_removed = set()
         for room_id in resp.content.rooms:
             if room_id not in self.rooms_with_mod_permissions:
+                # Remove room data from cache
+                if room_id in self.rooms_with_conditions:
+                    del self.rooms_with_conditions[room_id]
+
+                # Remove room data from bot state
                 await self.client.put_account_data(type="rooms", data={}, room_id=room_id)
                 rooms_to_be_removed.add(room_id)
 
