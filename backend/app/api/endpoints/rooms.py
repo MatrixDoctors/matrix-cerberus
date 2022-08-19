@@ -65,11 +65,13 @@ async def parse_github_org_data(github_conditions: GithubConditions):
     return list_of_conditions
 
 
-async def parse_github_user_data(github_conditions: GithubConditions):
-    users = github_conditions.users
+async def parse_github_user_data(user_name: str, github_conditions: GithubConditions):
     owner_type = "user"
     list_of_conditions = []
-    for user_name, user_data in users.items():
+
+    if user_name in github_conditions.users:
+        user_data = github_conditions.users[user_name]
+
         for repo_name, repo_data in user_data.repos.items():
             repo_condition = RoomConditions(
                 type=owner_type,
@@ -97,12 +99,19 @@ async def parse_github_user_data(github_conditions: GithubConditions):
 
 
 @router.get("/{room_id}", dependencies=[Depends(verify_room_permissions)])
-async def get_room_conditions(room_id: str):
+async def get_room_conditions(request: Request, room_id: str):
     resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+
+    session_data = fastapi_sessions.get_session(request)
+    github_username = session_data.github_user_id
 
     list_of_conditions = []
     list_of_conditions.extend(await parse_github_org_data(resp.content.github))
-    list_of_conditions.extend(await parse_github_user_data(resp.content.github))
+    list_of_conditions.extend(
+        await parse_github_user_data(
+            user_name=github_username, github_conditions=resp.content.github
+        )
+    )
     return JSONResponse(list_of_conditions)
 
 
@@ -150,7 +159,7 @@ async def get_github_room_condition(
             if owner_type == "org":
                 tiers = await github_api.get_sponsorship_tiers_for_org(owner.parent)
             else:
-                tiers = await github_api.get_sponsorship_tiers_for_org(owner.parent)
+                tiers = await github_api.get_sponsorship_tiers_for_user(owner.parent)
             data_to_be_sent = {tier_name: False for tier_name in tiers}
     else:
         raise HTTPException(status_code=400, detail="Invalid condition type sent.")
@@ -236,6 +245,11 @@ async def delete_github_room_condition(
 
     resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
     return JSONResponse({"msg": "success"})
+
+
+@router.post("/{room_id}/patreon/campaign", dependencies=[Depends(verify_room_permissions)])
+async def get_patreon_campaign_conditions(room_id: str):
+    pass
 
 
 @router.put("/{room_id}/disable-room-kick/edit", dependencies=[Depends(verify_room_permissions)])
