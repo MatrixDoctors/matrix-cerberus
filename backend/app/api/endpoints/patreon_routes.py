@@ -3,12 +3,18 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 
 import aiohttp
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from app.api.deps import fastapi_sessions, save_user_data
+from app.api.deps import (
+    fastapi_sessions,
+    patreon_api_instance,
+    save_user_data,
+    verify_room_permissions,
+)
 from app.api.models import OAuthCode
 from app.core.app_state import app_state
+from app.patreon.patreon_api import PatreonAPI
 
 router = APIRouter()
 
@@ -97,3 +103,9 @@ async def authenticate_user(request: Request, body: OAuthCode, background_tasks:
             return JSONResponse({"message": "success"})
     except aiohttp.ClientConnectionError as err:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/tiers", dependencies=[Depends(verify_room_permissions)])
+async def get_tiers(request: Request, patreon_api: PatreonAPI = Depends(patreon_api_instance)):
+    resp = await patreon_api.tiers_of_all_campaigns()
+    return JSONResponse({"content": resp})

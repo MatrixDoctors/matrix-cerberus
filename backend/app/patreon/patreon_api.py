@@ -10,7 +10,7 @@ class PatreonAPI:
 
     async def tiers_of_all_campaigns(self):
         url = f"https://www.patreon.com/api/oauth2/v2/campaigns?"
-        scopes = "fields[campaign]=created_at,creation_name,patron_count&include=tiers&fields[tier]=title"
+        scopes = "fields[campaign]=created_at,creation_name&include=tiers&fields[tier]=title"
         scopes.replace("[", "%5B")
         scopes.replace("]", "%5D")
 
@@ -21,9 +21,9 @@ class PatreonAPI:
             if resp.status != 200:
                 raise HTTPException(status_code=422, detail="Error fetching patreon details")
             campaign_data = await resp.json()
-            tiers = []
+            tiers = dict()
             for tier in campaign_data["included"]:
-                tiers.append(tier["attributes"]["title"])
+                tiers[tier["id"]] = tier["attributes"]["title"]
             return tiers
 
     async def user_memberships(self):

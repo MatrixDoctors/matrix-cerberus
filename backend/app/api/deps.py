@@ -11,6 +11,7 @@ from app.core.app_state import app_state
 from app.core.models import ServerSessionData, UserData
 from app.github.github_api import GithubAPI
 from app.matrix.external_url import ExternalUrlAPI
+from app.patreon.patreon_api import PatreonAPI
 
 fastapi_sessions = app_state.server_session
 
@@ -94,6 +95,16 @@ async def github_api_instance(
         default_role=app_state.settings.github.organisation_membership,
     )
     return github_api
+
+
+async def patreon_api_instance(request: Request):
+    session_data = fastapi_sessions.get_session(request)
+    patreon_api = PatreonAPI(
+        email=session_data.patreon_user_id,
+        access_token=session_data.patreon_access_token,
+        session=app_state.http_client.session,
+    )
+    return patreon_api
 
 
 async def external_url_api_instance() -> ExternalUrlAPI:
