@@ -247,11 +247,6 @@ async def delete_github_room_condition(
     return JSONResponse({"msg": "success"})
 
 
-@router.post("/{room_id}/patreon/campaign", dependencies=[Depends(verify_room_permissions)])
-async def get_patreon_campaign_conditions(room_id: str):
-    pass
-
-
 @router.put("/{room_id}/disable-room-kick/edit", dependencies=[Depends(verify_room_permissions)])
 async def edit_room_disable_kick_option(room_id: str, disable_room_kick: bool):
 

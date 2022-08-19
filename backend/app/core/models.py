@@ -87,7 +87,7 @@ class PatreonCampaignConditions(BaseModel):
 
 
 class PatreonConditions(BaseModel):
-    campaigns: Dict[int, PatreonCampaignConditions]
+    campaigns: Dict[int, PatreonCampaignConditions] = dict()
 
 
 class RoomConditionsData(BaseModel):

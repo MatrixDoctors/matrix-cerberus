@@ -14,6 +14,7 @@ from app.api.deps import (
 )
 from app.api.models import OAuthCode
 from app.core.app_state import app_state
+from app.core.models import PatreonCampaignConditions, PatreonCampaignTier
 from app.patreon.patreon_api import PatreonAPI
 
 router = APIRouter()
@@ -103,6 +104,47 @@ async def authenticate_user(request: Request, body: OAuthCode, background_tasks:
             return JSONResponse({"message": "success"})
     except aiohttp.ClientConnectionError as err:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/{room_id}/patreon/campaign", dependencies=[Depends(verify_room_permissions)])
+async def get_patreon_campaign_conditions(
+    room_id: str, patreon_api: PatreonAPI = Depends(patreon_api_instance)
+):
+    """
+    API Route to fetch patreon conditions of a campaign owned by the authorized user.
+    """
+    resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+
+    data_to_be_sent = None
+
+    for campaign_id, campaign_data in resp.content.patreon.campaigns.items():
+        if patreon_api.email == campaign_data.belongs_to:
+            data_to_be_sent = {"id": campaign_id, "attributes": campaign_data.dict()}
+            break
+
+    if data_to_be_sent is None:
+        campaign_data = await patreon_api.campaign_information()
+        patreon_campaign_tiers = {
+            id: PatreonCampaignTier(title=title, is_enabled=False)
+            for id, title in campaign_data["tiers"].items()
+        }
+        attributes = PatreonCampaignConditions(
+            name=campaign_data["name"],
+            belongs_to=patreon_api.email,
+            tiers=patreon_campaign_tiers,
+            lifetime_support_cents=0,
+        )
+
+        data_to_be_sent = {"id": campaign_data["id"], "attributes": attributes.dict()}
+
+    return JSONResponse({"content": data_to_be_sent})
+
+
+@router.put("/{room_id}/patreon/campaign", dependencies=[Depends(verify_room_permissions)])
+async def get_patreon_campaign_conditions(
+    room_id: str, patreon_api: PatreonAPI = Depends(patreon_api_instance)
+):
+    pass
 
 
 @router.get("/tiers", dependencies=[Depends(verify_room_permissions)])
