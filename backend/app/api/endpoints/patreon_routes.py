@@ -123,19 +123,7 @@ async def get_patreon_campaign_conditions(
             break
 
     if data_to_be_sent is None:
-        campaign_data = await patreon_api.campaign_information()
-        patreon_campaign_tiers = {
-            id: PatreonCampaignTier(title=title, is_enabled=False)
-            for id, title in campaign_data["tiers"].items()
-        }
-        attributes = PatreonCampaignConditions(
-            name=campaign_data["name"],
-            belongs_to=patreon_api.email,
-            tiers=patreon_campaign_tiers,
-            lifetime_support_cents=0,
-        )
-
-        data_to_be_sent = {"id": campaign_data["id"], "attributes": attributes.dict()}
+        data_to_be_sent = await patreon_api.campaign_information()
 
     return JSONResponse({"content": data_to_be_sent})
 

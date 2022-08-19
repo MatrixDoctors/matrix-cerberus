@@ -1,6 +1,8 @@
 import aiohttp
 from fastapi import HTTPException
 
+from app.core.models import PatreonCampaignConditions, PatreonCampaignTier
+
 
 class PatreonAPI:
     def __init__(self, email: str, access_token: str, session: aiohttp.ClientSession):
@@ -22,14 +24,20 @@ class PatreonAPI:
                 raise HTTPException(status_code=422, detail="Error fetching patreon details")
             campaign_data = await resp.json()
 
-            tiers = dict()
-            for tier in campaign_data["included"]:
-                tiers[tier["id"]] = tier["attributes"]["title"]
+            tiers = {
+                tier["id"]: PatreonCampaignTier(title=tier["attributes"]["title"], is_enabled=False)
+                for tier in campaign_data["included"]
+            }
+            patreon_campaign_conditions = PatreonCampaignConditions(
+                name=campaign_data["data"][0]["attributes"]["creation_name"],
+                belongs_to=self.email,
+                tiers=tiers,
+                lifetime_support_cents=0,
+            )
 
             data = {
                 "id": campaign_data["data"][0]["id"],
-                "name": campaign_data["data"][0]["attributes"]["creation_name"],
-                "tiers": tiers,
+                "attributes": patreon_campaign_conditions.dict(),
             }
             return data
 
