@@ -29,21 +29,20 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
 
     function handleClose(){
         setCurrentData(modalData.data ? {...modalData.data} : {});
-        setInputField(modalData.data.lifetime_support_cents);
+        if(modalData.data){
+            setInputField("lifetime_support_cents" in modalData.data ? modalData.data.lifetime_support_cents : 0);
+        }
         setShowPatreonEditable(false);
     }
 
     function handleSave(){
 
-        async function saveData(roomId, modalData, currentData){
+        async function saveData(roomId, modalData, dataToBeSaved){
             const thirdPartyAccount = modalData.thirdPartyAccount.toLowerCase();
             const conditionType = modalData.conditionType.toLowerCase();
             const ownerType = modalData.type;
 
-            let url;
-            if(thirdPartyAccount === 'github') {
-                url = `/api/rooms/${roomId}/github/${ownerType}/${conditionType}`;
-            }
+            const url = `/api/patreon/${roomId}/patreon/campaign`;
 
             // Excludes the 'key' and updates the 'data' property.
             let dataToBeSent = {
@@ -51,21 +50,25 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
                 "third_party_account": thirdPartyAccount,
                 "owner": modalData.owner,
                 "condition_type": conditionType,
-                "data": currentData
+                "data": dataToBeSaved
             }
 
             return axios.put(url, dataToBeSent);
         }
 
-        const resp = saveData(roomId, modalData, currentData);
+        const dataToBeSaved = {
+            ...currentData,
+            lifetime_support_cents: inputField
+        }
+        const resp = saveData(roomId, modalData, dataToBeSaved);
 
-        resp.then( (resp) => {
-            setModalData(previousData => ({...previousData, data: currentData}));
+        resp.then( () => {
+            setModalData(previousData => ({...previousData, data: dataToBeSaved}));
 
             setRoomConditions(previousData => {
                 return previousData.map(item => {
                     if (item.key === modalData.key) {
-                        return {...modalData, data: currentData};
+                        return {...modalData, data: dataToBeSaved};
                     }
                     else {
                         return item;
@@ -82,7 +85,9 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
 
     useEffect( () => {
         setCurrentData(modalData.data ? {...modalData.data} : {});
-        setInputField(modalData.data.lifetime_support_cents);
+        if(modalData.data){
+            setInputField("lifetime_support_cents" in modalData.data ? modalData.data.lifetime_support_cents : 0);
+        }
     }, [modalData]);
 
     return (
