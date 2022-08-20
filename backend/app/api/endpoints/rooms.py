@@ -14,6 +14,7 @@ from app.core.models import (
     GithubOrganisationConditions,
     GithubRepositoryConditions,
     GithubUserConditions,
+    PatreonConditions,
 )
 from app.github.github_api import GithubAPI
 from app.matrix.external_url import ExternalUrlAPI
@@ -98,18 +99,43 @@ async def parse_github_user_data(user_name: str, github_conditions: GithubCondit
     return list_of_conditions
 
 
+async def parse_patreon_campaign(email: str, patreon_conditions: PatreonConditions):
+    owner_type = "user"
+    list_of_conditions = []
+
+    for campaign_id, campaign_data in patreon_conditions.campaigns.items():
+        if email == campaign_data.belongs_to:
+            list_of_conditions.append(
+                RoomConditions(
+                    type=owner_type,
+                    third_party_account="Patreon",
+                    owner={"parent": email},
+                    condition_type="Campaign",
+                    data={"id": campaign_id, **campaign_data.dict()},
+                ).dict()
+            )
+            break
+    return list_of_conditions
+
+
 @router.get("/{room_id}", dependencies=[Depends(verify_room_permissions)])
 async def get_room_conditions(request: Request, room_id: str):
     resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
 
     session_data = fastapi_sessions.get_session(request)
     github_username = session_data.github_user_id
+    patreon_username = session_data.patreon_user_id
 
     list_of_conditions = []
     list_of_conditions.extend(await parse_github_org_data(resp.content.github))
     list_of_conditions.extend(
         await parse_github_user_data(
             user_name=github_username, github_conditions=resp.content.github
+        )
+    )
+    list_of_conditions.extend(
+        await parse_patreon_campaign(
+            email=patreon_username, patreon_conditions=resp.content.patreon
         )
     )
     return JSONResponse(list_of_conditions)

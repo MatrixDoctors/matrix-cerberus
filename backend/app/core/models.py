@@ -83,6 +83,7 @@ class PatreonCampaignConditions(BaseModel):
     name: str = ""
     belongs_to: str = ""
     tiers: Dict[int, PatreonCampaignTier] = dict()
+    enable_lifetime_support_cents: bool = False
     lifetime_support_cents: int = 0
 
 

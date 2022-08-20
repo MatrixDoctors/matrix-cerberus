@@ -32,6 +32,7 @@ class PatreonAPI:
                 name=campaign_data["data"][0]["attributes"]["creation_name"],
                 belongs_to=self.email,
                 tiers=tiers,
+                enable_lifetime_support_cents=False,
                 lifetime_support_cents=0,
             )
 

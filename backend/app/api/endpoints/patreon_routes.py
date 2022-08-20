@@ -12,7 +12,7 @@ from app.api.deps import (
     save_user_data,
     verify_room_permissions,
 )
-from app.api.models import OAuthCode
+from app.api.models import OAuthCode, RoomConditions
 from app.core.app_state import app_state
 from app.core.models import PatreonCampaignConditions, PatreonCampaignTier
 from app.patreon.patreon_api import PatreonAPI
@@ -129,10 +129,22 @@ async def get_patreon_campaign_conditions(
 
 
 @router.put("/{room_id}/patreon/campaign", dependencies=[Depends(verify_room_permissions)])
-async def get_patreon_campaign_conditions(
-    room_id: str, patreon_api: PatreonAPI = Depends(patreon_api_instance)
-):
-    pass
+async def put_patreon_campaign_condition(room_id: str, room_conditions: RoomConditions):
+    """
+    API Route to save patreon conditions of a campaign owned by the authorized user.
+
+    It stores the updated data in the 'rooms' bot account data event.
+    """
+    resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+    patreon_data = resp.content.patreon
+
+    campaign_data = {key: value for key, value in room_conditions.data.items() if key != "id"}
+    patreon_data.campaigns[room_conditions.data["id"]] = PatreonCampaignConditions.parse_obj(
+        campaign_data
+    )
+
+    resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
+    return JSONResponse({"msg": "success"})
 
 
 @router.get("/tiers", dependencies=[Depends(verify_room_permissions)])
