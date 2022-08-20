@@ -106,7 +106,7 @@ async def authenticate_user(request: Request, body: OAuthCode, background_tasks:
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/{room_id}/patreon/campaign", dependencies=[Depends(verify_room_permissions)])
+@router.get("/{room_id}/campaign", dependencies=[Depends(verify_room_permissions)])
 async def get_patreon_campaign_conditions(
     room_id: str, patreon_api: PatreonAPI = Depends(patreon_api_instance)
 ):
@@ -128,8 +128,10 @@ async def get_patreon_campaign_conditions(
     return JSONResponse({"content": data_to_be_sent})
 
 
-@router.put("/{room_id}/patreon/campaign", dependencies=[Depends(verify_room_permissions)])
-async def put_patreon_campaign_condition(room_id: str, room_conditions: RoomConditions):
+@router.put("/{room_id}/campaign/{campaign_id}", dependencies=[Depends(verify_room_permissions)])
+async def put_patreon_campaign_condition(
+    room_id: str, campaign_id: int, patreon_campaign_conditions: PatreonCampaignConditions
+):
     """
     API Route to save patreon conditions of a campaign owned by the authorized user.
 
@@ -137,17 +139,13 @@ async def put_patreon_campaign_condition(room_id: str, room_conditions: RoomCond
     """
     resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
     patreon_data = resp.content.patreon
-
-    campaign_data = {key: value for key, value in room_conditions.data.items() if key != "id"}
-    patreon_data.campaigns[room_conditions.data["id"]] = PatreonCampaignConditions.parse_obj(
-        campaign_data
-    )
+    patreon_data.campaigns[campaign_id] = patreon_campaign_conditions
 
     resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
     return JSONResponse({"msg": "success"})
 
 
-@router.post("/{room_id}/patreon/campaign/delete", dependencies=[Depends(verify_room_permissions)])
+@router.post("/{room_id}/campaign/delete", dependencies=[Depends(verify_room_permissions)])
 async def delete_patreon_campaign_condition(room_id: str, campaign_id: int):
     """
     API Route to delete a github condition in the 'rooms' bot account data event.

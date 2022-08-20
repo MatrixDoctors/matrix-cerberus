@@ -37,49 +37,37 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
 
     function handleSave(){
 
-        async function saveData(roomId, modalData, dataToBeSaved){
-            const thirdPartyAccount = modalData.thirdPartyAccount.toLowerCase();
-            const conditionType = modalData.conditionType.toLowerCase();
-            const ownerType = modalData.type;
+        async function saveData(roomId, updatedData){
+            const {id, ...dataToBeSent} = updatedData
+            const url = `/api/patreon/${roomId}/campaign/${id}`;
 
-            const url = `/api/patreon/${roomId}/patreon/campaign`;
+            axios.put(url, dataToBeSent)
+            .then( () => {
+                setModalData(previousData => ({...previousData, data: updatedData}));
 
-            // Excludes the 'key' and updates the 'data' property.
-            let dataToBeSent = {
-                "type": ownerType,
-                "third_party_account": thirdPartyAccount,
-                "owner": modalData.owner,
-                "condition_type": conditionType,
-                "data": dataToBeSaved
-            }
+                setRoomConditions(previousData => {
+                    return previousData.map(item => {
+                        if (item.key === modalData.key) {
+                            return {...modalData, data: updatedData};
+                        }
+                        else {
+                            return item;
+                        }
+                    });
+                });
+                toast.success("Succesfully updated!");
+            })
+            .catch( () => {
+                toast.error("Failed to save data");
+            });
+        };
 
-            return axios.put(url, dataToBeSent);
-        }
-
-        const dataToBeSaved = {
+        const updatedData = {
             ...currentData,
             lifetime_support_cents: inputField
-        }
-        const resp = saveData(roomId, modalData, dataToBeSaved);
+        };
 
-        resp.then( () => {
-            setModalData(previousData => ({...previousData, data: dataToBeSaved}));
-
-            setRoomConditions(previousData => {
-                return previousData.map(item => {
-                    if (item.key === modalData.key) {
-                        return {...modalData, data: dataToBeSaved};
-                    }
-                    else {
-                        return item;
-                    }
-                });
-            });
-            toast.success("Succesfully updated!");
-        })
-        .catch( () => {
-            toast.error("Failed to save data");
-        })
+        saveData(roomId, updatedData);
         handleClose();
     }
 
