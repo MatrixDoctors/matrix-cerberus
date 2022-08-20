@@ -3,16 +3,16 @@ import Helmet from "react-helmet";
 import PropTypes from "prop-types"
 import { Link, useParams } from "react-router-dom";
 import SelectThirdPartyAccountModal from "../Components/SelectThirdPartyAccountModal";
-import PreviewConditions from "../Components/PreviewConditions";
+import GithubPreviewConditions from "../Components/GithubPreviewConditions";
 import axios from "../HelperFunctions/customAxios";
-import EditConditions from "../Components/EditConditions";
+import GithubEditConditions from "../Components/GithubEditConditions";
 
 const Images = {
     'github': require('../assets/img/github.svg').default,
     'patreon': require('../assets/img/patreon.svg').default,
 }
 
-const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData, handleDelete}) => {
+const TableRows = ({rowValue, setShowGithubPreview, setShowGithubEditable, setModalData, handleDelete}) => {
     const owner= rowValue.owner;
     const image = Images[rowValue.thirdPartyAccount.toLowerCase()];
 
@@ -46,7 +46,7 @@ const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData, han
                     title="Show"
                     onClick={() => {
                         setModalData(rowValue);
-                        setShowPreview(true);
+                        setShowGithubPreview(true);
                     }}
                     >
                         <img className="w-full h-full" src={require("../assets/img/eye-regular.svg").default} />
@@ -57,7 +57,7 @@ const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData, han
                     title="Edit"
                     onClick={() => {
                         setModalData(rowValue);
-                        setShowEditable(true);
+                        setShowGithubEditable(true);
                     }}
                     >
                         <img className="w-full h-full" src={require("../assets/img/pen-to-square.svg").default} />
@@ -76,8 +76,8 @@ const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData, han
 
 TableRows.propTypes = {
     rowValue: PropTypes.object,
-    setShowPreview: PropTypes.func,
-    setShowEditable: PropTypes.func,
+    setShowGithubPreview: PropTypes.func,
+    setShowGithubEditable: PropTypes.func,
     setModalData: PropTypes.func,
     handleDelete: PropTypes.func
 }
@@ -87,8 +87,8 @@ function Room() {
     const [showModal, setShowModal] = useState(false);
     const [roomConditions, setRoomConditions] = useState([]);
 
-    const [showPreview, setShowPreview] = useState(false);
-    const [showEditable, setShowEditable] = useState(false);
+    const [showGithubPreview, setShowGithubPreview] = useState(false);
+    const [showGithubEditable, setShowGithubEditable] = useState(false);
     const [modalData, setModalData] = useState({});
 
     function handleDelete(rowData) {
@@ -192,8 +192,16 @@ function Room() {
 
             <div className="w-full sm:px-6">
                 <div className="bg-gray-200 shadow px-4 md:px-10 pt-4 md:pt-7 pb-5 overflow-y-auto">
-                    <PreviewConditions modalData={modalData} showPreview={showPreview} setShowPreview={setShowPreview} />
-                    <EditConditions roomId={roomId} modalData={modalData} setModalData={setModalData} roomConditions={roomConditions} setRoomConditions={setRoomConditions} showEditable={showEditable} setShowEditable={setShowEditable} />
+                    <GithubPreviewConditions modalData={modalData} showGithubPreview={showGithubPreview} setShowGithubPreview={setShowGithubPreview} />
+                    <GithubEditConditions
+                        roomId={roomId}
+                        modalData={modalData}
+                        setModalData={setModalData}
+                        roomConditions={roomConditions}
+                        setRoomConditions={setRoomConditions}
+                        showGithubEditable={showGithubEditable}
+                        setShowGithubEditable={setShowGithubEditable}
+                    />
                     <table className="w-full whitespace-nowrap">
                         <thead>
                             <tr className="h-16 w-full text-sm leading-none text-gray-800">
@@ -209,8 +217,8 @@ function Room() {
                                     <TableRows
                                         rowValue={rowValue}
                                         key={rowValue.key}
-                                        setShowPreview={setShowPreview}
-                                        setShowEditable={setShowEditable}
+                                        setShowGithubPreview={setShowGithubPreview}
+                                        setShowGithubEditable={setShowGithubEditable}
                                         setModalData={setModalData}
                                         handleDelete={handleDelete}
                                     />
