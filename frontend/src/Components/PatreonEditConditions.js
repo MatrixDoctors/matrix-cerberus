@@ -5,8 +5,9 @@ import { toast } from 'react-toastify';
 
 export default function PatreonEditConditions({roomId, modalData, setModalData, setRoomConditions, showPatreonEditable, setShowPatreonEditable}) {
     const [currentData, setCurrentData] = useState({});
+    const [inputField, setInputField] = useState(0);
 
-    function handleCheckboxChange(e){
+    function handleTierCheckboxChange(e){
         const key = e.target.name;
         setCurrentData((previousData) => {
             return {...previousData, tiers: {
@@ -19,8 +20,16 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
         });
     }
 
+    function handleEnableCheckboxChange(e){
+        const key = e.target.name;
+        setCurrentData((previousData) => {
+            return {...previousData, enable_lifetime_support_cents: !previousData.enable_lifetime_support_cents};
+        });
+    }
+
     function handleClose(){
         setCurrentData(modalData.data ? {...modalData.data} : {});
+        setInputField(modalData.data.lifetime_support_cents);
         setShowPatreonEditable(false);
     }
 
@@ -73,6 +82,7 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
 
     useEffect( () => {
         setCurrentData(modalData.data ? {...modalData.data} : {});
+        setInputField(modalData.data.lifetime_support_cents);
     }, [modalData]);
 
     return (
@@ -136,7 +146,7 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
                             Tiers
                         </p>
 
-                        <div className='p-2 w-full'>
+                        <div className='p-2 w-full mb-4 pb-4 border-b border-solid border-slate-200 rounded-t'>
                             { "tiers" in currentData
                                 ? Object.entries(currentData.tiers).map( ([key, value]) => {
                                     return (
@@ -147,7 +157,7 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
                                             id={`checkbox-${key}`}
                                             name={key}
                                             checked={value.is_enabled}
-                                            onChange={(e) => handleCheckboxChange(e)}
+                                            onChange={(e) => handleTierCheckboxChange(e)}
                                             />
                                             <label htmlFor={`checkbox-${key}`}>{value.title}</label>
                                         </div>
@@ -156,6 +166,43 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
                                 : <></>
                             }
                         </div>
+
+                        <p className="text-md font-bold text-black">
+                            Life time support cents
+                        </p>
+
+                        { "lifetime_support_cents" in currentData
+                            ? <div className='p-2 w-full'>
+                                <div className='flex items-center'>
+                                    <input
+                                    className='mr-2'
+                                    type="checkbox"
+                                    id="enable_lifetime_support_cents"
+                                    checked={currentData.enable_lifetime_support_cents}
+                                    onChange={handleEnableCheckboxChange}
+                                    />
+                                    <label htmlFor="enable_lifetime_support_cents">Enabled</label>
+                                </div>
+                                <div className='flex items-center'>
+                                    <label
+                                    className="inline-block text-md text-black"
+                                    htmlFor="lifetime_support_cents"
+                                    >
+                                        Total amount:
+                                    </label>
+
+                                    <input
+                                    type="number"
+                                    className='mx-2 p-0.5 bg-gray-100 rounded-md border border-gray-600 focus:ring-blue-500 focus:border-blue-500'
+                                    id="lifetime_support_cents"
+                                    disabled={!currentData.enable_lifetime_support_cents}
+                                    value={inputField}
+                                    onChange={(e) => setInputField(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        : <></>
+                        }
 
 
                         <div className='flex justify-end items-center mt-3'>

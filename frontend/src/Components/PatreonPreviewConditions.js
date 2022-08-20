@@ -99,17 +99,13 @@ export default function PatreonPreviewConditions({ modalData, showPatreonPreview
                                 />
                                 <label htmlFor="enable_lifetime_support_cents">Enabled</label>
                             </div>
-                            <div className='flex justify-start items-center'>
-                                <p className="text-md text-black">
-                                    {`Total amount: ${modalData.data.lifetime_support_cents} $`}
+                            <div>
+                                <p className="inline-block text-md text-black">
+                                    Total amount:
                                 </p>
-                                {/* <label htmlFor="lifetime_support_cents"></label>
-                                <input
-                                type="text"
-                                id="lifetime_support_cents"
-                                value={modalData.data.lifetime_support_cents}
-                                readOnly
-                                /> */}
+                                <p className="inline-block ml-2 text-md font-semibold text-black">
+                                    {`${modalData.data.lifetime_support_cents} $`}
+                                </p>
                             </div>
                         </div>
 
