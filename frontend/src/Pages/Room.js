@@ -118,18 +118,22 @@ function Room() {
             let url;
             if(thirdPartyAccount === 'github') {
                 url = `/api/rooms/${roomId}/github/${ownerType}/${conditionType}/delete`;
-            }
 
-            // Excludes the 'key' and updates the 'data' property.
-            let dataToBeSent = {
-                "type": ownerType,
-                "third_party_account": thirdPartyAccount,
-                "owner": rowData.owner,
-                "condition_type": conditionType,
-                "data": rowData.data
-            }
+                // Excludes the 'key' and updates the 'data' property.
+                let dataToBeSent = {
+                    "type": ownerType,
+                    "third_party_account": thirdPartyAccount,
+                    "owner": rowData.owner,
+                    "condition_type": conditionType,
+                    "data": rowData.data
+                }
 
-            return axios.post(url, dataToBeSent);
+                return axios.post(url, dataToBeSent);
+            }
+            if(thirdPartyAccount === 'patreon') {
+                url = `/api/patreon/${roomId}/campaign/delete?campaign_id=${rowData.data.id}`;
+                return axios.post(url);
+            }
         }
 
         deleteData(roomId, rowData)

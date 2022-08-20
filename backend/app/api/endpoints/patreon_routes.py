@@ -147,7 +147,15 @@ async def put_patreon_campaign_condition(room_id: str, room_conditions: RoomCond
     return JSONResponse({"msg": "success"})
 
 
-@router.get("/tiers", dependencies=[Depends(verify_room_permissions)])
-async def get_tiers(request: Request, patreon_api: PatreonAPI = Depends(patreon_api_instance)):
-    resp = await patreon_api.tiers_of_all_campaigns()
-    return JSONResponse({"content": resp})
+@router.post("/{room_id}/patreon/campaign/delete", dependencies=[Depends(verify_room_permissions)])
+async def delete_patreon_campaign_condition(room_id: str, campaign_id: int):
+    """
+    API Route to delete a github condition in the 'rooms' bot account data event.
+    """
+    resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+
+    patreon_data = resp.content.patreon
+    del patreon_data.campaigns[campaign_id]
+
+    resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
+    return JSONResponse({"msg": "success"})
