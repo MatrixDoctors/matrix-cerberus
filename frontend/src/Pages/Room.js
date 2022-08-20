@@ -6,13 +6,15 @@ import SelectThirdPartyAccountModal from "../Components/SelectThirdPartyAccountM
 import GithubPreviewConditions from "../Components/GithubPreviewConditions";
 import axios from "../HelperFunctions/customAxios";
 import GithubEditConditions from "../Components/GithubEditConditions";
+import PatreonPreviewConditions from "../Components/PatreonPreviewConditions";
+import PatreonEditConditions from "../Components/PatreonEditConditions";
 
 const Images = {
     'github': require('../assets/img/github.svg').default,
     'patreon': require('../assets/img/patreon.svg').default,
 }
 
-const TableRows = ({rowValue, setShowGithubPreview, setShowGithubEditable, setModalData, handleDelete}) => {
+const TableRows = ({rowValue, setShowGithubPreview, setShowGithubEditable, setShowPatreonPreview, setShowPatreonEditable, setModalData, handleDelete}) => {
     const owner= rowValue.owner;
     const image = Images[rowValue.thirdPartyAccount.toLowerCase()];
 
@@ -46,7 +48,12 @@ const TableRows = ({rowValue, setShowGithubPreview, setShowGithubEditable, setMo
                     title="Show"
                     onClick={() => {
                         setModalData(rowValue);
-                        setShowGithubPreview(true);
+                        if(rowValue.thirdPartyAccount == 'Github'){
+                            setShowGithubPreview(true);
+                        }
+                        else if(rowValue.thirdPartyAccount == 'Patreon'){
+                            setShowPatreonPreview(true);
+                        }
                     }}
                     >
                         <img className="w-full h-full" src={require("../assets/img/eye-regular.svg").default} />
@@ -57,7 +64,12 @@ const TableRows = ({rowValue, setShowGithubPreview, setShowGithubEditable, setMo
                     title="Edit"
                     onClick={() => {
                         setModalData(rowValue);
-                        setShowGithubEditable(true);
+                        if(rowValue.thirdPartyAccount == 'Github'){
+                            setShowGithubEditable(true);
+                        }
+                        else if(rowValue.thirdPartyAccount == 'Patreon'){
+                            setShowPatreonEditable(true);
+                        }
                     }}
                     >
                         <img className="w-full h-full" src={require("../assets/img/pen-to-square.svg").default} />
@@ -78,6 +90,8 @@ TableRows.propTypes = {
     rowValue: PropTypes.object,
     setShowGithubPreview: PropTypes.func,
     setShowGithubEditable: PropTypes.func,
+    setShowPatreonPreview: PropTypes.func,
+    setShowPatreonEditable: PropTypes.func,
     setModalData: PropTypes.func,
     handleDelete: PropTypes.func
 }
@@ -89,6 +103,10 @@ function Room() {
 
     const [showGithubPreview, setShowGithubPreview] = useState(false);
     const [showGithubEditable, setShowGithubEditable] = useState(false);
+
+    const [showPatreonPreview, setShowPatreonPreview] = useState(false);
+    const [showPatreonEditable, setShowPatreonEditable] = useState(false);
+
     const [modalData, setModalData] = useState({});
 
     function handleDelete(rowData) {
@@ -140,17 +158,7 @@ function Room() {
                     key: key
                 };
             });
-            setRoomConditions([
-                ...data,
-                {
-                    thirdPartyAccount: "Patreon",
-                    owner: {
-                        parent: "Kuries"
-                    },
-                    conditionType: "Sponsorship Tiers",
-                    key: 3
-                }
-            ]);
+            setRoomConditions(data);
         };
         fetchRoomConditions();
     }, [])
@@ -197,10 +205,19 @@ function Room() {
                         roomId={roomId}
                         modalData={modalData}
                         setModalData={setModalData}
-                        roomConditions={roomConditions}
                         setRoomConditions={setRoomConditions}
                         showGithubEditable={showGithubEditable}
                         setShowGithubEditable={setShowGithubEditable}
+                    />
+
+                    <PatreonPreviewConditions modalData={modalData} showPatreonPreview={showPatreonPreview} setShowPatreonPreview={setShowPatreonPreview} />
+                    <PatreonEditConditions
+                        roomId={roomId}
+                        modalData={modalData}
+                        setModalData={setModalData}
+                        setRoomConditions={setRoomConditions}
+                        showPatreonEditable={showPatreonEditable}
+                        setShowPatreonEditable={setShowPatreonEditable}
                     />
                     <table className="w-full whitespace-nowrap">
                         <thead>
@@ -219,6 +236,8 @@ function Room() {
                                         key={rowValue.key}
                                         setShowGithubPreview={setShowGithubPreview}
                                         setShowGithubEditable={setShowGithubEditable}
+                                        setShowPatreonPreview={setShowPatreonPreview}
+                                        setShowPatreonEditable={setShowPatreonEditable}
                                         setModalData={setModalData}
                                         handleDelete={handleDelete}
                                     />

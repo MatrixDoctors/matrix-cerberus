@@ -3,19 +3,25 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types'
 import { toast } from 'react-toastify';
 
-export default function GithubEditConditions({roomId, modalData, setModalData, setRoomConditions, showGithubEditable, setShowGithubEditable}) {
+export default function PatreonEditConditions({roomId, modalData, setModalData, setRoomConditions, showPatreonEditable, setShowPatreonEditable}) {
     const [currentData, setCurrentData] = useState({});
 
     function handleCheckboxChange(e){
         const key = e.target.name;
         setCurrentData((previousData) => {
-            return {...previousData, [key]: !previousData[key]};
+            return {...previousData, tiers: {
+                ...previousData.tiers,
+                [key]: {
+                    ...previousData.tiers[key],
+                    is_enabled: !previousData.tiers[key].is_enabled
+                }
+            }};
         });
     }
 
     function handleClose(){
         setCurrentData(modalData.data ? {...modalData.data} : {});
-        setShowGithubEditable(false);
+        setShowPatreonEditable(false);
     }
 
     function handleSave(){
@@ -71,7 +77,7 @@ export default function GithubEditConditions({roomId, modalData, setModalData, s
 
     return (
     <>
-        {showGithubEditable ? (
+        {showPatreonEditable ? (
             <>
             <div
                 className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
@@ -83,8 +89,8 @@ export default function GithubEditConditions({roomId, modalData, setModalData, s
                     <div className="flex items-start justify-between py-4 px-6 border-b border-solid border-slate-200 rounded-t">
 
                         <div className="flex items-center mr-6">
-                            <div className="mr-2 w-5 h-5">
-                                <img className="w-full h-full" src={require("../assets/img/github.svg").default} />
+                            <div className="mr-2 w-4 h-4">
+                                <img className="w-full h-full" src={require("../assets/img/patreon.svg").default} />
                             </div>
 
                             <h3 className="text-xl font-semibold">
@@ -108,35 +114,31 @@ export default function GithubEditConditions({roomId, modalData, setModalData, s
                     {/*body*/}
                     <div className="relative p-6 flex-auto">
                         <div className='mb-4 pb-4 border-b border-solid border-slate-200 rounded-t'>
-                            <div className='flex justify-start'>
+                        <div className='flex justify-start'>
                                 <p className="text-md font-medium text-black">
                                     Owner:
                                 </p>
-                                <p className="ml-auto text-md font-normal text-black">
+                                <p className="ml-auto pl-4 text-md font-normal text-black">
                                     {modalData.owner.parent}
                                 </p>
                             </div>
-
-                            { modalData.owner.child
-                                ? <div className='flex justify-start'>
-                                    <p className="text-md font-medium text-black">
-                                        Repository:
-                                    </p>
-                                    <p className="ml-auto text-md font-normal text-black">
-                                        {modalData.owner.child}
-                                    </p>
-                                </div>
-                                : <></>
-                            }
+                            <div className='flex justify-start'>
+                                <p className="text-md font-medium text-black">
+                                    Campaign name:
+                                </p>
+                                <p className="ml-auto pl-4 text-md font-normal text-black">
+                                    {modalData.data.name}
+                                </p>
+                            </div>
                         </div>
 
                         <p className="text-md font-bold text-black">
-                            Conditions
+                            Tiers
                         </p>
 
                         <div className='p-2 w-full'>
-                            { modalData.data
-                                ? Object.entries(currentData).map( ([key, value]) => {
+                            { "tiers" in currentData
+                                ? Object.entries(currentData.tiers).map( ([key, value]) => {
                                     return (
                                         <div key={key}>
                                             <input
@@ -144,10 +146,10 @@ export default function GithubEditConditions({roomId, modalData, setModalData, s
                                             type="checkbox"
                                             id={`checkbox-${key}`}
                                             name={key}
-                                            checked={value}
+                                            checked={value.is_enabled}
                                             onChange={(e) => handleCheckboxChange(e)}
                                             />
-                                            <label className='w-full' htmlFor={`checkbox-${key}`}>{key}</label>
+                                            <label htmlFor={`checkbox-${key}`}>{value.title}</label>
                                         </div>
                                     )
                                 })
@@ -183,11 +185,12 @@ export default function GithubEditConditions({roomId, modalData, setModalData, s
   )
 }
 
-GithubEditConditions.propTypes = {
+PatreonEditConditions.propTypes = {
     roomId: PropTypes.string,
     modalData: PropTypes.object,
     setModalData: PropTypes.func,
+    roomConditions: PropTypes.array,
     setRoomConditions: PropTypes.func,
-    showGithubEditable: PropTypes.bool,
-    setShowGithubEditable: PropTypes.func
+    showPatreonEditable: PropTypes.bool,
+    setShowPatreonEditable: PropTypes.func
 }
