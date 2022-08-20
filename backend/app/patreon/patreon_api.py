@@ -38,7 +38,7 @@ class PatreonAPI:
 
             data = {
                 "id": campaign_data["data"][0]["id"],
-                "attributes": patreon_campaign_conditions.dict(),
+                "data": patreon_campaign_conditions.dict(),
             }
             return data
 

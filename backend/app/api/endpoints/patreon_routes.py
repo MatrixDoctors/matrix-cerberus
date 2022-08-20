@@ -119,7 +119,7 @@ async def get_patreon_campaign_conditions(
 
     for campaign_id, campaign_data in resp.content.patreon.campaigns.items():
         if patreon_api.email == campaign_data.belongs_to:
-            data_to_be_sent = {"id": campaign_id, "attributes": campaign_data.dict()}
+            data_to_be_sent = {"id": campaign_id, "data": campaign_data.dict()}
             break
 
     if data_to_be_sent is None:

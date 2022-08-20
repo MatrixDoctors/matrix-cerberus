@@ -51,14 +51,16 @@ export default function SelectThirdPartyAccountModal({ roomId, showModal, setSho
                           </Link>
                         </li>
                         <li>
-                            <button className='flex justify-start items-center w-full p-2 border bg-gray-200 hover:bg-gray-300 rounded-md'>
-                                <div className="w-4 h-4">
-                                    <img className="w-full h-full" src={require("../assets/img/patreon.svg").default} />
-                                </div>
-                                <div className="pl-4">
-                                    <p className="font-medium">Patreon</p>
-                                </div>
-                            </button>
+                          <Link to={`/rooms/${roomId}/patreon-conditions`} >
+                              <button className='flex justify-start items-center w-full p-2 border bg-gray-200 hover:bg-gray-300 rounded-md'>
+                                  <div className="w-4 h-4">
+                                      <img className="w-full h-full" src={require("../assets/img/patreon.svg").default} />
+                                  </div>
+                                  <div className="pl-4">
+                                      <p className="font-medium">Patreon</p>
+                                  </div>
+                              </button>
+                          </Link>
                         </li>
                     </ul>
 

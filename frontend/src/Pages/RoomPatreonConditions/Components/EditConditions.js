@@ -1,9 +1,10 @@
-import axios from '../HelperFunctions/customAxios';
+import axios from '../../../HelperFunctions/customAxios';
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 
-export default function PatreonEditConditions({roomId, modalData, setModalData, setRoomConditions, showPatreonEditable, setShowPatreonEditable}) {
+export default function EditConditions({roomId, modalData, setModalData, setShowEditable}) {
+
     const [currentData, setCurrentData] = useState({});
     const [inputField, setInputField] = useState(0);
 
@@ -32,32 +33,21 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
         if(modalData.data){
             setInputField("lifetime_support_cents" in modalData.data ? modalData.data.lifetime_support_cents : 0);
         }
-        setShowPatreonEditable(false);
+        setShowEditable(false);
     }
 
     function handleSave(){
 
-        async function saveData(roomId, updatedData){
-            const {id, ...dataToBeSent} = updatedData
-            const url = `/api/patreon/${roomId}/campaign/${id}`;
+        async function saveData(roomId, campaignId, updatedData){
+            const url = `/api/patreon/${roomId}/campaign/${campaignId}`;
 
-            axios.put(url, dataToBeSent)
+            axios.put(url, updatedData)
             .then( () => {
                 setModalData(previousData => ({...previousData, data: updatedData}));
-
-                setRoomConditions(previousData => {
-                    return previousData.map(item => {
-                        if (item.key === modalData.key) {
-                            return {...modalData, data: updatedData};
-                        }
-                        else {
-                            return item;
-                        }
-                    });
-                });
                 toast.success("Succesfully updated!");
             })
-            .catch( () => {
+            .catch( (err) => {
+                console.log(err);
                 toast.error("Failed to save data");
             });
         };
@@ -67,21 +57,19 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
             lifetime_support_cents: inputField
         };
 
-        saveData(roomId, updatedData);
+        saveData(roomId, modalData.id, updatedData);
         handleClose();
     }
 
     useEffect( () => {
-        setCurrentData(modalData.data ? {...modalData.data} : {});
+        setCurrentData(modalData.data);
         if(modalData.data){
             setInputField("lifetime_support_cents" in modalData.data ? modalData.data.lifetime_support_cents : 0);
         }
     }, [modalData]);
 
     return (
-    <>
-        {showPatreonEditable ? (
-            <>
+        <>
             <div
                 className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
             >
@@ -92,12 +80,12 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
                     <div className="flex items-start justify-between py-4 px-6 border-b border-solid border-slate-200 rounded-t">
 
                         <div className="flex items-center mr-6">
-                            <div className="mr-2 w-4 h-4">
-                                <img className="w-full h-full" src={require("../assets/img/patreon.svg").default} />
+                            <div className="mr-2 w-5 h-5">
+                                <img className="w-full h-full" src={require("../../../assets/img/github.svg").default} />
                             </div>
 
                             <h3 className="text-xl font-semibold">
-                                {modalData.thirdPartyAccount} - {modalData.conditionType}
+                                Patreon
                             </h3>
                         </div>
 
@@ -122,7 +110,7 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
                                     Owner:
                                 </p>
                                 <p className="ml-auto pl-4 text-md font-normal text-black">
-                                    {modalData.owner.parent}
+                                    {modalData.data.belongs_to}
                                 </p>
                             </div>
                             <div className='flex justify-start'>
@@ -219,18 +207,13 @@ export default function PatreonEditConditions({roomId, modalData, setModalData, 
                 </div>
             </div>
             <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
-            </>
-        ) : null}
-    </>
-  )
-}
+        </>
+      )
+};
 
-PatreonEditConditions.propTypes = {
+EditConditions.propTypes = {
     roomId: PropTypes.string,
     modalData: PropTypes.object,
     setModalData: PropTypes.func,
-    roomConditions: PropTypes.array,
-    setRoomConditions: PropTypes.func,
-    showPatreonEditable: PropTypes.bool,
-    setShowPatreonEditable: PropTypes.func
-}
+    setShowEditable: PropTypes.func
+};
