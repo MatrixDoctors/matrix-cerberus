@@ -7,7 +7,8 @@ COPY requirements.txt ./
 RUN pip install -r requirements.txt
 RUN pip install 'uvicorn[standard]'
 
-COPY . .
+COPY ./app ./app
+COPY "config.yml" "config.yml"
 
 # start app
-CMD ["python", "./run.py"]
+CMD ["uvicorn", "app.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "8000"]
