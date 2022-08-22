@@ -3,7 +3,7 @@
 
 # pull official base image
 FROM node:16.13.2-alpine
-ENV NODE_ENV production
+ENV NODE_ENV development
 
 # set working directory
 WORKDIR /usr/app
@@ -11,7 +11,7 @@ WORKDIR /usr/app
 # install and cache app dependencies
 COPY package.json .
 COPY package-lock.json .
-RUN npm ci && npm cache clean
+RUN npm ci && npm cache clean --force
 
 COPY . .
 
