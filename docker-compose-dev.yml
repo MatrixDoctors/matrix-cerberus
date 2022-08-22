@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/backend
+    expose:
+      - 8000
+    depends_on:
+      - redis_service
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/frontend
+    expose:
+      - 3000
+
+  redis_service:
+    image: "redis:alpine"
+    expose:
+      - 6379
+
+  nginx:
+    image: "nginx:latest"
+    volumes:
+      - ./nginx/dev/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+      - frontend
+      - redis_service
