@@ -13,8 +13,7 @@ class PatreonAPI:
     async def campaign_information(self):
         url = f"https://www.patreon.com/api/oauth2/v2/campaigns?"
         scopes = "fields[campaign]=created_at,creation_name&include=tiers&fields[tier]=title"
-        scopes.replace("[", "%5B")
-        scopes.replace("]", "%5D")
+        scopes = scopes.replace("[", "%5B").replace("]", "%5D")
 
         url = url + scopes
         headers = {"Authorization": f"Bearer {self.access_token}", "Accept": "application/json"}
@@ -44,9 +43,8 @@ class PatreonAPI:
 
     async def user_memberships(self):
         url = f"https://www.patreon.com/api/oauth2/v2/identity?"
-        scopes = "fields[user]=about,created,email,first_name,last_name,full_name&include=memberships&fields[member]=campaign_lifetime_support_cents"
-        scopes.replace("[", "%5B")
-        scopes.replace("]", "%5D")
+        scopes = "fields[user]=email,full_name&include=memberships"
+        scopes = scopes.replace("[", "%5B").replace("]", "%5D")
 
         url = url + scopes
         headers = {"Authorization": f"Bearer {self.access_token}", "Accept": "application/json"}
@@ -56,19 +54,16 @@ class PatreonAPI:
                 raise HTTPException(status_code=422, detail="Error fetching patreon details")
 
             user_data = await resp.json()
-            membership_list = []
+            memberships_list = []
             for membership in user_data["included"]:
-                member_id = membership["id"]
-                data = await self.membership_details(member_id)
-                membership_list.append(data)
+                memberships_list.append(membership["id"])
 
-            return membership_list
+            return memberships_list
 
     async def membership_details(self, member_id: str):
         url = f"https://www.patreon.com/api/oauth2/v2/members/{member_id}?"
-        scopes = "fields[member]=currently_entitled_amount_cents,patron_status&include=currently_entitled_tiers&fields[tier]=title"
-        scopes.replace("[", "%5B")
-        scopes.replace("]", "%5D")
+        scopes = "fields[member]=currently_entitled_amount_cents,patron_status&include=currently_entitled_tiers&fields[tier]=title&include=campaign"
+        scopes = scopes.replace("[", "%5B").replace("]", "%5D")
 
         url = url + scopes
         headers = {"Authorization": f"Bearer {self.access_token}", "Accept": "application/json"}
@@ -78,11 +73,15 @@ class PatreonAPI:
                 raise HTTPException(status_code=422, detail="Error fetching patreon details")
             membership_data = await resp.json()
 
-            tiers = []
-            for tier in membership_data["included"]:
-                tiers.append(tier["attributes"]["title"])
+            tiers = dict()
+            for relationship in membership_data["included"]:
+                if relationship["type"] == "tier":
+                    tiers[relationship["id"]] = relationship["attributes"]["title"]
+
+            campaign_id = membership_data["relationships"]["campaign"]["data"]["id"]
 
             data = {
+                "campaign_id": campaign_id,
                 "tiers": tiers,
                 "currently_entitled_amount_cents": membership_data["data"]["attributes"][
                     "currently_entitled_amount_cents"

@@ -8,11 +8,13 @@ from app.core.bot import BaseBotClient
 from app.core.http_client import HttpClient
 from app.core.models import RoomSpecificData, UserData
 from app.github.github_api import GithubAPI
+from app.patreon.patreon_api import PatreonAPI
 
 
 class RegisteredUser:
     def __init__(self, user_data: UserData, http_client: HttpClient, default_role: str):
         self.github_username = user_data.content.github.username
+        self.patreon_username = user_data.content.patreon.email
 
         if self.github_username is not None:
             gh = gidgethub.aiohttp.GitHubAPI(
@@ -25,6 +27,13 @@ class RegisteredUser:
                 gh=gh,
                 username=self.github_username,
                 default_role=default_role,
+            )
+
+        if self.patreon_username is not None:
+            self.patreon_api = PatreonAPI(
+                email=self.patreon_username,
+                access_token=user_data.content.patreon.access_token,
+                session=http_client.session,
             )
 
 
@@ -217,6 +226,40 @@ class BackgroundValidater:
                 and user_conditions.sponsorship_tiers[sponsoring_tier]
             ):
                 return True
+
+        return False
+
+    async def check_patreon_conditions(
+        self, user_id: str, room_specific_data: RoomSpecificData
+    ) -> bool:
+        """
+        Method which validates a user's room membership based on a list of patreon campaign conditions set by the room admin.
+        """
+        campaign_conditions = room_specific_data.content.patreon.campaigns
+
+        # If there are no conditions present
+        if len(campaign_conditions) == 0:
+            return True
+
+        # If the user didn't register with patreon.
+        if self.registered_users[user_id].patreon_username is None:
+            return False
+
+        patreon_api = self.registered_users[user_id].patreon_api
+
+        memerships_list = await patreon_api.user_memberships()
+
+        for member_id in memerships_list:
+            membership_data = await patreon_api.membership_details(member_id)
+            campaign_id = membership_data["campaign_id"]
+
+            if campaign_id in campaign_conditions:
+                for tier_id in membership_data["tiers"]:
+                    if (
+                        tier_id in campaign_conditions[campaign_id].tiers
+                        and campaign_conditions[campaign_id].tiers[tier_id].is_enabled
+                    ):
+                        return True
 
         return False
 
