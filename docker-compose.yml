@@ -3,7 +3,10 @@ version: '3.8'
 services:
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        CONFIG_FILE: config.yml #replace with your own config file
     volumes:
       - ./backend:/backend
     expose:

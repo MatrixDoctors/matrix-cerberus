@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import yaml
@@ -11,7 +12,10 @@ from app.matrix.background_validator import BackgroundValidater
 
 
 class AppState:
-    def __init__(self, settings_file: str = "config.yml"):
+    def __init__(self):
+        # Variables which dosen't store state will be initialised here (except for settings).
+        settings_file = os.getenv("CONFIG_FILE", "config.sample.yml")
+
         self.settings = self.get_settings_from_yaml(settings_file)
         self.session_storage = RedisSessionStorage(self.settings.redis.uri)
         self.server_session = SessionCookie(
