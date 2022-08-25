@@ -2,19 +2,19 @@ import re
 from pathlib import Path
 
 import yaml
-from pydantic import BaseSettings, RedisDsn, root_validator, validator
+from pydantic import BaseModel, BaseSettings, RedisDsn, root_validator, validator
 
 
-class RedisSettings(BaseSettings):
+class RedisSettings(BaseModel):
     uri: RedisDsn
 
 
-class ServerSessionsSettings(BaseSettings):
+class ServerSessionsSettings(BaseModel):
     session_key: str
     expires_in: int
 
 
-class MatrixBotSettings(BaseSettings):
+class MatrixBotSettings(BaseModel):
     homeserver: str
     access_token: str
     min_power_level: int
@@ -31,17 +31,35 @@ class MatrixBotSettings(BaseSettings):
         return values
 
 
-class GitHubAppCredentials(BaseSettings):
+class GitHubAppCredentials(BaseModel):
     client_id: str
     client_secret: str
     redirect_uri: str
     organisation_membership: str
 
 
-class PatreonAppCredentials(BaseSettings):
+class PatreonAppCredentials(BaseModel):
     client_id: str
     client_secret: str
     redirect_uri: str
+
+
+class LoggerSettings(BaseModel):
+    path: str
+    filename: str
+    rotation: str
+    retention: str
+    filepath: str = None
+
+    @validator("filepath", always=True)
+    def validate_filepath(cls, v, values):
+        path_to_file_directory = Path(values["path"]).absolute()
+        path_to_file = Path.joinpath(path_to_file_directory, values["filename"])
+
+        if path_to_file_directory.exists():
+            return str(path_to_file)
+        else:
+            raise ValueError("Path does not exist.")
 
 
 class Settings(BaseSettings):
@@ -52,6 +70,7 @@ class Settings(BaseSettings):
     matrix_bot: MatrixBotSettings
     github: GitHubAppCredentials
     patreon: PatreonAppCredentials
+    logging: LoggerSettings
 
     # Used to convert the dicitonary received from the root_validator of MatrixBotSettings class to an instance of the latter.
     @validator("matrix_bot")

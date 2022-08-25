@@ -35,3 +35,9 @@ patreon:
   client_id: client_id_token
   client_secret: client_secret
   redirect_uri: http://localhost:80/oauth2/patreon
+
+logging:
+  path: "./logs"
+  filename: "out.log"
+  rotation: 20 days
+  retention: 1 months
