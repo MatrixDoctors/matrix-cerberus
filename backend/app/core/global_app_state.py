@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import yaml
+from loguru import logger
 
 from app.core.background_runner import MatrixBotBackgroundRunner
 from app.core.bot import BaseBotClient
@@ -9,6 +10,8 @@ from app.core.config import Settings
 from app.core.http_client import HttpClient
 from app.core.sessions import RedisSessionStorage, SessionCookie
 from app.matrix.background_validator import BackgroundValidater
+
+logger.add("out.log", format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}")
 
 
 class AppState:
@@ -81,4 +84,4 @@ class AppState:
                 yaml_settings = yaml.safe_load(f)
                 return Settings.parse_obj(yaml_settings)
         except (IOError, ImportError) as err:
-            print(f"Couldn't load config from file. Error: {err}")
+            logger.error(f"Couldn't load config from file. Error: {err}")
