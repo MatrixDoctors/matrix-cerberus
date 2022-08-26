@@ -24,6 +24,7 @@ class AppState:
             filepath=self.settings.logging.filepath,
             rotation=self.settings.logging.rotation,
             retention=self.settings.logging.retention,
+            use_stdout=self.settings.logging.use_stdout,
         )
         self.session_storage = RedisSessionStorage(self.settings.redis.uri)
         self.server_session = SessionCookie(

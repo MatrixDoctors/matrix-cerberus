@@ -49,10 +49,14 @@ class LoggerSettings(BaseModel):
     filename: str
     rotation: str
     retention: str
+    use_stdout: bool
     filepath: str = None
 
     @validator("filepath", always=True)
     def validate_filepath(cls, v, values):
+        if values["use_stdout"]:
+            return v
+
         path_to_file_directory = Path(values["path"]).absolute()
         path_to_file = Path.joinpath(path_to_file_directory, values["filename"])
 

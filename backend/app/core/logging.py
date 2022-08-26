@@ -1,5 +1,6 @@
 # This code has been taken taken from https://gist.github.com/nkhitrov/a3e31cfcc1b19cba8e1b626276148c49.
 
+import sys
 import logging
 from pprint import pformat
 
@@ -48,7 +49,7 @@ def format_record(record: dict) -> str:
     return format_string
 
 
-def setup_logging(filepath: str, rotation: str, retention: str):
+def setup_logging(filepath: str, rotation: str, retention: str, use_stdout: bool):
 
     # disable handlers for specific uvicorn loggers
     # to redirect their output to the default uvicorn logger
@@ -68,15 +69,18 @@ def setup_logging(filepath: str, rotation: str, retention: str):
         _logger.handlers = [InterceptHandler()]
 
     # configure loguru
-    logger.configure(
-        handlers=[
-            {
-                "sink": filepath,
-                "rotation": rotation,
-                "retention": retention,
-                "enqueue": True,
-                "level": logging.INFO,
-                "format": format_record,
-            }
-        ]
-    )
+    if use_stdout:
+        logger.add(sink=sys.stdout, level=logging.INFO, format=format_record)
+    else:
+        logger.configure(
+            handlers=[
+                {
+                    "sink": filepath,
+                    "rotation": rotation,
+                    "retention": retention,
+                    "enqueue": True,
+                    "level": logging.INFO,
+                    "format": format_record,
+                }
+            ]
+        )

@@ -6,9 +6,9 @@ services:
     build:
       context: ./backend
       args:
-        CONFIG_FILE: config.yml #replace with your own config file
+        CONFIG_FILE: config.yml # Replace with your own config file
     volumes:
-      - ./backend:/backend
+      # To persist logs in the host system
       - ./backend/logs:/backend/logs
     expose:
       - 8000
