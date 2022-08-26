@@ -9,6 +9,7 @@ services:
         CONFIG_FILE: config.yml #replace with your own config file
     volumes:
       - ./backend:/backend
+      - ./backend/logs:/backend/logs
     expose:
       - 8000
     depends_on:

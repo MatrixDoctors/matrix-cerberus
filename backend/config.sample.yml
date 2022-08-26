@@ -37,7 +37,8 @@ patreon:
   redirect_uri: http://localhost:80/oauth2/patreon
 
 logging:
-  path: "./logs"
+  # Basic Loguru configuration
+  path: "./logs"  # Make sure the directory path exists before running the application
   filename: "out.log"
   rotation: 20 days
   retention: 1 months
