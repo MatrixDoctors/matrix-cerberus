@@ -84,6 +84,7 @@ class BackgroundValidater:
         self.queue_processor_task.cancel()
         logger.success("Background validator has stopped")
 
+    @logger.catch
     async def main_task(self):
         """
         The main background validator task which validates the room memberships of registered users for all the rooms with conditions.

@@ -8,10 +8,9 @@ from app.core.background_runner import MatrixBotBackgroundRunner
 from app.core.bot import BaseBotClient
 from app.core.config import Settings
 from app.core.http_client import HttpClient
+from app.core.logging import setup_logging
 from app.core.sessions import RedisSessionStorage, SessionCookie
 from app.matrix.background_validator import BackgroundValidater
-
-logger.add("out.log", format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}")
 
 
 class AppState:
@@ -20,6 +19,12 @@ class AppState:
         settings_file = os.getenv("CONFIG_FILE", "config.sample.yml")
 
         self.settings = self.get_settings_from_yaml(settings_file)
+
+        setup_logging(
+            filepath=self.settings.logging.filepath,
+            rotation=self.settings.logging.rotation,
+            retention=self.settings.logging.retention,
+        )
         self.session_storage = RedisSessionStorage(self.settings.redis.uri)
         self.server_session = SessionCookie(
             session_storage=self.session_storage,
