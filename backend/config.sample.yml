@@ -28,11 +28,12 @@ github:
   # GitHub OAuth App credentials
   # 'organisation_membership' can be set to 'admin' or 'member'.
   # A room admin can change conditions for an organisation only if they satisfy this membership.
+  # It is recommended to keep it 'admin' for the current version due to reasons mentioned here https://github.com/MatrixDoctors/matrix-cerberus/issues/52.
   #
   client_id: client_id_token
   client_secret: client_secret_token
   redirect_uri: http://localhost:80/oauth2/github
-  organisation_membership: "member"
+  organisation_membership: "admin"
 
 patreon:
   # Patreon OAuth App credentials
