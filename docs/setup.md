@@ -11,10 +11,6 @@ git clone https://github.com/MatrixDoctors/matrix-cerberus.git
 cd matrix-cerberus
 ```
 
-## Development Setup
-
-If you only want to put the application into production, then you can skip this section and go to [production](#production-setup).
-
 
 ## Production Setup
 
@@ -23,7 +19,7 @@ If you only want to put the application into production, then you can skip this 
 First comes the configuration files.
 This contains all of your sensitive data (i.e third party app IDs and secrets), custom configuration, domain address and other essesntial details which will be required to get your app running properly.
 
-List of configuration and environment files:
+List of configuration and environment files for production:
 - `config.yml` for backend
 - `.env.production` for frontend
 - `nginx.conf` in `nginx/prod` for nginx
@@ -45,7 +41,7 @@ You can also optionally edit the `REACT_APP_DEFAULT_HOMESERVER` to view this hom
 
 #### 3) Nginx configuration (nginx.conf)
 
-Copy the `nginx.sample.conf` to a new file `nginx.conf` under the same directory.
+Copy the `nginx.sample.conf` to a new file `nginx.conf` under the same directory (`nginx/prod`).
 
 Edit the `DOMAIN_URL` to the domain url that you intend to host the application on.
 
@@ -93,3 +89,34 @@ docker-compose run --rm certbot renew
 ```
 
 If you run into any issues while setting up https and certbot, do check out the [article](https://mindsers.blog/post/https-using-nginx-certbot-docker/) or join [#matrix-cerberus:cadair.dev](https://matrix.to/#/#matrix-cerberus:cadair.com) so that we can work out a solution together!
+
+### Time to run the application!
+
+Now, that you have everything setup, you can simply start the application by running the commands
+
+```
+docker-compose build
+docker-compose up
+```
+
+## Development Setup
+
+This is for those who intend to contribute to this project (thank you!) or would like to play around a bit with the app by setting it up locally.
+
+### Configuration files
+
+The configuration files are similar to the ones in production except for a few changes.
+
+List of configuration and environment files for development:
+- `config.yml` for backend
+- `.env.development` for frontend
+
+#### 1) Backend configuration (config.yml)
+
+You can follow the same instructions mentioned in [here](#1-backend-configuration-configyml)
+
+#### 2) Frontend configuration (.env.development)
+
+Copy the `.env.test` to a new file `.env.development`.
+
+You can use the same configuration in `.env.test` as is without changing anything.
