@@ -6,14 +6,12 @@ FROM node:16.13.2-alpine
 ENV NODE_ENV development
 
 # set working directory
-WORKDIR /usr/app
+WORKDIR /frontend
 
 # install and cache app dependencies
-COPY package.json .
-COPY package-lock.json .
+COPY package.json /frontend
+COPY package-lock.json /frontend
 RUN npm ci && npm cache clean --force
-
-COPY . .
 
 # start app
 CMD ["npm", "run", "start"]

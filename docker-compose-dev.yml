@@ -5,10 +5,13 @@ services:
   backend:
     build:
       context: ./backend
+    # Override the command provided in dockerfile to support hot reloads
+    command: uvicorn app.main:app --reload --proxy-headers --host 0.0.0.0 --port 8000
     volumes:
       # To persist logs in the host system
       - ./backend/logs:/backend/logs
       - ./backend/config.yml:/backend/config.yml
+      - ./backend:/backend
     expose:
       - 8000
     depends_on:
