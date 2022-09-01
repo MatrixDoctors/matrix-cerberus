@@ -61,6 +61,7 @@ class AppState:
             bot_client=self.bot_client,
             http_client=self.http_client,
             github_default_role=self.settings.github.organisation_membership,
+            bg_validation_cooldown=self.settings.matrix_bot.bg_validation_cooldown,
         )
         await self.background_validator.create_background_task()
 
