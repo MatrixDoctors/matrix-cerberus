@@ -14,7 +14,7 @@
 
 ## Documentation
 
-You can find the documentation here.
+You can find the documentation [here](https://matrixdoctors.github.io/matrix-cerberus/).
 
 
 ## Contact Us
