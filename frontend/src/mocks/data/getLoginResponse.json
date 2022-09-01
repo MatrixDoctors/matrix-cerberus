@@ -1,0 +1,30 @@
+{
+    "flows": [
+      {
+        "type": "m.login.sso",
+        "identity_providers": [
+          {
+            "id": "oidc-github",
+            "name": "GitHub",
+            "icon": "mxc://matrix.org/sVesTtrFDTpXRbYfpahuJsKP",
+            "brand": "github"
+          },
+          {
+            "id": "oidc-google",
+            "name": "Google",
+            "icon": "mxc://matrix.org/ZlnaaZNPxtUuQemvgQzlOlkz",
+            "brand": "google"
+          }
+        ]
+      },
+      {
+        "type": "m.login.token"
+      },
+      {
+        "type": "m.login.password"
+      },
+      {
+        "type": "m.login.application_service"
+      }
+    ]
+  }

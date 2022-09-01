@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import {Helmet} from "react-helmet"
 
 import UserField from '../Components/UserField'
 import SSOLogin from '../Components/SSOLogin'
@@ -53,7 +54,6 @@ export default function Login() {
 			try {
 				const baseUrl = validateAndReturnUrl(homeServer);
 				let response = await new MatrixApi(baseUrl).getLogin();
-
 				let listOfSSOProviders = [];
 				for(let flowItem of response.data.flows){
 					if(flowItem.type === 'm.login.sso'){
@@ -183,6 +183,10 @@ export default function Login() {
 
     return (
 	<div>
+		<Helmet>
+			<title>Login - MatrixCerberus</title>
+        </Helmet>
+
 		<section className="fixed w-full h-full top-0 bg-dark-ash" >
 
 			<div className="text-gray-300 hover:text-white px-4 py-4 font-bold">
@@ -202,7 +206,7 @@ export default function Login() {
 								</div>
 
 								{/* Error Message Display */}
-								<div className="text-center mb-3">
+								<div className="text-center mb-3" aria-label={errorMessage !== '' ? 'Error' : "No Error"}>
 									<p className="text-red-600 text-sm">
 										{errorMessage}
 									</p>
@@ -227,14 +231,13 @@ export default function Login() {
 									<div className="w-full mb-3">
 										<label
 										className="block text-gray-700 text-sm font-bold mb-2"
-										htmlFor="grid-password"
+										htmlFor="homeserver"
 										>
-										Homeserver
-										{/* border-0 px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full disabled:opacity-50 */}
+											Homeserver
 										</label>
 										<div className='flex items-center justify-between w-full no-overflow'>
 											<input
-											type="homeserver"
+											id="homeserver"
 											className="field-input w-3/4"
 											value={inputHomeServer}
 											style={styles}
@@ -260,12 +263,13 @@ export default function Login() {
 									<div className="flex items-center justify-between w-full my-4">
 										<label
 											className="block text-gray-700 text-xs"
-											htmlFor="grid-password"
+											htmlFor="select-user-field"
 										>
 											Sign in with
 										</label>
 										<div className="">
 											<select
+											id="select-user-field"
 											disabled={disableFields}
 											value={fieldType}
 											onChange={(e) => setFieldType(e.target.value)}
@@ -284,6 +288,7 @@ export default function Login() {
 									<div className="w-full mb-3">
 										<input
 										disabled={disableFields}
+										data-testid="password"
 										type="password"
 										className='field-input w-full'
 										placeholder="Password"

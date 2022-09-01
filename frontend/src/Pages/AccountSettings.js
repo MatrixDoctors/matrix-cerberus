@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import Helmet from 'react-helmet';
 import { GlobalContext } from '../GlobalContext';
 import axios from '../HelperFunctions/customAxios';
 
@@ -19,6 +20,10 @@ export default function AccountSettings() {
 
 	return (
 		<div>
+			<Helmet>
+				<title>Accounts - MatrixCerberus</title>
+        	</Helmet>
+
 			<div className="flex items-center w-full h-48 py-5 shadow-lg bg-dark-eye" >
 				<div className='flex items-center justify-center w-full sm:w-1/3'>
 					<div className='relative bottom-5 font-bold text-3xl my-5 px-3 sm:px-0 text-gray-200'>
