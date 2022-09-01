@@ -36,11 +36,16 @@ class RegisteredRoom:
 
 class BackgroundValidater:
     def __init__(
-        self, bot_client: BaseBotClient, http_client: HttpClient, github_default_role: str
+        self,
+        bot_client: BaseBotClient,
+        http_client: HttpClient,
+        github_default_role: str,
+        bg_validation_cooldown: int,
     ):
         self.client = bot_client
         self.http_client = http_client
         self.github_default_role = github_default_role
+        self.bg_validation_cooldown = bg_validation_cooldown
 
         self.registered_users: Dict[str, RegisteredUser] = dict()
 
@@ -50,7 +55,7 @@ class BackgroundValidater:
         self.rooms_with_conditions: Dict[str, RegisteredRoom] = dict()
 
         # Set of rooms where the bot has invite and kick permissions.
-        self.rooms_with_mod_permissions: Set[str] = {}
+        self.rooms_with_mod_permissions: Set[str] = set()
 
         # Queue to keep track of rooms whose permissions are recently modified.
         self.queue = asyncio.Queue()
@@ -79,8 +84,7 @@ class BackgroundValidater:
             for room_id in self.rooms_with_conditions.keys():
                 for user_id in self.registered_users.keys():
                     await self.validate_room_membership_of_user(room_id, user_id)
-                    await asyncio.sleep(1)
-            await asyncio.sleep(10)
+            await asyncio.sleep(self.bg_validation_cooldown)
 
     async def process_queue(self):
         """
@@ -147,7 +151,6 @@ class BackgroundValidater:
             return
 
         await self.send_next_state_event(room_id, user_id, next_state)
-        await asyncio.sleep(1)
 
     async def fetch_rooms_and_users(self):
         """
@@ -160,6 +163,7 @@ class BackgroundValidater:
         resp = await self.client.get_account_data("global_data")
 
         # User Data
+
         for user_id in resp.content.users:
             user_data = await self.client.get_account_data("user", user_id=user_id)
             self.registered_users[user_id] = RegisteredUser(
@@ -168,10 +172,11 @@ class BackgroundValidater:
                 default_role=self.github_default_role,
             )
 
-            # Cache the mapping github id and matrix id
+            # Cache the mapping between github id and matrix id
             self.github_id_to_matrix_id[user_data.content.github.username] = user_id
 
         # Room Data
+
         self.rooms_with_mod_permissions = await self.client.get_rooms_with_mod_permissions(
             self.client.user_id
         )
