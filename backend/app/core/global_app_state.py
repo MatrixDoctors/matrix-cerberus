@@ -35,7 +35,7 @@ class AppState:
 
     async def setup_state(self):
         await self.http_client.start_session()
-        self.matrix_bot_runner.create_background_task()
+        await self.matrix_bot_runner.create_background_task()
 
     async def close(self):
         await self.http_client.stop_session()
