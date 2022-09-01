@@ -18,4 +18,4 @@ You can find the documentation [here](https://matrixdoctors.github.io/matrix-cer
 
 
 ## Contact Us
-If you have any ideas that you want to share or have any queries then feel free to join the public room [#matrix-cerberus:cadair.dev](https://matrix.to/#/#matrix-cerberus:cadair.com)
+If you have any ideas that you want to share or have any queries then feel free to join the public room [#matrix-cerberus:cadair.com](https://matrix.to/#/#matrix-cerberus:cadair.com)
