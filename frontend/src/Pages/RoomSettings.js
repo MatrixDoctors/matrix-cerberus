@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from "prop-types"
 import axios from '../HelperFunctions/customAxios'
+import { useNavigate } from 'react-router-dom'
 
 const TableHeader = ({ colValue }) => {
   return (
@@ -15,10 +16,14 @@ TableHeader.propTypes = {
 }
 
 const TableRows =  ({ rowValue }) => {
+  const navigate = useNavigate();
   return (
-    <tr className="border-b transition duration-300 ease-in-out hover:bg-gray-200">
+    <tr
+    className="cursor-pointer border-b transition duration-300 ease-in-out hover:bg-gray-200"
+    onClick={() => navigate(`/rooms/${rowValue.roomId}`)}
+    >
       <td className="px-6 py-4 whitespace-nowrap text-md font-medium text-gray-900">
-        {rowValue.id}
+        {rowValue.id + 1}
       </td>
       <td className="text-md text-gray-900 font-light px-6 py-4 whitespace-nowrap">
         {rowValue.roomAlias}
@@ -45,18 +50,15 @@ export default function RoomSettings() {
 
   useEffect( () => {
     async function fetchRoomData() {
-      const resp = await axios.get('api/users/room-list');
+      const resp = await axios.get('/api/users/room-list');
       const data = resp.data.content;
 
-      let roomData = [], index=1;
-      for(let key in data){
-        roomData.push({
-          id: index,
-          roomAlias: data[key],
-          roomId: key
-        })
-        index += 1;
-      }
+      const roomData = Object.entries(data).map( ([roomId, roomAlias], id) => ({
+        id,
+        roomAlias,
+        roomId
+      }));
+
       setRoomBodyData(roomData);
     }
     fetchRoomData();

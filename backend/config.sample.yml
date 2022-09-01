@@ -17,6 +17,7 @@ server_sessions:
 matrix_bot:
   homeserver: "https://example.org"
   access_token: some_access_token
+  min_power_level: 50
 
 github:
 # GitHub config which consists of the registered OAuth app credentials

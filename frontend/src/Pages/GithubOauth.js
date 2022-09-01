@@ -19,7 +19,7 @@ export default function GithubOauth() {
 
     useEffect( () => {
         async function sendCode(){
-            await axios.post('api/github/login', {
+            await axios.post('/api/github/login', {
                 "code": loginCode
             })
             .catch( (err) => {
