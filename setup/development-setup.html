@@ -139,6 +139,19 @@
                     <main>
                         <h1 id="development-setup"><a class="header" href="#development-setup">Development Setup</a></h1>
 <p>This is for those who intend to contribute to this project (thank you!) or would like to play around a bit with the app by setting it up locally.</p>
+<h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
+<ul>
+<li>Docker is installed, signed in and running.
+<ul>
+<li>Link to installation - https://docs.docker.com/engine/install/</li>
+</ul>
+</li>
+<li>Docker compose is installed
+<ul>
+<li>Link to installation - https://docs.docker.com/compose/install/</li>
+</ul>
+</li>
+</ul>
 <h2 id="configuration-files"><a class="header" href="#configuration-files">Configuration files</a></h2>
 <p>The configuration files are similar to the ones in production except for a few changes.</p>
 <p>List of configuration and environment files for development:</p>
@@ -147,13 +160,28 @@
 <li><code>.env.development</code> for frontend</li>
 </ul>
 <h3 id="1-backend-configuration-configyml"><a class="header" href="#1-backend-configuration-configyml">1) Backend configuration (config.yml)</a></h3>
-<p>You can follow the same instructions mentioned in <a href="#1-backend-configuration-configyml">here</a></p>
+<p>Copy the <code>config.sample.yml</code> to a new file <code>config.yml</code> and edit the configuration as mentioned in the file.</p>
+<p>The current <code>config.sample.yml</code> file is configured to be used by the backend tests to test its interactions and functionality.</p>
 <h3 id="2-frontend-configuration-envdevelopment"><a class="header" href="#2-frontend-configuration-envdevelopment">2) Frontend configuration (.env.development)</a></h3>
 <p>Copy the following into a new file <code>.env.development</code>.</p>
 <pre><code>REACT_APP_BASE_URL=http://localhost:80
 REACT_APP_DEFAULT_HOMESERVER=https://matrix.org
 WDS_SOCKET_PORT=0
 </code></pre>
+<p><strong>Note:</strong>
+The last variable <code>WDS_SOCKET_PORT</code> is used to avoid the following error.</p>
+<pre><code>Browser can’t establish a connection to the server at ws://localhost:3000/ws.
+</code></pre>
+<p>We lose the hot reloading feature in this case. You can find more details about it <a href="https://github.com/facebook/create-react-app/issues/11779">here</a>.</p>
+<h2 id="running-the-application"><a class="header" href="#running-the-application">Running the application</a></h2>
+<p>There are two different <code>docker-compose</code> files available, one for development (<code>docker-compose-dev.yml</code>) and one for production (<code>docker-compose.yml</code>).</p>
+<p>By default, docker-compose uses the <code>docker-compose.yml</code> file.
+Use the <code>-f</code> flag to specify the filename</p>
+<p>Run the following commands to start the application</p>
+<pre><code>docker-compose -f docker-compose-dev.yml build
+docker-compose -f docker-compose-dev.yml up
+</code></pre>
+<p>You can find the application hosted here <a href="http://localhost:80/">localhost:80/</a></p>
 
                     </main>
 

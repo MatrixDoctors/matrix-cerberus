@@ -172,6 +172,19 @@ cd matrix-cerberus
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="development-setup"><a class="header" href="#development-setup">Development Setup</a></h1>
 <p>This is for those who intend to contribute to this project (thank you!) or would like to play around a bit with the app by setting it up locally.</p>
+<h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
+<ul>
+<li>Docker is installed, signed in and running.
+<ul>
+<li>Link to installation - https://docs.docker.com/engine/install/</li>
+</ul>
+</li>
+<li>Docker compose is installed
+<ul>
+<li>Link to installation - https://docs.docker.com/compose/install/</li>
+</ul>
+</li>
+</ul>
 <h2 id="configuration-files"><a class="header" href="#configuration-files">Configuration files</a></h2>
 <p>The configuration files are similar to the ones in production except for a few changes.</p>
 <p>List of configuration and environment files for development:</p>
@@ -180,17 +193,48 @@ cd matrix-cerberus
 <li><code>.env.development</code> for frontend</li>
 </ul>
 <h3 id="1-backend-configuration-configyml"><a class="header" href="#1-backend-configuration-configyml">1) Backend configuration (config.yml)</a></h3>
-<p>You can follow the same instructions mentioned in <a href="setup/development-setup.html#1-backend-configuration-configyml">here</a></p>
+<p>Copy the <code>config.sample.yml</code> to a new file <code>config.yml</code> and edit the configuration as mentioned in the file.</p>
+<p>The current <code>config.sample.yml</code> file is configured to be used by the backend tests to test its interactions and functionality.</p>
 <h3 id="2-frontend-configuration-envdevelopment"><a class="header" href="#2-frontend-configuration-envdevelopment">2) Frontend configuration (.env.development)</a></h3>
 <p>Copy the following into a new file <code>.env.development</code>.</p>
 <pre><code>REACT_APP_BASE_URL=http://localhost:80
 REACT_APP_DEFAULT_HOMESERVER=https://matrix.org
 WDS_SOCKET_PORT=0
 </code></pre>
+<p><strong>Note:</strong>
+The last variable <code>WDS_SOCKET_PORT</code> is used to avoid the following error.</p>
+<pre><code>Browser can’t establish a connection to the server at ws://localhost:3000/ws.
+</code></pre>
+<p>We lose the hot reloading feature in this case. You can find more details about it <a href="https://github.com/facebook/create-react-app/issues/11779">here</a>.</p>
+<h2 id="running-the-application"><a class="header" href="#running-the-application">Running the application</a></h2>
+<p>There are two different <code>docker-compose</code> files available, one for development (<code>docker-compose-dev.yml</code>) and one for production (<code>docker-compose.yml</code>).</p>
+<p>By default, docker-compose uses the <code>docker-compose.yml</code> file.
+Use the <code>-f</code> flag to specify the filename</p>
+<p>Run the following commands to start the application</p>
+<pre><code>docker-compose -f docker-compose-dev.yml build
+docker-compose -f docker-compose-dev.yml up
+</code></pre>
+<p>You can find the application hosted here <a href="http://localhost:80/">localhost:80/</a></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="production-setup"><a class="header" href="#production-setup">Production Setup</a></h1>
-<h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
-<p>The entire matrix-cerberus project is containerized with docker.
-You should have the following dependencies installed</p>
+<h2 id="requirements-1"><a class="header" href="#requirements-1">Requirements</a></h2>
+<ul>
+<li>Access to a local machine or development server as a non-root user with sudo privileges</li>
+<li>Docker is installed, signed in and running.
+<ul>
+<li>Installation link: https://docs.docker.com/engine/install/</li>
+</ul>
+</li>
+<li>Docker compose is installed
+<ul>
+<li>Installation link: https://docs.docker.com/compose/install/</li>
+</ul>
+</li>
+<li>Node.js and npm installed
+<ul>
+<li>Use <a href="https://github.com/nvm-sh/nvm">nvm</a> to install and manage multiple versions easily.</li>
+</ul>
+</li>
+</ul>
 <h2 id="configuration-files-1"><a class="header" href="#configuration-files-1">Configuration files</a></h2>
 <p>First comes the configuration files.
 This contains all of your sensitive data (i.e third party app IDs and secrets), custom configuration, domain address and other essesntial details which will be required to get your app running properly.</p>
@@ -201,8 +245,7 @@ This contains all of your sensitive data (i.e third party app IDs and secrets), 
 <li><code>nginx.conf</code> in <code>nginx/prod</code> for nginx</li>
 </ul>
 <h3 id="1-backend-configuration-configyml-1"><a class="header" href="#1-backend-configuration-configyml-1">1) Backend configuration (config.yml)</a></h3>
-<p>Copy the <code>config.sample.yml</code> to a new file <code>config.yml</code> and edit the configuration as mentioned in the file.</p>
-<p>The current <code>config.sample.yml</code> file is configured to be used by the backend tests to test its interactions and functionality.</p>
+<p>You can follow the same instructions mentioned in <a href="setup/./development-setup.html#1-backend-configuration-configyml">here</a></p>
 <h3 id="2-frontend-configuration-envproduction"><a class="header" href="#2-frontend-configuration-envproduction">2) Frontend configuration (.env.production)</a></h3>
 <p>Copy the <code>.env.test</code> to a new file <code>.env.production</code>.</p>
 <p>Edit the <code>REACT_APP_BASE_URL</code> to the domain url that you intend to host the application on.</p>
@@ -238,13 +281,48 @@ Please check out <a href="https://letsencrypt.org/docs/rate-limits/">https://let
 <p>The generated certificates are only valid for 3 months. To renew the certificates run the command</p>
 <pre><code>docker-compose run --rm certbot renew
 </code></pre>
-<p>If you run into any issues while setting up https and certbot, do check out the <a href="https://mindsers.blog/post/https-using-nginx-certbot-docker/">article</a> or join <a href="https://matrix.to/#/#matrix-cerberus:cadair.com">#matrix-cerberus:cadair.dev</a> so that we can work out a solution together!</p>
+<p>If you run into any issues while setting up https and certbot, do check out this <a href="https://mindsers.blog/post/https-using-nginx-certbot-docker/">article</a> or join <a href="https://matrix.to/#/#matrix-cerberus:cadair.com">#matrix-cerberus:cadair.dev</a> so that we can work out a solution together!</p>
+<h2 id="build-the-react-frontend"><a class="header" href="#build-the-react-frontend">Build the React frontend</a></h2>
+<p>To use the frontend code in production, we'll have to use the optimized build produced by the <code>react-scripts</code> from create-react-app.</p>
+<p>But we first need to install the packages before we start building the code.</p>
+<pre><code>cd frontend/
+npm install
+</code></pre>
+<p>After the packages have been installed, we can simply run</p>
+<pre><code>npm run build
+</code></pre>
+<p>and we will find a new <code>build/</code> directory created.</p>
+<p>This will later be served by <a href="https://www.nginx.com/resources/wiki/">Nginx</a> to the clients requesting it.</p>
 <h2 id="time-to-run-the-application"><a class="header" href="#time-to-run-the-application">Time to run the application!</a></h2>
 <p>Now, that you have everything setup, you can simply start the application by running the commands</p>
 <pre><code>docker-compose build
 docker-compose up
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="testing"><a class="header" href="#testing">Testing</a></h1>
+<p>Currently, there is no support for running tests in docker. So, you will have to setup the dependencies in your system manually.</p>
+<h2 id="requirements-2"><a class="header" href="#requirements-2">Requirements</a></h2>
+<ul>
+<li><a href="https://redis.io/">Redis</a> is installed and running
+<ul>
+<li>Installation link: https://redis.io/docs/getting-started/installation/install-redis-on-linux/</li>
+</ul>
+</li>
+<li>It is recommended to use <code>venv</code> (virtual environment) to install the project depenendencies. This helps avoid conflicts globally.</li>
+</ul>
+<h2 id="backend-tests"><a class="header" href="#backend-tests">Backend tests</a></h2>
+<p>We use <code>pytest</code> to test our backend framework.
+Run the following commands to start running all the tests</p>
+<pre><code>cd backend/
+pytest
+</code></pre>
+<p><strong>Note:</strong>
+Make sure to activate the virtual environment incase you are using before you run the above commands.</p>
+<h2 id="frontend-tests"><a class="header" href="#frontend-tests">Frontend tests</a></h2>
+<p>We use the testing framework provided by the <a href="https://www.google.com/search?channel=fs&amp;client=ubuntu&amp;q=react+testing+library">react-testing-library</a> and Jest runner to test the frontend code.</p>
+<p>Run the following commands to start the tests</p>
+<pre><code>cd frontend/
+npm run test
+</code></pre>
 
                     </main>
 
