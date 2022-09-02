@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="setup.html" class="active"><strong aria-hidden="true">2.</strong> Installation and Setup</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="setup.html" class="active"><strong aria-hidden="true">2.</strong> Installation and Setup</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="setup/development-setup.html"><strong aria-hidden="true">2.1.</strong> Development Setup</a></li><li class="chapter-item expanded "><a href="setup/production-setup.html"><strong aria-hidden="true">2.2.</strong> Production Setup</a></li><li class="chapter-item expanded "><a href="setup/testing.html"><strong aria-hidden="true">2.3.</strong> Testing</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -144,74 +144,13 @@
 <pre><code class="language-bash">git clone https://github.com/MatrixDoctors/matrix-cerberus.git
 cd matrix-cerberus
 </code></pre>
-<h2 id="production-setup"><a class="header" href="#production-setup">Production Setup</a></h2>
-<h3 id="configuration-files"><a class="header" href="#configuration-files">Configuration files</a></h3>
-<p>First comes the configuration files.
-This contains all of your sensitive data (i.e third party app IDs and secrets), custom configuration, domain address and other essesntial details which will be required to get your app running properly.</p>
-<p>List of configuration and environment files for production:</p>
+<h2 id="project-setup"><a class="header" href="#project-setup">Project Setup</a></h2>
+<p>Follow these instructions to setup the project depending on your requirements:</p>
 <ul>
-<li><code>config.yml</code> for backend</li>
-<li><code>.env.production</code> for frontend</li>
-<li><code>nginx.conf</code> in <code>nginx/prod</code> for nginx</li>
+<li>For local development/setup: <a href="./setup/development-setup.html">development-setup.md</a></li>
+<li>For production setup: <a href="./setup/production-setup.html">production-setup.md</a></li>
+<li>To test the changes locally: <a href="./setup/testing.html">testing.md</a></li>
 </ul>
-<h4 id="1-backend-configuration-configyml"><a class="header" href="#1-backend-configuration-configyml">1) Backend configuration (config.yml)</a></h4>
-<p>Copy the <code>config.sample.yml</code> to a new file <code>config.yml</code> and edit the configuration as mentioned in the file.</p>
-<p>The current <code>config.sample.yml</code> file is configured to be used by the backend tests to test its interactions and functionality.</p>
-<h4 id="2-frontend-configuration-envproduction"><a class="header" href="#2-frontend-configuration-envproduction">2) Frontend configuration (.env.production)</a></h4>
-<p>Copy the <code>.env.test</code> to a new file <code>.env.production</code>.</p>
-<p>Edit the <code>REACT_APP_BASE_URL</code> to the domain url that you intend to host the application on.</p>
-<p>You can also optionally edit the <code>REACT_APP_DEFAULT_HOMESERVER</code> to view this homeserver by default when the login page loads for the first time.</p>
-<h4 id="3-nginx-configuration-nginxconf"><a class="header" href="#3-nginx-configuration-nginxconf">3) Nginx configuration (nginx.conf)</a></h4>
-<p>Copy the <code>nginx.sample.conf</code> to a new file <code>nginx.conf</code> under the same directory (<code>nginx/prod</code>).</p>
-<p>Edit the <code>DOMAIN_URL</code> to the domain url that you intend to host the application on.</p>
-<h3 id="how-to-issue-ssl-certificates-for-your-domain"><a class="header" href="#how-to-issue-ssl-certificates-for-your-domain">How to issue SSL certificates for your domain?</a></h3>
-<p>It is very important to make sure that the application supports HTTPS requests to protect the website and its users from other external factors.</p>
-<p>In the docker compose <a href="../docker-compose.yml">file</a>, we've mapped the the local files in certbot directory with other directories which belong to the nginx docker container.</p>
-<p>This is to ensure that we keep using the same SSL certificates that has been generated the first time this app has been setup and also to share the data between two different containers i.e. nginx and certbot.</p>
-<pre><code>  nginx:
-    image: &quot;nginx:latest&quot;
-    volumes:
-      - ./nginx/prod/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./nginx/prod/corsheaders.conf:/etc/nginx/conf.d/corsheaders.conf:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot/:ro
-      - ./frontend/build:/usr/src/app
-</code></pre>
-<pre><code>certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt:rw
-      - ./certbot/www/:/var/www/certbot/:rw
-</code></pre>
-<p>Run the following command to fill the <code>certbot</code> directory with certificates.</p>
-<pre><code class="language-bash">docker-compose run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ -d {DOMAIN_URL}
-</code></pre>
-<p><strong>Note:</strong>
-There is a limit to how many certificates can be generated per registered domain. (It is 50 per week)
-Please check out <a href="https://letsencrypt.org/docs/rate-limits/">https://letsencrypt.org/docs/rate-limits/</a></p>
-<p>The generated certificates are only valid for 3 months. To renew the certificates run the command</p>
-<pre><code>docker-compose run --rm certbot renew
-</code></pre>
-<p>If you run into any issues while setting up https and certbot, do check out the <a href="https://mindsers.blog/post/https-using-nginx-certbot-docker/">article</a> or join <a href="https://matrix.to/#/#matrix-cerberus:cadair.com">#matrix-cerberus:cadair.dev</a> so that we can work out a solution together!</p>
-<h3 id="time-to-run-the-application"><a class="header" href="#time-to-run-the-application">Time to run the application!</a></h3>
-<p>Now, that you have everything setup, you can simply start the application by running the commands</p>
-<pre><code>docker-compose build
-docker-compose up
-</code></pre>
-<h2 id="development-setup"><a class="header" href="#development-setup">Development Setup</a></h2>
-<p>This is for those who intend to contribute to this project (thank you!) or would like to play around a bit with the app by setting it up locally.</p>
-<h3 id="configuration-files-1"><a class="header" href="#configuration-files-1">Configuration files</a></h3>
-<p>The configuration files are similar to the ones in production except for a few changes.</p>
-<p>List of configuration and environment files for development:</p>
-<ul>
-<li><code>config.yml</code> for backend</li>
-<li><code>.env.development</code> for frontend</li>
-</ul>
-<h4 id="1-backend-configuration-configyml-1"><a class="header" href="#1-backend-configuration-configyml-1">1) Backend configuration (config.yml)</a></h4>
-<p>You can follow the same instructions mentioned in <a href="#1-backend-configuration-configyml">here</a></p>
-<h4 id="2-frontend-configuration-envdevelopment"><a class="header" href="#2-frontend-configuration-envdevelopment">2) Frontend configuration (.env.development)</a></h4>
-<p>Copy the <code>.env.test</code> to a new file <code>.env.development</code>.</p>
-<p>You can use the same configuration in <code>.env.test</code> as is without changing anything.</p>
 
                     </main>
 
@@ -219,6 +158,9 @@ docker-compose up
                         <!-- Mobile navigation buttons -->
                             <a rel="prev" href="index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="setup/development-setup.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
                     </nav>
@@ -228,6 +170,9 @@ docker-compose up
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                     <a rel="prev" href="index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="setup/development-setup.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
 
