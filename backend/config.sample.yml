@@ -15,7 +15,7 @@ server_sessions:
   expires_in: 3600
 
 matrix_bot:
-  # Details of the user account which will be acting as the bot for the application service.
+  # Details of the user account which will be acting as the bot for the application.
   # 'homeserver' is set to the server where the bot account belongs/created.
   # 'min_power_level' corresponds to the minimum power level required for a room member to access the room permissions for a particular room.
   #

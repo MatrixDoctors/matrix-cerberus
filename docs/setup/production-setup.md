@@ -3,8 +3,13 @@ Production Setup
 
 ## Requirements
 
-The entire matrix-cerberus project is containerized with docker.
-You should have the following dependencies installed
+- Access to a local machine or development server as a non-root user with sudo privileges
+- Docker is installed, signed in and running.
+   - Installation link: https://docs.docker.com/engine/install/
+- Docker compose is installed
+  - Installation link: https://docs.docker.com/compose/install/
+- Node.js and npm installed
+  - Use [nvm](https://github.com/nvm-sh/nvm) to install and manage multiple versions easily.
 
 ## Configuration files
 
@@ -19,9 +24,8 @@ List of configuration and environment files for production:
 
 ### 1) Backend configuration (config.yml)
 
-Copy the `config.sample.yml` to a new file `config.yml` and edit the configuration as mentioned in the file.
+You can follow the same instructions mentioned in [here](./development-setup.md#1-backend-configuration-configyml)
 
-The current `config.sample.yml` file is configured to be used by the backend tests to test its interactions and functionality.
 
 ### 2) Frontend configuration (.env.production)
 
@@ -80,7 +84,28 @@ The generated certificates are only valid for 3 months. To renew the certificate
 docker-compose run --rm certbot renew
 ```
 
-If you run into any issues while setting up https and certbot, do check out the [article](https://mindsers.blog/post/https-using-nginx-certbot-docker/) or join [#matrix-cerberus:cadair.dev](https://matrix.to/#/#matrix-cerberus:cadair.com) so that we can work out a solution together!
+If you run into any issues while setting up https and certbot, do check out this [article](https://mindsers.blog/post/https-using-nginx-certbot-docker/) or join [#matrix-cerberus:cadair.dev](https://matrix.to/#/#matrix-cerberus:cadair.com) so that we can work out a solution together!
+
+## Build the React frontend
+
+To use the frontend code in production, we'll have to use the optimized build produced by the `react-scripts` from create-react-app.
+
+But we first need to install the packages before we start building the code.
+
+```
+cd frontend/
+npm install
+```
+
+After the packages have been installed, we can simply run
+
+```
+npm run build
+```
+
+and we will find a new `build/` directory created.
+
+This will later be served by [Nginx](https://www.nginx.com/resources/wiki/) to the clients requesting it.
 
 ## Time to run the application!
 
