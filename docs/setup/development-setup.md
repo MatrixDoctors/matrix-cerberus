@@ -34,6 +34,7 @@ REACT_APP_DEFAULT_HOMESERVER=https://matrix.org
 WDS_SOCKET_PORT=0
 ```
 **Note:**
+
 The last variable `WDS_SOCKET_PORT` is used to avoid the following error.
 ```
 Browser can’t establish a connection to the server at ws://localhost:3000/ws.
@@ -53,4 +54,4 @@ docker-compose -f docker-compose-dev.yml build
 docker-compose -f docker-compose-dev.yml up
 ```
 
-You can find the application hosted here [localhost:80/](http://localhost:80/)
+You can find the application running here [localhost:80/](http://localhost:80/)
