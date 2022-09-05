@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="setup.html"><strong aria-hidden="true">2.</strong> Installation and Setup</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="setup/development-setup.html"><strong aria-hidden="true">2.1.</strong> Development Setup</a></li><li class="chapter-item expanded "><a href="setup/production-setup.html"><strong aria-hidden="true">2.2.</strong> Production Setup</a></li><li class="chapter-item expanded "><a href="setup/testing.html"><strong aria-hidden="true">2.3.</strong> Testing</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="setup.html"><strong aria-hidden="true">2.</strong> Installation and Setup</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="setup/development-setup.html"><strong aria-hidden="true">2.1.</strong> Development Setup</a></li><li class="chapter-item expanded "><a href="setup/production-setup.html"><strong aria-hidden="true">2.2.</strong> Production Setup</a></li><li class="chapter-item expanded "><a href="setup/testing.html"><strong aria-hidden="true">2.3.</strong> Testing</a></li></ol></li><li class="chapter-item expanded "><a href="usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="usage/login.html"><strong aria-hidden="true">3.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="usage/accounts.html"><strong aria-hidden="true">3.2.</strong> Accounts</a></li><li class="chapter-item expanded "><a href="usage/room_settings.html"><strong aria-hidden="true">3.3.</strong> Room Settings</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -201,8 +201,8 @@ cd matrix-cerberus
 REACT_APP_DEFAULT_HOMESERVER=https://matrix.org
 WDS_SOCKET_PORT=0
 </code></pre>
-<p><strong>Note:</strong>
-The last variable <code>WDS_SOCKET_PORT</code> is used to avoid the following error.</p>
+<p><strong>Note:</strong></p>
+<p>The last variable <code>WDS_SOCKET_PORT</code> is used to avoid the following error.</p>
 <pre><code>Browser can’t establish a connection to the server at ws://localhost:3000/ws.
 </code></pre>
 <p>We lose the hot reloading feature in this case. You can find more details about it <a href="https://github.com/facebook/create-react-app/issues/11779">here</a>.</p>
@@ -214,7 +214,7 @@ Use the <code>-f</code> flag to specify the filename</p>
 <pre><code>docker-compose -f docker-compose-dev.yml build
 docker-compose -f docker-compose-dev.yml up
 </code></pre>
-<p>You can find the application hosted here <a href="http://localhost:80/">localhost:80/</a></p>
+<p>You can find the application running here <a href="http://localhost:80/">localhost:80/</a></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="production-setup"><a class="header" href="#production-setup">Production Setup</a></h1>
 <h2 id="requirements-1"><a class="header" href="#requirements-1">Requirements</a></h2>
 <ul>
@@ -323,6 +323,44 @@ Make sure to activate the virtual environment incase you are using before you ru
 <pre><code>cd frontend/
 npm run test
 </code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="usage"><a class="header" href="#usage">Usage</a></h1>
+<p>This page goes over the general usage of the app after it is properly setup.</p>
+<p>You can check out the <a href="./setup.html">Installation and Setup</a> page for more information about hosting and setting up the project.</p>
+<p>This section is further divided into several other subsections based on the different webpages available:</p>
+<ul>
+<li>Login</li>
+<li>Accounts</li>
+<li>Room Settings</li>
+<li>Room</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="login-page"><a class="header" href="#login-page">Login Page</a></h1>
+<p><img src="usage/../assets/login.png" alt="Login" /></p>
+<p><strong>Route</strong>: /login</p>
+<p>This is the first webpage that will be displayed to an <strong>unauthenticated</strong> user.</p>
+<p>The functionality of this webapge is similar to the login page provided by <a href="https://app.element.io/#/login">Element</a>.</p>
+<p>A user can authenticate with the application by logging in to matrix through the following methods:</p>
+<ul>
+<li><a href="https://spec.matrix.org/v1.3/client-server-api/#password-based">Password based</a></li>
+<li><a href="https://spec.matrix.org/v1.3/client-server-api/#single-sign-on">Single Sign-on</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="accounts-page"><a class="header" href="#accounts-page">Accounts Page</a></h1>
+<p><img src="usage/../assets/accounts.png" alt="Accounts" /></p>
+<p><strong>Route</strong>: /</p>
+<p>This is the first webpage that will be displayed to an <strong>authenticated</strong> user.
+<strong>Unauthenticated</strong> users are redirected to the <a href="usage/./login.html">Login</a> page.</p>
+<p>One can view/edit their third party accounts details here.</p>
+<p>To link a different <strong>GitHub</strong>/<strong>Patreon</strong> user account to their current matrix username, one can click on the <strong>Edit</strong> button provided and follow the <strong>OAuth</strong> process to give the application access to the third party account.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="room-settings-page"><a class="header" href="#room-settings-page">Room Settings Page</a></h1>
+<p><img src="usage/../assets/room_settings.png" alt="Room Settings" /></p>
+<p><strong>Route</strong>: /room-settings</p>
+<p>Webpage which displays the rooms for which the current user has permissions to add third party conditions.</p>
+<p>This can be accesible by clicking on the <strong>Room Settings</strong> on the navbar.</p>
+<p>Each row in the table will open a specific <a href="usage/">Rooms</a> webpage by appending <strong>room_id</strong> as a path paramater to the end of <strong>/rooms</strong> route.</p>
+<p>A <strong>room_id</strong> will appear among the list of rooms only if it satisfies the following:</p>
+<ul>
+<li>The current user is a member of the room and has minimum power level.</li>
+<li>Bot is a member of the room and has <strong>invite</strong>, <strong>kick</strong> permissions.</li>
+</ul>
 
                     </main>
 
