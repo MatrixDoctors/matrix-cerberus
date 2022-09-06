@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="setup.html"><strong aria-hidden="true">2.</strong> Installation and Setup</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="setup/development-setup.html"><strong aria-hidden="true">2.1.</strong> Development Setup</a></li><li class="chapter-item expanded "><a href="setup/production-setup.html"><strong aria-hidden="true">2.2.</strong> Production Setup</a></li><li class="chapter-item expanded "><a href="setup/testing.html"><strong aria-hidden="true">2.3.</strong> Testing</a></li></ol></li><li class="chapter-item expanded "><a href="usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="usage/login.html"><strong aria-hidden="true">3.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="usage/accounts.html"><strong aria-hidden="true">3.2.</strong> Accounts</a></li><li class="chapter-item expanded "><a href="usage/room_settings.html"><strong aria-hidden="true">3.3.</strong> Room Settings</a></li><li class="chapter-item expanded "><a href="usage/rooms.html"><strong aria-hidden="true">3.4.</strong> Rooms</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="setup.html"><strong aria-hidden="true">2.</strong> Installation and Setup</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="setup/development-setup.html"><strong aria-hidden="true">2.1.</strong> Development Setup</a></li><li class="chapter-item expanded "><a href="setup/production-setup.html"><strong aria-hidden="true">2.2.</strong> Production Setup</a></li><li class="chapter-item expanded "><a href="setup/testing.html"><strong aria-hidden="true">2.3.</strong> Testing</a></li></ol></li><li class="chapter-item expanded "><a href="usage.html"><strong aria-hidden="true">3.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="usage/login.html"><strong aria-hidden="true">3.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="usage/accounts.html"><strong aria-hidden="true">3.2.</strong> Accounts</a></li><li class="chapter-item expanded "><a href="usage/room_settings.html"><strong aria-hidden="true">3.3.</strong> Room Settings</a></li><li class="chapter-item expanded "><a href="usage/rooms.html"><strong aria-hidden="true">3.4.</strong> Rooms</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="usage/rooms/room_external_url.html"><strong aria-hidden="true">3.4.1.</strong> Room External URL</a></li><li class="chapter-item expanded "><a href="usage/rooms/github_conditions.html"><strong aria-hidden="true">3.4.2.</strong> Github Conditions</a></li><li class="chapter-item expanded "><a href="usage/rooms/patreon_conditions.html"><strong aria-hidden="true">3.4.3.</strong> Patreon Conditions</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="additional_resources.html"><strong aria-hidden="true">4.</strong> Additional Resources</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -328,10 +328,10 @@ npm run test
 <p>You can check out the <a href="./setup.html">Installation and Setup</a> page for more information about hosting and setting up the project.</p>
 <p>This section is further divided into several other subsections based on the different webpages available:</p>
 <ul>
-<li>Login</li>
-<li>Accounts</li>
-<li>Room Settings</li>
-<li>Room</li>
+<li><a href="./usage/login.html">Login</a></li>
+<li><a href="./usage/accounts.html">Accounts</a></li>
+<li><a href="./usage/room_settings.html">Room Settings</a></li>
+<li><a href="./usage/rooms.html">Room</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="login-page"><a class="header" href="#login-page">Login Page</a></h1>
 <p><img src="usage/../assets/login.png" alt="Login" /></p>
@@ -365,7 +365,75 @@ npm run test
 <p><img src="usage/../assets/rooms.png" alt="Rooms" /></p>
 <p><strong>Route</strong>: /rooms/{room_id}</p>
 <p>This webpage is specific to the <strong>room_id</strong> for which the current user intends to edit third party conditions.</p>
-<p>There are two buttons available right below the <strong>Navbar</strong> (i.e. External Url and Edit Conditions) where each directs the user to different webpages.</p>
+<p>There are two buttons available right below the <strong>Navbar</strong> (i.e. <a href="usage/./rooms/room_external_url.html">External Url</a> and <a href="usage/rooms.html#add-conditions">Add Conditions</a>) where each directs the user to different webpages.</p>
+<h2 id="add-conditions"><a class="header" href="#add-conditions">Add Conditions</a></h2>
+<p><img src="usage/../assets/add_conditions_modal.png" alt="Add conditions modal" /></p>
+<p>The &quot;Add conditions&quot; button opens a modal which displays all the third party services currently supported by the application.</p>
+<p>Each option leads to a webpage listing out the options based on the third party account linked with matrix user ID.</p>
+<p>For more details on how to add conditions specific to a third party service, check out the following pages</p>
+<ul>
+<li><a href="usage/./rooms/github_conditions.html">GitHub</a></li>
+<li><a href="usage/./rooms/patreon_conditions.html">Patreon</a></li>
+</ul>
+<h2 id="edit-conditions"><a class="header" href="#edit-conditions">Edit Conditions</a></h2>
+<p>One has the option to preview/edit/delete the existing coniditions for a particular room.</p>
+<p><img src="usage/../assets/edit_conditions_modal.png" alt="Edit Conditions modal" /></p>
+<h2 id="how-do-these-conditions-work"><a class="header" href="#how-do-these-conditions-work">How do these conditions work?</a></h2>
+<p>To keep it brief, all of these conditions work in a <strong>&quot;if any one of these are satisfied then <em>let them in</em> otherwise, don't&quot;</strong> manner.</p>
+<p>For example if there are two conditions set for a room,</p>
+<ol>
+<li>Allow users with read only access to &quot;TestOrgForCerberus/SampleRepo&quot; repository to join the room.</li>
+<li>Allow patreon users who have contributed atleast <strong>55$</strong> to Bob's campaign join the room.</li>
+</ol>
+<p>If a user has <strong>write</strong> permissions for the <strong>SampleRepo</strong> and contributed <strong>60$</strong> to Bob's <strong>campaign</strong> then they satisfy only condition 2. (Since, condition 1 is only asking for read-only users)
+In this case, the user will be invited to the room if they are not already part of the room.</p>
+<h3 id="what-if-they-fail-to-satisfy-any-of-the-conditions-present"><a class="header" href="#what-if-they-fail-to-satisfy-any-of-the-conditions-present">What if they fail to satisfy any of the conditions present?</a></h3>
+<p>In this case, the user will either be</p>
+<ul>
+<li>kicked from the room</li>
+<li>invite is withdrawn or</li>
+<li>knock will be rejected</li>
+</ul>
+<p>depending on their current state.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="room-external-url"><a class="header" href="#room-external-url">Room External URL</a></h1>
+<p><img src="usage/rooms/../../assets/room_external_url.png" alt="Room External URL" /></p>
+<p><strong>Route</strong>: /rooms/{room_id}/external-url</p>
+<p>All the external URLs for a particular room will be available here.</p>
+<p>The URLs are of two types:</p>
+<ul>
+<li>Permanent</li>
+<li>Temporary (single use only)</li>
+</ul>
+<p>For permanent URL, you have the option to generate a new URL in place of the existing one.
+For temporary URLs, you can either delete or add a new one.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="github-conditions"><a class="header" href="#github-conditions">GitHub Conditions</a></h1>
+<p><img src="usage/rooms/../../assets/github_conditions.png" alt="Github Conditions" /></p>
+<p><strong>Route</strong>: /rooms/{room_id}/github-conditions</p>
+<p>This page consists of a list of dropdowns and each dropdown is categorized either as <strong>User</strong> or <strong>Org</strong>.</p>
+<p>There will be only one <strong>User</strong> and multiple <strong>Orgs</strong> in this page.</p>
+<p><img src="usage/rooms/../../assets/github_conditions_expand.png" alt="expand github conditions" /></p>
+<p>There are three kinds of conditions available for GitHub:</p>
+<ul>
+<li>Repositories</li>
+<li>Teams</li>
+<li>Sponsorship tiers</li>
+</ul>
+<p>Any changes made here will be reflected in the <a href="usage/rooms/../rooms.html">Rooms</a> webpage.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="patreon-conditions"><a class="header" href="#patreon-conditions">Patreon Conditions</a></h1>
+<p><img src="usage/rooms/../../assets/patreon_conditions.png" alt="Patreon Conditions" /></p>
+<p><strong>Route</strong>: /rooms/{room_id}/patreon-conditions</p>
+<p>This webpage displays the conditions for a single campaign under the current user.
+(It is assumed that a patreon user is responsible only for <strong>one</strong> campaign.)</p>
+<p><img src="usage/rooms/../../assets/patreon_conditions_modal.png" alt="Patreon Conditions Modal" /></p>
+<p>There are two types of conditions available for Patreon:</p>
+<ul>
+<li>Tiers</li>
+<li>Life time support cents</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="additional-resources"><a class="header" href="#additional-resources">Additional Resources</a></h1>
+<p>I worked on this project as part of GSoC'22. I have blogged about my entire journey at <a href="https://kuries-gsoc.blogspot.com/">https://kuries-gsoc.blogspot.com/</a>.
+It includes details about each week's progress, bugs encountered and how they have been solved and the thought process behind the entire project.
+If you are interested, do give it a read!</p>
 
                     </main>
 
