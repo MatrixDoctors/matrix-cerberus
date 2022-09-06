@@ -10,3 +10,7 @@
     - [Accounts](./usage/accounts.md)
     - [Room Settings](./usage/room_settings.md)
     - [Rooms](./usage/rooms.md)
+        - [Room External URL](./usage/rooms/room_external_url.md)
+        - [Github Conditions](./usage/rooms/github_conditions.md)
+        - [Patreon Conditions](./usage/rooms/patreon_conditions.md)
+- [Additional Resources](./additional_resources.md)
