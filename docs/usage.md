@@ -9,4 +9,4 @@ This section is further divided into several other subsections based on the diff
 - [Login](./usage/login.md)
 - [Accounts](./usage/accounts.md)
 - [Room Settings](./usage/room_settings.md)
-- [Room](./usage/rooms.md)
+- [Rooms](./usage/rooms.md)

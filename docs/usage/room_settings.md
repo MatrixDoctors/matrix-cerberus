@@ -5,7 +5,7 @@ Room Settings Page
 
 **Route**: /room-settings
 
-Webpage which displays the rooms for which the current user has permissions to add third party conditions.
+Webpage that displays the rooms for which the current user has permissions to add third party conditions.
 
 This can be accesible by clicking on the **Room Settings** on the navbar.
 
