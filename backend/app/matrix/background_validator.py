@@ -76,7 +76,7 @@ class BackgroundValidater:
 
     async def create_background_task(self):
         logger.success("Background validator has started")
-        self.background_validator_task = asyncio.create_task(self.start_task())
+        self.background_validator_task = asyncio.create_task(self.main_task())
         self.queue_processor_task = asyncio.create_task(self.process_queue())
 
     async def cancel_background_task(self):
