@@ -18,6 +18,7 @@ class MatrixBotSettings(BaseSettings):
     homeserver: str
     access_token: str
     min_power_level: int
+    bg_validation_cooldown: int
 
     # This checks if the homeserver url is valid or not.
     @root_validator(pre=True)

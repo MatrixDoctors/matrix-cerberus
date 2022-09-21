@@ -40,6 +40,38 @@ async def verify_room_permissions(request: Request, room_id: str):
         raise HTTPException(status_code=400, detail="Bot is not part of the room")
 
 
+async def add_user_to_validator_queue(user_id: str):
+    await app_state.background_validator.add_user_to_queue(user_id)
+
+
+async def add_room_to_validator_queue(room_id: str):
+    await app_state.background_validator.add_room_to_queue(room_id)
+
+
+async def register_new_user(user_id: str):
+    """
+    Method which verifies if the user is currently a part of the registered users list.
+    If not, the user id is added to the global data.
+    """
+    resp = await app_state.bot_client.get_account_data(type="global_data")
+    if user_id not in resp.content.users:
+        resp.content.users.append(user_id)
+        await app_state.bot_client.put_account_data(type="global_data", data=resp)
+
+        await add_user_to_validator_queue(user_id)
+
+
+async def register_new_room(room_id: str):
+    """
+    Method which verifies if the room is currently a part of the registered rooms list.
+    If not, the room id is added to the global data.
+    """
+    global_bot_data = await app_state.bot_client.get_account_data(type="global_data")
+    if room_id not in global_bot_data.content.rooms:
+        global_bot_data.content.rooms.append(room_id)
+        await app_state.bot_client.put_account_data(type="global_data", data=global_bot_data)
+
+
 async def fetch_user_data(session_id, session_data: ServerSessionData):
     """
     Method used to fetch the account data event for a particular user.
@@ -74,6 +106,8 @@ async def save_user_data(session_data: ServerSessionData):
     await app_state.bot_client.put_account_data(
         type="user", data=data, user_id=session_data.matrix_user
     )
+
+    await add_user_to_validator_queue(session_data.matrix_user)
 
 
 async def gidgethub_instance(request: Request) -> gidgethub.aiohttp.GitHubAPI:

@@ -19,6 +19,7 @@ def test_message_users(client):
 @pytest.mark.asyncio
 async def test_user_session_flow(mocker, client, mock_server, mock_app_state):
     mock_fetch_user_data = mocker.patch("app.api.api.fetch_user_data")
+    mock_register_new_user = mocker.patch("app.api.api.register_new_user")
 
     matrix_user = "@example_user:matrix.org"
     session_key = mock_app_state.settings.server_sessions.session_key
@@ -42,6 +43,7 @@ async def test_user_session_flow(mocker, client, mock_server, mock_app_state):
     assert session_cookie[session_key] is not None
     assert response.json() == {"message": "success"}
     assert mock_fetch_user_data.call_count == 1
+    assert mock_register_new_user.call_count == 1
 
     # Check the saved details of the user
     response = client.post("api/users/printToken")

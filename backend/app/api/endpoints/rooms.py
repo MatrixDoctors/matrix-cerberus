@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from starlette.responses import JSONResponse
 
 from app.api.deps import (
+    add_room_to_validator_queue,
     external_url_api_instance,
     fastapi_sessions,
     github_api_instance,
+    register_new_room,
     verify_room_permissions,
 )
 from app.api.models import OwnerField, RoomConditions
@@ -203,6 +205,7 @@ async def put_github_room_condition(
     owner_type: str,
     condition_type: str,
     room_conditions: RoomConditions,
+    background_task: BackgroundTasks,
 ):
     """
     API Route to save github conditions of a specific type under a particular owner (user/org).
@@ -237,6 +240,13 @@ async def put_github_room_condition(
         raise HTTPException(status_code=400, detail="Invalid condition type sent.")
 
     resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
+
+    # Add the room_id to the global list of rooms if not present.
+    # This will later be used during validation checks
+    background_task.add_task(register_new_room, room_id)
+
+    background_task.add_task(add_room_to_validator_queue, room_id)
+
     return JSONResponse({"msg": "success"})
 
 
@@ -245,7 +255,11 @@ async def put_github_room_condition(
     dependencies=[Depends(verify_room_permissions)],
 )
 async def delete_github_room_condition(
-    room_id: str, owner_type: str, condition_type: str, room_conditions: RoomConditions
+    room_id: str,
+    owner_type: str,
+    condition_type: str,
+    room_conditions: RoomConditions,
+    background_task: BackgroundTasks,
 ):
     """
     API Route to delete a github condition in the 'rooms' bot account data event.
@@ -270,6 +284,9 @@ async def delete_github_room_condition(
         raise HTTPException(status_code=400, detail="Invalid condition type sent.")
 
     resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
+
+    background_task.add_task(add_room_to_validator_queue, room_id)
+
     return JSONResponse({"msg": "success"})
 
 
