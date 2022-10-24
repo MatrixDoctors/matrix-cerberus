@@ -10,7 +10,7 @@ repos:
       - id: check-ast
   # Python / Backend
   - repo: https://github.com/psf/black
-    rev: 22.8.0
+    rev: 22.10.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
@@ -19,7 +19,7 @@ repos:
       - id: isort
   # Javascript / frontend
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: 'v8.24.0'
+    rev: 'v8.26.0'
     hooks:
       - id: eslint
         additional_dependencies:
