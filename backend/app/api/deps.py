@@ -41,8 +41,8 @@ async def verify_room_permissions(request: Request, room_id: str):
 
 async def fetch_user_data(session_id, session_data: ServerSessionData):
     """
-    Method used to fetch the account data event for a particular user and
-    stores it in the logged-in user's server session.
+    Method used to fetch the account data event for a particular user.
+    The fetched data is preserved in the logged-in user's server session.
     """
 
     resp = await app_state.bot_client.get_account_data("user", user_id=session_data.matrix_user)
@@ -65,8 +65,10 @@ async def save_user_data(session_data: ServerSessionData):
     data.content.github.username = session_data.github_user_id
     data.content.github.access_token = session_data.github_access_token
 
-    data.content.patreon.email = session_data.patreon_access_token
+    data.content.patreon.email = session_data.patreon_user_id
     data.content.patreon.access_token = session_data.patreon_access_token
+    data.content.patreon.refresh_token = session_data.patreon_refresh_token
+    data.content.patreon.expire_date = session_data.patreon_expire_date
 
     await app_state.bot_client.put_account_data(
         type="user", data=data, user_id=session_data.matrix_user

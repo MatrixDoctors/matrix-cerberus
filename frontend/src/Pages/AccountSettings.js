@@ -7,11 +7,11 @@ import axios from '../HelperFunctions/customAxios';
  * The default web page where an authorized matrix user can edit their third-party account connections.
  */
 export default function AccountSettings() {
-	const {matrixUserId, githubUserId} = useContext(GlobalContext);
+	const {matrixUserId, githubUserId, patreonUserId} = useContext(GlobalContext);
 	const homeServer = localStorage.getItem('homeServer');
 
-	function githubHandleClick(){
-		axios.get('/api/github/login')
+	function oauthHandleClick(accountType){
+		axios.get(`/api/${accountType}/login`)
 		.then( (resp) => {
 			localStorage.setItem('state', resp.data.state);
 			window.location.href = resp.data.url;
@@ -89,11 +89,11 @@ export default function AccountSettings() {
 									</div>
 								</div>
 								<div className='inline-block px-2 w-1/3 text-gray-600'>
-									{githubUserId == "" ? "Disconnected" : `Connected as ${githubUserId}.`}
+									{githubUserId == "" ? "Disconnected" : `${githubUserId}`}
 								</div>
 								<div className='flex justify-end mx-2 w-1/3'>
 									<button
-									onClick={githubHandleClick}
+									onClick={() => oauthHandleClick('github')}
 									className='px-2 inline text-blue-600 hover:shadow-md'>
 										{githubUserId == "" ? "Connect" : "Edit"}
 									</button>
@@ -121,12 +121,14 @@ export default function AccountSettings() {
 									</div>
 								</div>
 								<div className='w-1/3 px-2 text-gray-600'>
-									Connected as Patreon user
+									{patreonUserId == "" ? "Disconnected" : `${patreonUserId}`}
 								</div>
 								<div className='flex justify-end mx-2 w-1/3'>
-									<span className='px-2 text-blue-600 hover:shadow-md'>
-										Edit
-									</span>
+								<button
+									onClick={() => oauthHandleClick('patreon')}
+									className='px-2 inline text-blue-600 hover:shadow-md'>
+										{patreonUserId == "" ? "Connect" : "Edit"}
+									</button>
 								</div>
 							</div>
 

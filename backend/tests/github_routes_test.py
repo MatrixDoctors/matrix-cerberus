@@ -76,7 +76,11 @@ async def test_post_login(mocker, logged_in_client, mock_server, mock_app_state)
 
     response = logged_in_client.get("api/current-user")
     assert response.status_code == 200
-    assert response.json() == {"matrix_user_id": MATRIX_USER_ID, "github_user_id": GITHUB_USER_ID}
+    assert response.json() == {
+        "matrix_user_id": MATRIX_USER_ID,
+        "github_user_id": GITHUB_USER_ID,
+        "patreon_user_id": None,
+    }
     assert m_save_user_data.call_count == 1
 
 

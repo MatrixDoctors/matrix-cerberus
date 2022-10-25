@@ -69,7 +69,10 @@ class GithubAPI:
         return True
 
     async def repo_permissions(self, owner, repo, user):
-        resp = await self.gh.getitem(f"/repos/{owner}/{repo}/collaborators/{user}/permission")
+        try:
+            resp = await self.gh.getitem(f"/repos/{owner}/{repo}/collaborators/{user}/permission")
+        except gidgethub.BadRequest:
+            return None
         return resp["permission"]
 
     async def get_sponsorship_tiers_for_user(self, user):

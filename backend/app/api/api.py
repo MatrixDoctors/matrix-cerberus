@@ -17,7 +17,7 @@ from app.api.deps import (
     fetch_user_data,
     verify_room_permissions,
 )
-from app.api.endpoints import external_url, github_routes, rooms, users
+from app.api.endpoints import external_url, github_routes, patreon_routes, rooms, users
 from app.api.models import OpenIdInfo
 from app.core.app_state import app_state
 from app.core.models import ServerSessionData
@@ -49,16 +49,30 @@ api_router.include_router(
     dependencies=[Depends(authenticate_user)],
 )
 
+api_router.include_router(
+    patreon_routes.router,
+    prefix="/patreon",
+    tags=["patreon"],
+    dependencies=[Depends(authenticate_user)],
+)
+
 
 @api_router.get("/current-user")
 async def current_user(request: Request):
     session_data = fastapi_sessions.get_session(request)
-    matrix_user_id, github_user_id = None, None
+    matrix_user_id, github_user_id, patreon_user_id = None, None, None
     if session_data is not None:
         matrix_user_id = session_data.matrix_user
         github_user_id = session_data.github_user_id
+        patreon_user_id = session_data.patreon_user_id
 
-    return JSONResponse({"matrix_user_id": matrix_user_id, "github_user_id": github_user_id})
+    return JSONResponse(
+        {
+            "matrix_user_id": matrix_user_id,
+            "github_user_id": github_user_id,
+            "patreon_user_id": patreon_user_id,
+        }
+    )
 
 
 @api_router.post("/verify-openid")

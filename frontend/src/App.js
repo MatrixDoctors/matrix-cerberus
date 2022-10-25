@@ -11,7 +11,7 @@ import ExternalUrl from './Pages/ExternalUrl';
 import { GlobalContext } from './GlobalContext';
 import LayoutsWithNavbar from './Components/LayoutsWithNavbar';
 import Logout from './Pages/Logout';
-import GithubOauth from './Pages/GithubOauth';
+import OAuth from './Pages/OAuth';
 import Room from './Pages/Room';
 import RoomExternalUrl from './Pages/RoomExternalUrl';
 import RoomGitubConditions from './Pages/RoomGithubConditions/RoomGitubConditions';
@@ -19,10 +19,11 @@ import RoomGitubConditions from './Pages/RoomGithubConditions/RoomGitubCondition
 export default function App() {
   const [matrixUserId, setMatrixUserId] = useState('');
   const [githubUserId, setGithubUserId] = useState('');
+  const [patreonUserId, setPatreonUserId] = useState('');
 
   return (
     <GlobalContext.Provider
-          value = {{matrixUserId, setMatrixUserId, githubUserId, setGithubUserId}}>
+          value = {{matrixUserId, setMatrixUserId, githubUserId, setGithubUserId, patreonUserId, setPatreonUserId}}>
       <Routes>
           <Route element={<LayoutsWithNavbar/>}>
             <Route path="/" element={<AccountSettings />} />
@@ -35,7 +36,8 @@ export default function App() {
           </Route>
 
         <Route path="/i/:url_code" element={<ExternalUrl />} />
-        <Route path="/oauth2/github" element={<GithubOauth />} />
+        <Route path="/oauth2/github" element={<OAuth accountType={'github'}/>} />
+        <Route path="/oauth2/patreon" element={<OAuth accountType={'patreon'}/>} />
         <Route path="/login" element={<Login />} />
         <Route path="/login-success" element={<LoginSuccess/>} />
         <Route path="*" element={<ErrorPage/>} />

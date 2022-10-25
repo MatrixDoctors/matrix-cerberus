@@ -20,7 +20,7 @@ matrix_bot:
   min_power_level: 50
 
 github:
-# GitHub config which consists of the registered OAuth app credentials
+  # GitHub OAuth App credentials
   # 'organisation_membership' can be set to 'admin' or 'member'.
   # A room admin can change conditions for an organisation only if they satisfy this membership.
   #
@@ -28,3 +28,9 @@ github:
   client_secret: client_secret_token
   redirect_uri: http://localhost:80/oauth2/github
   organisation_membership: "member"
+
+patreon:
+  # Patreon OAuth App credentials
+  client_id: client_id_token
+  client_secret: client_secret
+  redirect_uri: http://localhost:80/oauth2/patreon

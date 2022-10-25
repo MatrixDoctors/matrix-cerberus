@@ -5,6 +5,7 @@ ii) Data required by other core modules.
 """
 
 from typing import Any, Set, Dict, List, Optional
+from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
 
@@ -21,6 +22,8 @@ class ServerSessionData(BaseModel):
     github_access_token: Optional[str] = None
     patreon_user_id: Optional[str] = None
     patreon_access_token: Optional[str] = None
+    patreon_refresh_token: Optional[str] = None
+    patreon_expire_date: Optional[str] = None
 
 
 class RoomUrlObject(BaseModel):
@@ -63,6 +66,7 @@ class GithubOrganisationConditions(BaseModel):
     repos: Dict[str, GithubRepositoryConditions] = dict()
     teams: Dict[str, bool] = dict()
     sponsorship_tiers: Dict[str, bool] = dict()
+    last_edited_by: str = None
 
 
 class GithubConditions(BaseModel):
@@ -133,6 +137,7 @@ class PatreonUserData(BaseModel):
     email: Optional[EmailStr] = None
     access_token: Optional[str] = None
     refresh_token: Optional[str] = None
+    expire_date: Optional[datetime] = None
 
 
 class UserMappedData(BaseModel):

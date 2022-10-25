@@ -1,14 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from starlette.responses import JSONResponse
 
 from app.api.deps import (
     external_url_api_instance,
+    fastapi_sessions,
     github_api_instance,
     verify_room_permissions,
 )
 from app.api.models import OwnerField, RoomConditions
 from app.core.app_state import app_state
-from app.core.models import GithubConditions, GithubRepositoryConditions
+from app.core.models import (
+    GithubConditions,
+    GithubOrganisationConditions,
+    GithubRepositoryConditions,
+    GithubUserConditions,
+)
 from app.github.github_api import GithubAPI
 from app.matrix.external_url import ExternalUrlAPI
 
@@ -126,19 +132,19 @@ async def get_github_room_condition(
     data_to_be_sent = None
 
     if condition_type == "repository":
-        if owner.child in github_data[owner.parent].repos:
+        if owner.parent in github_data and owner.child in github_data[owner.parent].repos:
             data_to_be_sent = github_data[owner.parent].repos[owner.child]
         else:
             data_to_be_sent = GithubRepositoryConditions()
         data_to_be_sent = data_to_be_sent.dict()
     elif condition_type == "teams" and owner_type == "org":
-        if github_data[owner.parent].teams:
+        if owner.parent in github_data and github_data[owner.parent].teams:
             data_to_be_sent = github_data[owner.parent].teams
         else:
             teams = await github_api.get_teams_in_an_org(owner.parent)
             data_to_be_sent = {team_slug: False for team_slug in teams.keys()}
     elif condition_type == "sponsorship tiers":
-        if github_data[owner.parent].sponsorship_tiers:
+        if owner.parent in github_data and github_data[owner.parent].sponsorship_tiers:
             data_to_be_sent = github_data[owner.parent].sponsorship_tiers
         else:
             if owner_type == "org":
@@ -157,7 +163,11 @@ async def get_github_room_condition(
     dependencies=[Depends(verify_room_permissions)],
 )
 async def put_github_room_condition(
-    room_id: str, owner_type: str, condition_type: str, room_conditions: RoomConditions
+    request: Request,
+    room_id: str,
+    owner_type: str,
+    condition_type: str,
+    room_conditions: RoomConditions,
 ):
     """
     API Route to save github conditions of a specific type under a particular owner (user/org).
@@ -166,12 +176,20 @@ async def put_github_room_condition(
     """
     resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
 
+    owner_name = room_conditions.owner.parent
+    user_session = fastapi_sessions.get_session(request)
+    logged_in_user = user_session.matrix_user
+
     if owner_type == "org":
         github_data = resp.content.github.orgs
+        if owner_name not in github_data:
+            github_data[owner_name] = GithubOrganisationConditions()
+
+        github_data[owner_name].last_edited_by = logged_in_user
     else:
         github_data = resp.content.github.users
-
-    owner_name = room_conditions.owner.parent
+        if owner_name not in github_data:
+            github_data[owner_name] = GithubUserConditions()
 
     if condition_type == "repository":
         repo_name = room_conditions.owner.child
@@ -220,10 +238,23 @@ async def delete_github_room_condition(
     return JSONResponse({"msg": "success"})
 
 
+@router.put("/{room_id}/disable-room-kick/edit", dependencies=[Depends(verify_room_permissions)])
+async def edit_room_disable_kick_option(room_id: str, disable_room_kick: bool):
+
+    resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+    resp.content.disable_room_kick = disable_room_kick
+    del resp.content.github.orgs["kuries"]
+    resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
+    return JSONResponse({"msg": "success"})
+
+
 @router.get("/{room_id}/external-url", dependencies=[Depends(verify_room_permissions)])
 async def get_room_external_urls(
     room_id: str, external_url: ExternalUrlAPI = Depends(external_url_api_instance)
 ):
+    """
+    Method to edit the room kick option for a room.
+    """
     resp = await external_url.get_room_external_url(room_id)
     return JSONResponse(
         {"content": {"permanent": resp.permanent, "temporary": list(resp.temporary)}}

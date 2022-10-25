@@ -38,6 +38,8 @@ class BackgroundValidater:
 
         self.registered_users: Dict[str, RegisteredUser] = dict()
 
+        self.github_id_to_matrix_id = dict()
+
         # List of rooms registered under the application and has "room membership" conditions.
         self.rooms_with_conditions: List[str] = []
 
@@ -62,7 +64,7 @@ class BackgroundValidater:
                 if room_id not in self.rooms_with_permissions or room_id not in self.client.rooms:
                     continue
 
-                ignore_members = await self.get_users_not_removed_by_bot(room_id)
+                ignore_members = await self.get_ignored_users_for_a_room(room_id)
                 room_specific_data = await self.client.get_account_data("rooms", room_id=room_id)
 
                 for user_id in self.registered_users.keys():
@@ -106,6 +108,9 @@ class BackgroundValidater:
                 http_client=self.http_client,
                 default_role=self.github_default_role,
             )
+
+            # Cache the mapping github id and matrix id
+            self.github_id_to_matrix_id[user_data.content.github.username] = user_id
 
         self.rooms_with_permissions = await self.client.get_rooms_with_mod_permissions(
             self.client.user_id
@@ -156,9 +161,13 @@ class BackgroundValidater:
         # Organisation conditions
         for org_name, org_conditions in room_github_conditions.orgs.items():
 
+            # Using access token of the admin who last edited the github condition.
+            admin_matrix_id = org_conditions.last_edited_by
+            admin_gh_api = self.registered_users[admin_matrix_id].github_api
+
             # Repository conditions
             for repo_name, repo_conditions in org_conditions.repos.items():
-                resp = await gh_api.repo_permissions(org_name, repo_name, gh_username)
+                resp = await admin_gh_api.repo_permissions(org_name, repo_name, gh_username)
 
                 if resp == "admin" and repo_conditions.admin:
                     return True
@@ -176,15 +185,22 @@ class BackgroundValidater:
 
             # Sponsorship tier conditions
             sponsoring_tier = await gh_api.org_sponsored_at_tier(org_name)
-            if sponsoring_tier and org_conditions.sponsorship_tiers[sponsoring_tier]:
+            if (
+                sponsoring_tier
+                and org_conditions.sponsorship_tiers
+                and org_conditions.sponsorship_tiers[sponsoring_tier]
+            ):
                 return True
 
-        # Organisation conditions
+        # User conditions
         for user_name, user_conditions in room_github_conditions.users.items():
+            # Using access token of the owner
+            owner_matrix_id = self.github_id_to_matrix_id[user_name]
+            owner_gh_api = self.registered_users[owner_matrix_id].github_api
 
             # Repository conditions
             for repo_name, repo_conditions in user_conditions.repos.items():
-                resp = await gh_api.repo_permissions(user_name, repo_name, gh_username)
+                resp = await owner_gh_api.repo_permissions(user_name, repo_name, gh_username)
 
                 if resp == "admin" and repo_conditions.admin:
                     return True
@@ -195,7 +211,11 @@ class BackgroundValidater:
 
             # Sponsorship tier conditions
             sponsoring_tier = await gh_api.user_sponsored_at_tier(user_name)
-            if sponsoring_tier and user_conditions.sponsorship_tiers[sponsoring_tier]:
+            if (
+                sponsoring_tier
+                and user_conditions.sponsorship_tiers
+                and user_conditions.sponsorship_tiers[sponsoring_tier]
+            ):
                 return True
 
         return False
@@ -230,13 +250,22 @@ class BackgroundValidater:
             if isinstance(resp, RoomKickError):
                 print(f"Error: {resp}")
 
-    async def get_users_not_removed_by_bot(self, room_id: str) -> Set[str]:
+    async def get_ignored_users_for_a_room(self, room_id: str) -> Set[str]:
         """
-        Method that returns the set of users whose 'leave' state is not a result of the bot's actions.
+        Method that returns the set of users to ignore.
         """
 
         ignore_members = set()
 
+        # Users whose power level exceeds the bot's current power level.
+        power_levels = self.client.rooms[room_id].power_levels
+        for room_member_id in self.registered_users.keys():
+            if power_levels.get_user_level(room_member_id) >= power_levels.get_user_level(
+                self.client.user_id
+            ):
+                ignore_members.add(room_member_id)
+
+        # Set of users whose 'leave' state is not a result of the bot's actions.
         resp = await self.client.get_room_members(room_id)
         if isinstance(resp, ErrorResponse):
             print(f"Error: {resp}")
