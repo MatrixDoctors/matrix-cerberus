@@ -18,20 +18,20 @@ export default function GithubOauth() {
     }
 
     useEffect( () => {
-        async function sendCode(){
-            await axios.post('/api/github/login', {
-                "code": loginCode
-            })
-            .catch( (err) => {
-                console.error(err);
-            });
-        }
-        const resp = sendCode();
-        resp.then( (resp) => {
+        axios.post('/api/github/login', {
+            "code": loginCode
+        })
+        .then (() => {
             navigate('/');
+        })
+        .catch( (err) => {
+            console.error("Failed to handle GitHub login", err);
         });
     }, []);
+
     return (
-    <></>
+    <>
+        You are being redirected to Home page...
+    </>
     )
 }

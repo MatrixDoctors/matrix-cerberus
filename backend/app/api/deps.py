@@ -21,6 +21,11 @@ async def authenticate_user(request: Request):
 
 
 async def verify_room_permissions(request: Request, room_id: str):
+    """
+    Method used to verify the room permissions of a user.
+
+    This will be triggered everytime an API endpoint which handles room conditions is called.
+    """
     session_data: ServerSessionData = fastapi_sessions.get_session(request)
 
     if room_id in app_state.bot_client.rooms:
@@ -35,6 +40,11 @@ async def verify_room_permissions(request: Request, room_id: str):
 
 
 async def fetch_user_data(session_id, session_data: ServerSessionData):
+    """
+    Method used to fetch the account data event for a particular user and
+    stores it in the logged-in user's server session.
+    """
+
     resp = await app_state.bot_client.get_account_data("user", user_id=session_data.matrix_user)
 
     session_data.github_user_id = resp.content.github.username
@@ -47,6 +57,10 @@ async def fetch_user_data(session_id, session_data: ServerSessionData):
 
 
 async def save_user_data(session_data: ServerSessionData):
+    """
+    Method used to save the session data of a logged-in user in the bot's account data event.
+    """
+
     data = UserData()
     data.content.github.username = session_data.github_user_id
     data.content.github.access_token = session_data.github_access_token

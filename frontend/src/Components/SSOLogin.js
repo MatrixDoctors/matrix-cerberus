@@ -14,7 +14,7 @@ const Images = {
 function AuthButton({ idp, homeServer }){
 
 	async function handleClick() {
-		const redirectUrl = 'http://localhost:80/login-success'
+		const redirectUrl = `${process.env.REACT_APP_BASE_URL}/login-success`
 		window.location.href = new MatrixApi(homeServer).ssoRedirectUrl(idp.id, redirectUrl);
 	}
 

@@ -37,6 +37,8 @@ export default function LoginSuccess() {
     }, []);
 
     return (
-        <></>
+        <>
+            Authenticating with the server...
+        </>
     )
 }

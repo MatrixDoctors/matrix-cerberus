@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from "prop-types"
 import { Link, useParams } from 'react-router-dom'
 import axios from '../HelperFunctions/customAxios'
-import {ToastContainer, toast} from "react-toastify"
+import { toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 import Helmet from 'react-helmet'
 
 const PermanentUrl = ({ urlCode, handleReplace }) => {
-    const fullUrl = `https://matrix-cerberus/i/${urlCode}`
+    const fullUrl = `${process.env.REACT_APP_BASE_URL}/i/${urlCode}`;
     return (
         <tr className="h-20 text-sm leading-none text-gray-800 bg-gray-200 border-b border-t border-gray-200">
             <td className="pl-4 cursor-pointer">
@@ -31,7 +31,6 @@ const PermanentUrl = ({ urlCode, handleReplace }) => {
                         });
                     }} >
                         <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
-                        <ToastContainer />
                     </button>
                     <button className="w-5 h-5 mx-4" title="Replace" onClick={() => handleReplace(urlCode)} >
                         <img className="w-full h-full" src={require("../assets/img/arrow-rotate-right-solid.svg").default} />
@@ -48,7 +47,7 @@ PermanentUrl.propTypes = {
 }
 
 const TemporaryUrl = ({ urlCode, handleDelete }) => {
-    const fullUrl = `https://matrix-cerberus/i/${urlCode}`;
+    const fullUrl = `${process.env.REACT_APP_BASE_URL}/i/${urlCode}`;
     return (
         <tr className="h-20 text-sm leading-none text-gray-800 bg-white border-b border-t border-gray-100">
             <td className="pl-4 cursor-pointer">
@@ -72,7 +71,6 @@ const TemporaryUrl = ({ urlCode, handleDelete }) => {
                         });
                     }}>
                         <img className="w-full h-full" src={require("../assets/img/copy-regular.svg").default} />
-                        <ToastContainer />
                     </button>
                     <button className="w-5 h-5 mx-4" title="Delete" onClick={() => handleDelete(urlCode)}>
                         <img className="w-full h-full" src={require("../assets/img/delete-icon.svg").default} />
@@ -110,12 +108,14 @@ export default function RoomExternalUrl() {
 
     async function handleDelete(urlCode) {
         const resp = await axios.post(`/api/rooms/${roomId}/external-url/delete?url_code=${urlCode}`);
-        if(resp.status == 401) {
+        if(resp.status == 400) {
             console.error(resp.data);
+            toast.error(`Cannot delete ${urlCode}`);
         }
         setTemporaryUrl(urls => urls.filter( url => {
             return url !== urlCode;
         }))
+        toast.success(`Successfully deleted ${urlCode}`);
     };
 
     async function handleCreateNew(useOnceOnly) {

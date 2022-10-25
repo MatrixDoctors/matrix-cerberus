@@ -11,12 +11,14 @@ export default function LayoutsWithNavbar() {
   useEffect( () => {
       const fetchCurrentUser = async () => {
         const resp = await axios.get('/api/current-user');
-        console.log(resp.data);
         if(resp.data.matrix_user_id !== null){
-            const matrix_user_id = resp.data.matrix_user_id;
-            const github_user_id = resp.data.github_user_id ? resp.data.github_user_id : "";
-            setMatrixUserId(matrix_user_id);
-            setGithubUserId(github_user_id);
+            const matrixUserId = resp.data.matrix_user_id;
+            const githubUserId = resp.data.github_user_id ? resp.data.github_user_id : "";
+
+            console.log(`Logged in as ${resp.data.matrix_user_id}!`);
+
+            setMatrixUserId(matrixUserId);
+            setGithubUserId(githubUserId);
         }
         else {
           navigate('/login');
