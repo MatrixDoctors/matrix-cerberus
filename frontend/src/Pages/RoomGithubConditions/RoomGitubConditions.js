@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Helmet from 'react-helmet'
 import { Link, useParams } from 'react-router-dom'
-import PropTypes from "prop-types"
 import axios from '../../HelperFunctions/customAxios'
 import OrgConditionsDropdown from './Components/OrgConditionsDropdown'
 import UserConditionsDropdown from './Components/UserConditionsDropdown'

@@ -74,6 +74,23 @@ class GithubConditions(BaseModel):
     users: Dict[str, GithubUserConditions] = dict()
 
 
+class PatreonCampaignTier(BaseModel):
+    title: str
+    is_enabled: bool
+
+
+class PatreonCampaignConditions(BaseModel):
+    name: str = ""
+    belongs_to: str = ""
+    tiers: Dict[int, PatreonCampaignTier] = dict()
+    enable_lifetime_support_cents: bool = False
+    lifetime_support_cents: int = 0
+
+
+class PatreonConditions(BaseModel):
+    campaigns: Dict[int, PatreonCampaignConditions] = dict()
+
+
 class RoomConditionsData(BaseModel):
     """
     RoomConditionsData class which handles conditions and data related to a specific room.
@@ -86,7 +103,7 @@ class RoomConditionsData(BaseModel):
 
     disable_room_kick: bool = False
     github: GithubConditions = GithubConditions()
-    patreon: Any = dict()
+    patreon: PatreonConditions = PatreonConditions()
 
 
 class RoomSpecificData(BaseModel):

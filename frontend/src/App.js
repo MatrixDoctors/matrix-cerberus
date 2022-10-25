@@ -15,6 +15,7 @@ import OAuth from './Pages/OAuth';
 import Room from './Pages/Room';
 import RoomExternalUrl from './Pages/RoomExternalUrl';
 import RoomGitubConditions from './Pages/RoomGithubConditions/RoomGitubConditions';
+import RoomPatreonConditions from './Pages/RoomPatreonConditions/RoomPatreonConditions';
 
 export default function App() {
   const [matrixUserId, setMatrixUserId] = useState('');
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/rooms/:roomId" element={<Room />} />
             <Route path="/rooms/:roomId/external-url" element={<RoomExternalUrl />} />
             <Route path="/rooms/:roomId/github-conditions" element={<RoomGitubConditions />} />
+            <Route path="/rooms/:roomId/patreon-conditions" element={<RoomPatreonConditions />} />
           </Route>
 
         <Route path="/i/:url_code" element={<ExternalUrl />} />

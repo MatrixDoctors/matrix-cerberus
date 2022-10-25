@@ -3,16 +3,18 @@ import Helmet from "react-helmet";
 import PropTypes from "prop-types"
 import { Link, useParams } from "react-router-dom";
 import SelectThirdPartyAccountModal from "../Components/SelectThirdPartyAccountModal";
-import PreviewConditions from "../Components/PreviewConditions";
+import GithubPreviewConditions from "../Components/GithubPreviewConditions";
 import axios from "../HelperFunctions/customAxios";
-import EditConditions from "../Components/EditConditions";
+import GithubEditConditions from "../Components/GithubEditConditions";
+import PatreonPreviewConditions from "../Components/PatreonPreviewConditions";
+import PatreonEditConditions from "../Components/PatreonEditConditions";
 
 const Images = {
     'github': require('../assets/img/github.svg').default,
     'patreon': require('../assets/img/patreon.svg').default,
 }
 
-const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData, handleDelete}) => {
+const TableRows = ({rowValue, setShowGithubPreview, setShowGithubEditable, setShowPatreonPreview, setShowPatreonEditable, setModalData, handleDelete}) => {
     const owner= rowValue.owner;
     const image = Images[rowValue.thirdPartyAccount.toLowerCase()];
 
@@ -46,7 +48,12 @@ const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData, han
                     title="Show"
                     onClick={() => {
                         setModalData(rowValue);
-                        setShowPreview(true);
+                        if(rowValue.thirdPartyAccount == 'Github'){
+                            setShowGithubPreview(true);
+                        }
+                        else if(rowValue.thirdPartyAccount == 'Patreon'){
+                            setShowPatreonPreview(true);
+                        }
                     }}
                     >
                         <img className="w-full h-full" src={require("../assets/img/eye-regular.svg").default} />
@@ -57,7 +64,12 @@ const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData, han
                     title="Edit"
                     onClick={() => {
                         setModalData(rowValue);
-                        setShowEditable(true);
+                        if(rowValue.thirdPartyAccount == 'Github'){
+                            setShowGithubEditable(true);
+                        }
+                        else if(rowValue.thirdPartyAccount == 'Patreon'){
+                            setShowPatreonEditable(true);
+                        }
                     }}
                     >
                         <img className="w-full h-full" src={require("../assets/img/pen-to-square.svg").default} />
@@ -76,8 +88,10 @@ const TableRows = ({rowValue, setShowPreview, setShowEditable, setModalData, han
 
 TableRows.propTypes = {
     rowValue: PropTypes.object,
-    setShowPreview: PropTypes.func,
-    setShowEditable: PropTypes.func,
+    setShowGithubPreview: PropTypes.func,
+    setShowGithubEditable: PropTypes.func,
+    setShowPatreonPreview: PropTypes.func,
+    setShowPatreonEditable: PropTypes.func,
     setModalData: PropTypes.func,
     handleDelete: PropTypes.func
 }
@@ -87,8 +101,12 @@ function Room() {
     const [showModal, setShowModal] = useState(false);
     const [roomConditions, setRoomConditions] = useState([]);
 
-    const [showPreview, setShowPreview] = useState(false);
-    const [showEditable, setShowEditable] = useState(false);
+    const [showGithubPreview, setShowGithubPreview] = useState(false);
+    const [showGithubEditable, setShowGithubEditable] = useState(false);
+
+    const [showPatreonPreview, setShowPatreonPreview] = useState(false);
+    const [showPatreonEditable, setShowPatreonEditable] = useState(false);
+
     const [modalData, setModalData] = useState({});
 
     function handleDelete(rowData) {
@@ -100,18 +118,22 @@ function Room() {
             let url;
             if(thirdPartyAccount === 'github') {
                 url = `/api/rooms/${roomId}/github/${ownerType}/${conditionType}/delete`;
-            }
 
-            // Excludes the 'key' and updates the 'data' property.
-            let dataToBeSent = {
-                "type": ownerType,
-                "third_party_account": thirdPartyAccount,
-                "owner": rowData.owner,
-                "condition_type": conditionType,
-                "data": rowData.data
-            }
+                // Excludes the 'key' and updates the 'data' property.
+                let dataToBeSent = {
+                    "type": ownerType,
+                    "third_party_account": thirdPartyAccount,
+                    "owner": rowData.owner,
+                    "condition_type": conditionType,
+                    "data": rowData.data
+                }
 
-            return axios.post(url, dataToBeSent);
+                return axios.post(url, dataToBeSent);
+            }
+            if(thirdPartyAccount === 'patreon') {
+                url = `/api/patreon/${roomId}/campaign/delete?campaign_id=${rowData.data.id}`;
+                return axios.post(url);
+            }
         }
 
         deleteData(roomId, rowData)
@@ -140,17 +162,7 @@ function Room() {
                     key: key
                 };
             });
-            setRoomConditions([
-                ...data,
-                {
-                    thirdPartyAccount: "Patreon",
-                    owner: {
-                        parent: "Kuries"
-                    },
-                    conditionType: "Sponsorship Tiers",
-                    key: 3
-                }
-            ]);
+            setRoomConditions(data);
         };
         fetchRoomConditions();
     }, [])
@@ -192,8 +204,25 @@ function Room() {
 
             <div className="w-full sm:px-6">
                 <div className="bg-gray-200 shadow px-4 md:px-10 pt-4 md:pt-7 pb-5 overflow-y-auto">
-                    <PreviewConditions modalData={modalData} showPreview={showPreview} setShowPreview={setShowPreview} />
-                    <EditConditions roomId={roomId} modalData={modalData} setModalData={setModalData} roomConditions={roomConditions} setRoomConditions={setRoomConditions} showEditable={showEditable} setShowEditable={setShowEditable} />
+                    <GithubPreviewConditions modalData={modalData} showGithubPreview={showGithubPreview} setShowGithubPreview={setShowGithubPreview} />
+                    <GithubEditConditions
+                        roomId={roomId}
+                        modalData={modalData}
+                        setModalData={setModalData}
+                        setRoomConditions={setRoomConditions}
+                        showGithubEditable={showGithubEditable}
+                        setShowGithubEditable={setShowGithubEditable}
+                    />
+
+                    <PatreonPreviewConditions modalData={modalData} showPatreonPreview={showPatreonPreview} setShowPatreonPreview={setShowPatreonPreview} />
+                    <PatreonEditConditions
+                        roomId={roomId}
+                        modalData={modalData}
+                        setModalData={setModalData}
+                        setRoomConditions={setRoomConditions}
+                        showPatreonEditable={showPatreonEditable}
+                        setShowPatreonEditable={setShowPatreonEditable}
+                    />
                     <table className="w-full whitespace-nowrap">
                         <thead>
                             <tr className="h-16 w-full text-sm leading-none text-gray-800">
@@ -209,8 +238,10 @@ function Room() {
                                     <TableRows
                                         rowValue={rowValue}
                                         key={rowValue.key}
-                                        setShowPreview={setShowPreview}
-                                        setShowEditable={setShowEditable}
+                                        setShowGithubPreview={setShowGithubPreview}
+                                        setShowGithubEditable={setShowGithubEditable}
+                                        setShowPatreonPreview={setShowPatreonPreview}
+                                        setShowPatreonEditable={setShowPatreonEditable}
                                         setModalData={setModalData}
                                         handleDelete={handleDelete}
                                     />

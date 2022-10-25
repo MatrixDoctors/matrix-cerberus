@@ -11,6 +11,7 @@ GITHUB_USER_ID = "Bob"
 async def logged_in_client(mocker, client, mock_server, mock_app_state):
     # mock_app_state is imported to start the http_client session
     mocker.patch("app.api.api.fetch_user_data")
+    m_register_new_user = mocker.patch("app.api.api.register_new_user")
 
     mock_server.get(
         url="https://matrix.org/_matrix/federation/v1/openid/userinfo?access_token=some_access_token",
@@ -27,6 +28,7 @@ async def logged_in_client(mocker, client, mock_server, mock_app_state):
 
     response = client.post("api/verify-openid", data=json.dumps(open_id_data))
     assert response.status_code == 200
+    assert m_register_new_user.call_count == 1
 
     yield client
 

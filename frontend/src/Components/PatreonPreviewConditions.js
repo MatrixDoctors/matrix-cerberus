@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-export default function PreviewConditions({ modalData, showPreview, setShowPreview }) {
+export default function PatreonPreviewConditions({ modalData, showPatreonPreview, setShowPatreonPreview }) {
     return (
         <>
-        {showPreview ? (
+        {showPatreonPreview ? (
             <>
             <div
                 className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
@@ -17,17 +17,17 @@ export default function PreviewConditions({ modalData, showPreview, setShowPrevi
 
                         <div className="flex items-center mr-6">
                             <div className="mr-2 w-5 h-5">
-                                <img className="w-full h-full" src={require("../assets/img/github.svg").default} />
+                                <img className="w-full h-full" src={require("../assets/img/patreon.svg").default} />
                             </div>
 
                             <h3 className="text-xl font-semibold">
-                                {modalData.thirdPartyAccount} - {modalData.conditionType}
+                                {modalData.thirdPartyAccount}
                             </h3>
                         </div>
 
                         <button
                             className="p-1 ml-auto"
-                            onClick={() => setShowPreview(false)}
+                            onClick={() => setShowPatreonPreview(false)}
                         >
                             <svg
                             className="w-6 h-6"
@@ -45,31 +45,27 @@ export default function PreviewConditions({ modalData, showPreview, setShowPrevi
                                 <p className="text-md font-medium text-black">
                                     Owner:
                                 </p>
-                                <p className="ml-auto text-md font-normal text-black">
+                                <p className="ml-auto pl-4 text-md font-normal text-black">
                                     {modalData.owner.parent}
                                 </p>
                             </div>
-
-                            { modalData.owner.child
-                                ? <div className='flex justify-start'>
-                                    <p className="text-md font-medium text-black">
-                                        Repository:
-                                    </p>
-                                    <p className="ml-auto text-md font-normal text-black">
-                                        {modalData.owner.child}
-                                    </p>
-                                </div>
-                                : <></>
-                            }
+                            <div className='flex justify-start'>
+                                <p className="text-md font-medium text-black">
+                                    Campaign name:
+                                </p>
+                                <p className="ml-auto pl-4 text-md font-normal text-black">
+                                    {modalData.data.name}
+                                </p>
+                            </div>
                         </div>
 
                         <p className="text-md font-bold text-black">
-                            Conditions
+                            Tiers
                         </p>
 
-                        <div className='p-2 w-full'>
+                        <div className='p-2 w-full mb-4 pb-4 border-b border-solid border-slate-200 rounded-t'>
                             { modalData.data
-                                ? Object.entries(modalData.data).map( ([key, value]) => {
+                                ? Object.entries(modalData.data.tiers).map( ([key, value]) => {
                                     return (
                                         <div key={key}>
                                             <input
@@ -78,14 +74,39 @@ export default function PreviewConditions({ modalData, showPreview, setShowPrevi
                                             id={`checkbox-${key}`}
                                             name={key}
                                             disabled={true}
-                                            checked={value}
+                                            checked={value.is_enabled}
                                             />
-                                            <label htmlFor={`checkbox-${key}`}>{key}</label>
+                                            <label htmlFor={`checkbox-${key}`}>{value.title}</label>
                                         </div>
                                     )
                                 })
                                 : <></>
                             }
+                        </div>
+
+                        <p className="text-md font-bold text-black">
+                            Life time support cents
+                        </p>
+
+                        <div className='p-2 w-full'>
+                            <div className='flex items-center'>
+                                <input
+                                className='mr-2'
+                                type="checkbox"
+                                id="enable_lifetime_support_cents"
+                                disabled={true}
+                                checked={modalData.data.enable_lifetime_support_cents}
+                                />
+                                <label htmlFor="enable_lifetime_support_cents">Enabled</label>
+                            </div>
+                            <div>
+                                <p className="inline-block text-md text-black">
+                                    Total amount:
+                                </p>
+                                <p className="inline-block ml-2 text-md font-semibold text-black">
+                                    {`${modalData.data.lifetime_support_cents} $`}
+                                </p>
+                            </div>
                         </div>
 
                     </div>
@@ -99,8 +120,8 @@ export default function PreviewConditions({ modalData, showPreview, setShowPrevi
     );
 }
 
-PreviewConditions.propTypes = {
+PatreonPreviewConditions.propTypes = {
     modalData: PropTypes.object,
-    showPreview: PropTypes.bool,
-    setShowPreview: PropTypes.func
+    showPatreonPreview: PropTypes.bool,
+    setShowPatreonPreview: PropTypes.func
 }

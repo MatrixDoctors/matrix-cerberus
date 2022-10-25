@@ -93,7 +93,7 @@ class GithubAPI:
 
         resp = await self.gh.graphql(query=query, user=user, number_of_tiers_to_fetch=10)
 
-        if resp["organization"]["sponsorsListing"] is None:
+        if resp["user"]["sponsorsListing"] is None:
             return []
 
         sponsor_tiers = []

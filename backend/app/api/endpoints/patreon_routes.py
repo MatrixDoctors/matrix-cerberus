@@ -3,12 +3,19 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 
 import aiohttp
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from app.api.deps import fastapi_sessions, save_user_data
-from app.api.models import OAuthCode
+from app.api.deps import (
+    fastapi_sessions,
+    patreon_api_instance,
+    save_user_data,
+    verify_room_permissions,
+)
+from app.api.models import OAuthCode, RoomConditions
 from app.core.app_state import app_state
+from app.core.models import PatreonCampaignConditions, PatreonCampaignTier
+from app.patreon.patreon_api import PatreonAPI
 
 router = APIRouter()
 
@@ -97,3 +104,56 @@ async def authenticate_user(request: Request, body: OAuthCode, background_tasks:
             return JSONResponse({"message": "success"})
     except aiohttp.ClientConnectionError as err:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/{room_id}/campaign", dependencies=[Depends(verify_room_permissions)])
+async def get_patreon_campaign_conditions(
+    room_id: str, patreon_api: PatreonAPI = Depends(patreon_api_instance)
+):
+    """
+    API Route to fetch patreon conditions of a campaign owned by the authorized user.
+    """
+    resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+
+    data_to_be_sent = None
+
+    for campaign_id, campaign_data in resp.content.patreon.campaigns.items():
+        if patreon_api.email == campaign_data.belongs_to:
+            data_to_be_sent = {"id": campaign_id, "data": campaign_data.dict()}
+            break
+
+    if data_to_be_sent is None:
+        data_to_be_sent = await patreon_api.campaign_information()
+
+    return JSONResponse({"content": data_to_be_sent})
+
+
+@router.put("/{room_id}/campaign/{campaign_id}", dependencies=[Depends(verify_room_permissions)])
+async def put_patreon_campaign_condition(
+    room_id: str, campaign_id: int, patreon_campaign_conditions: PatreonCampaignConditions
+):
+    """
+    API Route to save patreon conditions of a campaign owned by the authorized user.
+
+    It stores the updated data in the 'rooms' bot account data event.
+    """
+    resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+    patreon_data = resp.content.patreon
+    patreon_data.campaigns[campaign_id] = patreon_campaign_conditions
+
+    resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
+    return JSONResponse({"msg": "success"})
+
+
+@router.post("/{room_id}/campaign/delete", dependencies=[Depends(verify_room_permissions)])
+async def delete_patreon_campaign_condition(room_id: str, campaign_id: int):
+    """
+    API Route to delete a github condition in the 'rooms' bot account data event.
+    """
+    resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
+
+    patreon_data = resp.content.patreon
+    del patreon_data.campaigns[campaign_id]
+
+    resp = await app_state.bot_client.put_account_data(type="rooms", data=resp, room_id=room_id)
+    return JSONResponse({"msg": "success"})

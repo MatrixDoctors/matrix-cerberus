@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types'
 import { toast } from 'react-toastify';
 
-export default function EditConditions({roomId, modalData, setModalData, roomConditions, setRoomConditions, showEditable, setShowEditable}) {
+export default function GithubEditConditions({roomId, modalData, setModalData, setRoomConditions, showGithubEditable, setShowGithubEditable}) {
     const [currentData, setCurrentData] = useState({});
 
     function handleCheckboxChange(e){
@@ -15,7 +15,7 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
 
     function handleClose(){
         setCurrentData(modalData.data ? {...modalData.data} : {});
-        setShowEditable(false);
+        setShowGithubEditable(false);
     }
 
     function handleSave(){
@@ -71,7 +71,7 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
 
     return (
     <>
-        {showEditable ? (
+        {showGithubEditable ? (
             <>
             <div
                 className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
@@ -183,12 +183,11 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
   )
 }
 
-EditConditions.propTypes = {
+GithubEditConditions.propTypes = {
     roomId: PropTypes.string,
     modalData: PropTypes.object,
     setModalData: PropTypes.func,
-    roomConditions: PropTypes.array,
     setRoomConditions: PropTypes.func,
-    showEditable: PropTypes.bool,
-    setShowEditable: PropTypes.func
+    showGithubEditable: PropTypes.bool,
+    setShowGithubEditable: PropTypes.func
 }

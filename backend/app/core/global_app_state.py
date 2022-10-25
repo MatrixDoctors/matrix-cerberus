@@ -7,12 +7,11 @@ from app.core.bot import BaseBotClient
 from app.core.config import Settings
 from app.core.http_client import HttpClient
 from app.core.sessions import RedisSessionStorage, SessionCookie
+from app.matrix.background_validator import BackgroundValidater
 
 
 class AppState:
     def __init__(self, settings_file: str = "config.yml"):
-        # Variables which dosen't store state will be initialised here (except for settings).
-
         self.settings = self.get_settings_from_yaml(settings_file)
         self.session_storage = RedisSessionStorage(self.settings.redis.uri)
         self.server_session = SessionCookie(
@@ -23,9 +22,12 @@ class AppState:
         self.http_client = HttpClient()
         self.bot_client = None
         self.matrix_bot_runner = None
+        self.background_validator = None
 
     async def setup_state(self):
-        # Variables which store state will be initialised here.
+        """
+        Variables which store state will be initialised here.
+        """
         self.bot_client = BaseBotClient(
             homeserver=self.settings.matrix_bot.homeserver,
             app_name=self.settings.app_name,
@@ -40,16 +42,33 @@ class AppState:
         )
 
     async def delete_state(self):
+        """
+        Clears the variables and their states
+        """
         self.bot_client = None
         self.matrix_bot_runner = None
 
     async def start_session(self):
+        """
+        All the background running tasks and session variables will be managed here.
+        """
+        await self.matrix_bot_runner.initialise_bot()
+
         await self.http_client.start_session()
         await self.matrix_bot_runner.create_background_task()
+
+        self.background_validator = BackgroundValidater(
+            bot_client=self.bot_client,
+            http_client=self.http_client,
+            github_default_role=self.settings.github.organisation_membership,
+            bg_validation_cooldown=self.settings.matrix_bot.bg_validation_cooldown,
+        )
+        await self.background_validator.create_background_task()
 
     async def close_session(self):
         await self.http_client.stop_session()
         await self.matrix_bot_runner.cancel_background_task()
+        await self.background_validator.cancel_background_task()
 
     def get_settings_from_yaml(cls, path_to_file):
         absolute_path_to_file = Path(path_to_file).absolute()
