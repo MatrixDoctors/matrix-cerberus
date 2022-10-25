@@ -1,18 +1,31 @@
+import os
 from pathlib import Path
 
 import yaml
+from loguru import logger
 
 from app.core.background_runner import MatrixBotBackgroundRunner
 from app.core.bot import BaseBotClient
 from app.core.config import Settings
 from app.core.http_client import HttpClient
+from app.core.logging import setup_logging
 from app.core.sessions import RedisSessionStorage, SessionCookie
 from app.matrix.background_validator import BackgroundValidater
 
 
 class AppState:
-    def __init__(self, settings_file: str = "config.yml"):
+    def __init__(self):
+        # Variables which dosen't store state will be initialised here (except for settings).
+        settings_file = os.getenv("CONFIG_FILE", "config.sample.yml")
+
         self.settings = self.get_settings_from_yaml(settings_file)
+
+        setup_logging(
+            filepath=self.settings.logging.filepath,
+            rotation=self.settings.logging.rotation,
+            retention=self.settings.logging.retention,
+            use_stdout=self.settings.logging.use_stdout,
+        )
         self.session_storage = RedisSessionStorage(self.settings.redis.uri)
         self.server_session = SessionCookie(
             session_storage=self.session_storage,
@@ -77,4 +90,4 @@ class AppState:
                 yaml_settings = yaml.safe_load(f)
                 return Settings.parse_obj(yaml_settings)
         except (IOError, ImportError) as err:
-            print(f"Couldn't load config from file. Error: {err}")
+            logger.error(f"Couldn't load config from file. Error: {err}")

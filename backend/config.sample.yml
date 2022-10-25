@@ -35,3 +35,13 @@ patreon:
   client_id: client_id_token
   client_secret: client_secret
   redirect_uri: http://localhost:80/oauth2/patreon
+
+logging:
+  # Basic Loguru configuration
+  # set 'use_stdout' to true if the logging needs to be done in console.
+  #
+  path: "./logs"  # Make sure the directory path matches the volume mapped under backend in the docker-compose file.
+  filename: "out.log"
+  rotation: 20 days
+  retention: 1 months
+  use_stdout: true

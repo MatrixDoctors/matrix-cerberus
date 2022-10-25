@@ -2,6 +2,7 @@ import asyncio
 from typing import Set, Dict
 
 import gidgethub.aiohttp
+from loguru import logger
 from nio import ErrorResponse, RoomGetStateEventError, RoomInviteError, RoomKickError
 
 from app.core.bot import BaseBotClient
@@ -74,15 +75,16 @@ class BackgroundValidater:
         self.queue_processor_task = None
 
     async def create_background_task(self):
-        print("Background validator has started")
+        logger.success("Background validator has started")
         self.background_validator_task = asyncio.create_task(self.main_task())
         self.queue_processor_task = asyncio.create_task(self.process_queue())
 
     async def cancel_background_task(self):
         self.background_validator_task.cancel()
         self.queue_processor_task.cancel()
-        print("Background validator has stopped")
+        logger.success("Background validator has stopped")
 
+    @logger.catch
     async def main_task(self):
         """
         The main background validator task which validates the room memberships of registered users for all the rooms with conditions.
@@ -376,13 +378,13 @@ class BackgroundValidater:
             resp = await self.client.room_invite(room_id, user_id)
 
             if isinstance(resp, RoomInviteError):
-                print(f"Error: {resp}")
+                logger.error(f"Error: {resp}")
 
         elif next_state == "leave":
             resp = await self.client.room_kick(room_id, user_id)
 
             if isinstance(resp, RoomKickError):
-                print(f"Error: {resp}")
+                logger.error(f"Error: {resp}")
 
     async def get_ignored_users_for_a_room(self, room_id: str) -> Set[str]:
         """
@@ -402,7 +404,7 @@ class BackgroundValidater:
         # Set of users whose 'leave' state is not a result of the bot's actions.
         resp = await self.client.get_room_members(room_id)
         if isinstance(resp, ErrorResponse):
-            print(f"Error: {resp}")
+            logger.error(f"Error: {resp}")
 
         for room_member in resp.chunk:
             # Bot is not the event's sender.

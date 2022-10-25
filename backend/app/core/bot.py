@@ -8,6 +8,7 @@ from collections import defaultdict
 from dataclasses import field, dataclass
 from urllib.parse import urljoin
 
+from loguru import logger
 from nio import (
     Api,
     AsyncClient,
@@ -85,7 +86,7 @@ class BaseBotClient(AsyncClient):
         await self.join(room.room_id)
 
     async def cb_print_messages(self, room: MatrixRoom, event: RoomMessageText):
-        print(f"{room.display_name} @{room.user_name(event.sender)}: {event.body}")
+        logger.info(f"{room.display_name} @{room.user_name(event.sender)}: {event.body}")
 
     async def send_message_to_room(self, room_id, msg):
         try:
@@ -98,7 +99,7 @@ class BaseBotClient(AsyncClient):
                 },
             )
         except exceptions as err:
-            print(err)
+            logger.error(err)
 
     def parse_event_data(self, type: str, data):
         if type == f"external_url":
@@ -141,7 +142,7 @@ class BaseBotClient(AsyncClient):
         try:
             event_type = self.parse_event_type(type, self.app_name, **additional_type_data)
         except ValueError as err:
-            print(err)
+            logger.error(err)
             return None
 
         url = urljoin(
@@ -160,7 +161,7 @@ class BaseBotClient(AsyncClient):
         try:
             event_type = self.parse_event_type(type, self.app_name, **additional_type_data)
         except ValueError as err:
-            print(err)
+            logger.error(err)
             return None
 
         data = self.parse_event_data(type, data)

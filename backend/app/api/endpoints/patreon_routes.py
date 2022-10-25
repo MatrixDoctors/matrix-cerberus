@@ -85,7 +85,6 @@ async def authenticate_user(request: Request, body: OAuthCode, background_tasks:
             if resp.status != 200:
                 raise HTTPException(status_code=422, detail="Invalid code")
             data = await resp.json()
-            print(data)
 
             session_data = fastapi_sessions.get_session(request)
 

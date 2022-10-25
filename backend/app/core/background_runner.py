@@ -6,6 +6,8 @@ Any methods that are requried to be run before bot startup or after bot shutdown
 
 import asyncio
 
+from loguru import logger
+
 from app.core.bot import BaseBotClient
 from app.core.sessions import RedisSessionStorage
 
@@ -46,11 +48,11 @@ class MatrixBotBackgroundRunner:
         except (asyncio.CancelledError, ValueError) as err:
             # Handles the ValueError received from BaseBotClient login function
             if isinstance(err, ValueError):
-                print(err)
+                logger.error(err)
             await self.client.close()
 
     async def create_background_task(self):
-        print("Background task has started")
+        logger.success("Background task has started")
         self.background_sync_task = asyncio.create_task(self.start_sync())
 
     async def cancel_background_task(self):
@@ -58,4 +60,4 @@ class MatrixBotBackgroundRunner:
         self.session_storage["next_batch_token"] = self.client.next_batch
 
         self.background_sync_task.cancel()
-        print(f"Background Task is cancelled")
+        logger.success("Background task is cancelled")
