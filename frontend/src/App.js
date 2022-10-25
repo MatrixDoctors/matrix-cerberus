@@ -14,6 +14,7 @@ import Logout from './Pages/Logout';
 import GithubOauth from './Pages/GithubOauth';
 import Room from './Pages/Room';
 import RoomExternalUrl from './Pages/RoomExternalUrl';
+import RoomGitubConditions from './Pages/RoomGitubConditions';
 
 export default function App() {
   const [matrixUserId, setMatrixUserId] = useState('');
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="/logout" element={<Logout />} />
             <Route path="/rooms/:roomId" element={<Room />} />
             <Route path="/rooms/:roomId/external-url" element={<RoomExternalUrl />} />
+            <Route path="/rooms/:roomId/github-conditions" element={<RoomGitubConditions />} />
           </Route>
 
         <Route path="/i/:url_code" element={<ExternalUrl />} />
