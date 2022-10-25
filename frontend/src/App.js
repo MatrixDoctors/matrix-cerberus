@@ -14,7 +14,7 @@ import Logout from './Pages/Logout';
 import GithubOauth from './Pages/GithubOauth';
 import Room from './Pages/Room';
 import RoomExternalUrl from './Pages/RoomExternalUrl';
-import RoomGitubConditions from './Pages/RoomGitubConditions';
+import RoomGitubConditions from './Pages/RoomGithubConditions/RoomGitubConditions';
 
 export default function App() {
   const [matrixUserId, setMatrixUserId] = useState('');

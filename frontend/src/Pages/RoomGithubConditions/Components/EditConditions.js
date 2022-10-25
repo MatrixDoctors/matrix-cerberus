@@ -1,9 +1,10 @@
-import axios from '../HelperFunctions/customAxios';
+import axios from '../../../HelperFunctions/customAxios';
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 
-export default function EditConditions({roomId, modalData, setModalData, roomConditions, setRoomConditions, showEditable, setShowEditable}) {
+export default function EditConditions({roomId, modalData, showEditable, setShowEditable}) {
+
     const [currentData, setCurrentData] = useState({});
 
     function handleCheckboxChange(e){
@@ -14,13 +15,11 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
     }
 
     function handleClose(){
-        setCurrentData(modalData.data ? {...modalData.data} : {});
         setShowEditable(false);
     }
 
     function handleSave(){
-
-        async function saveData(roomId, modalData, currentData){
+        async function saveData(){
             const thirdPartyAccount = modalData.thirdPartyAccount.toLowerCase();
             const conditionType = modalData.conditionType.toLowerCase();
             const ownerType = modalData.type;
@@ -39,40 +38,36 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
                 "data": currentData
             }
 
-            return axios.put(url, dataToBeSent);
-        }
-
-        const resp = saveData(roomId, modalData, currentData);
-
-        resp.then( (resp) => {
-            setModalData(previousData => ({...previousData, data: currentData}));
-
-            setRoomConditions(previousData => {
-                return previousData.map(item => {
-                    if (item.key === modalData.key) {
-                        return {...modalData, data: currentData};
-                    }
-                    else {
-                        return item;
-                    }
-                });
+            await axios.put(url, dataToBeSent)
+            .then(() => {
+                toast.success('Successfully updated!');
+            })
+            .catch((err) => {
+                toast.error("Failed to save data");
             });
-            toast.success("Succesfully updated!");
-        })
-        .catch( () => {
-            toast.error("Failed to save data");
-        })
-        handleClose();
+            handleClose();
+        }
+        saveData();
     }
 
     useEffect( () => {
-        setCurrentData(modalData.data ? {...modalData.data} : {});
+        async function fetchData(){
+            const thirdPartyAccount = modalData.thirdPartyAccount.toLowerCase();
+            const conditionType = modalData.conditionType.toLowerCase();
+            const ownerType = modalData.type;
+
+            let url;
+            if(thirdPartyAccount === 'github') {
+                url = `/api/rooms/${roomId}/github/${ownerType}/${conditionType}`;
+            }
+            const resp = await axios.post(url, modalData.owner);
+            setCurrentData(resp.data.content);
+        }
+        fetchData();
     }, [modalData]);
 
     return (
-    <>
-        {showEditable ? (
-            <>
+        <>
             <div
                 className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
             >
@@ -84,7 +79,7 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
 
                         <div className="flex items-center mr-6">
                             <div className="mr-2 w-5 h-5">
-                                <img className="w-full h-full" src={require("../assets/img/github.svg").default} />
+                                <img className="w-full h-full" src={require("../../../assets/img/github.svg").default} />
                             </div>
 
                             <h3 className="text-xl font-semibold">
@@ -135,8 +130,7 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
                         </p>
 
                         <div className='p-2 w-full'>
-                            { modalData.data
-                                ? Object.entries(currentData).map( ([key, value]) => {
+                            { Object.entries(currentData).map( ([key, value]) => {
                                     return (
                                         <div key={key}>
                                             <input
@@ -151,7 +145,6 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
                                         </div>
                                     )
                                 })
-                                : <></>
                             }
                         </div>
 
@@ -177,18 +170,13 @@ export default function EditConditions({roomId, modalData, setModalData, roomCon
                 </div>
             </div>
             <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
-            </>
-        ) : null}
-    </>
-  )
-}
+        </>
+      )
+};
 
 EditConditions.propTypes = {
     roomId: PropTypes.string,
     modalData: PropTypes.object,
-    setModalData: PropTypes.func,
-    roomConditions: PropTypes.array,
-    setRoomConditions: PropTypes.func,
     showEditable: PropTypes.bool,
     setShowEditable: PropTypes.func
-}
+};

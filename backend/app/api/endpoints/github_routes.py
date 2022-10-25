@@ -5,7 +5,12 @@ import gidgethub.aiohttp
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from app.api.deps import fastapi_sessions, github_api_instance, save_user_data
+from app.api.deps import (
+    fastapi_sessions,
+    github_api_instance,
+    save_user_data,
+    verify_room_permissions,
+)
 from app.api.models import GithubCode
 from app.core.app_state import app_state
 from app.github.github_api import GithubAPI
@@ -77,28 +82,30 @@ async def authenticate_user(request: Request, body: GithubCode, background_tasks
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
+@router.get("/{room_id}/user/repos", dependencies=[Depends(verify_room_permissions)])
+async def get_orgs(room_id: str, github_api: GithubAPI = Depends(github_api_instance)):
+    resp = await github_api.get_individual_repos()
+    return JSONResponse({"content": resp})
+
+
 @router.get("/user")
 async def get_user(github_api: GithubAPI = Depends(github_api_instance)):
     resp = await github_api.display_user()
     return JSONResponse({"user": resp})
 
 
-@router.get("/orgs")
-async def get_orgs(github_api: GithubAPI = Depends(github_api_instance)):
+@router.get("/{room_id}/orgs", dependencies=[Depends(verify_room_permissions)])
+async def get_orgs(room_id: str, github_api: GithubAPI = Depends(github_api_instance)):
     resp = await github_api.get_orgs_with_membership()
-    return JSONResponse({"orgs": resp})
+    return JSONResponse({"content": resp})
 
 
-@router.get("/individual-repos")
-async def get_individual_repos(github_api: GithubAPI = Depends(github_api_instance)):
-    resp = await github_api.get_individual_repos()
-    return JSONResponse({"repos": resp})
-
-
-@router.get("/org-repos")
-async def get_org_repos(org: str, github_api: GithubAPI = Depends(github_api_instance)):
-    resp = await github_api.get_repos_in_an_org(org)
-    return JSONResponse({"repos": resp})
+@router.get("/{room_id}/org/repos", dependencies=[Depends(verify_room_permissions)])
+async def get_orgs(
+    room_id: str, org_name: str, github_api: GithubAPI = Depends(github_api_instance)
+):
+    resp = await github_api.get_repos_in_an_org(org_name)
+    return JSONResponse({"content": resp})
 
 
 @router.get("/org-teams")
