@@ -1,3 +1,16 @@
 # Summary
 
 - [Introduction](./README.md)
+- [Installation and Setup](./setup.md)
+    - [Development Setup](./setup/development-setup.md)
+    - [Production Setup](./setup/production-setup.md)
+    - [Testing](./setup/testing.md)
+- [Usage](./usage.md)
+    - [Login](./usage/login.md)
+    - [Accounts](./usage/accounts.md)
+    - [Room Settings](./usage/room_settings.md)
+    - [Rooms](./usage/rooms.md)
+        - [Room External URL](./usage/rooms/room_external_url.md)
+        - [Github Conditions](./usage/rooms/github_conditions.md)
+        - [Patreon Conditions](./usage/rooms/patreon_conditions.md)
+- [Additional Resources](./additional_resources.md)

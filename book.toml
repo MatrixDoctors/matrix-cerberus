@@ -7,4 +7,4 @@ title = "Matrix Cerberus Documentation"
 
 [output.html]
 # The source code URL of the repository
-git-repository-url = "https://github.com/MatrixDoctors/matrix-cerberus/docs"
+git-repository-url = "https://github.com/MatrixDoctors/matrix-cerberus"
