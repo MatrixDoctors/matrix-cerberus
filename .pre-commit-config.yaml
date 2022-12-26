@@ -14,12 +14,12 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
+    rev: 5.11.4
     hooks:
       - id: isort
   # Javascript / frontend
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: 'v8.29.0'
+    rev: 'v8.30.0'
     hooks:
       - id: eslint
         additional_dependencies:
