@@ -28,7 +28,6 @@ async def get_github_user_id(access_token):
 
 @router.get("/login")
 async def get_login():
-
     client_id = app_state.settings.github.client_id
     scope = ["read:org", "repo", "user"]
     scope = "%20".join(scope)

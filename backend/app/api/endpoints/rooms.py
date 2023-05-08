@@ -292,7 +292,6 @@ async def delete_github_room_condition(
 
 @router.put("/{room_id}/disable-room-kick/edit", dependencies=[Depends(verify_room_permissions)])
 async def edit_room_disable_kick_option(room_id: str, disable_room_kick: bool):
-
     resp = await app_state.bot_client.get_account_data(type="rooms", room_id=room_id)
     resp.content.disable_room_kick = disable_room_kick
     del resp.content.github.orgs["kuries"]

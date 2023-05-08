@@ -37,7 +37,6 @@ async def load_room_to_external_url_object(
 async def test_get_room_external_urls(
     client_with_no_dependencies, mock_server, mock_app_state: AppState
 ):
-
     await bot_login(mock_app_state)
 
     homeserver = mock_app_state.settings.matrix_bot.homeserver
@@ -58,7 +57,6 @@ async def test_get_room_external_urls(
 async def test_replace_external_url(
     client_with_no_dependencies: TestClient, mock_server, mock_app_state: AppState
 ):
-
     await bot_login(mock_app_state)
 
     homeserver = mock_app_state.settings.matrix_bot.homeserver
@@ -159,7 +157,6 @@ async def test_delete_external_url(
 async def test_create_new_url(
     client_with_no_dependencies: TestClient, mock_server, mock_app_state: AppState
 ):
-
     await bot_login(mock_app_state)
 
     homeserver = mock_app_state.settings.matrix_bot.homeserver
