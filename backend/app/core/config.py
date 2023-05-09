@@ -67,7 +67,6 @@ class LoggerSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-
     app_name: str
     redis: RedisSettings
     server_sessions: ServerSessionsSettings

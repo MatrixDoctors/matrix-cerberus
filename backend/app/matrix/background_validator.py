@@ -102,7 +102,6 @@ class BackgroundValidater:
         Method which validates room memberships for all recently modified rooms in the queue.
         """
         while True:
-
             # Blocks until the queue is not empty
             type, id = await self.queue.get()
             if type == "room":
@@ -262,7 +261,6 @@ class BackgroundValidater:
 
         # Organisation conditions
         for org_name, org_conditions in room_github_conditions.orgs.items():
-
             # Using access token of the admin who last edited the github condition.
             admin_matrix_id = org_conditions.last_edited_by
             admin_gh_api = self.registered_users[admin_matrix_id].github_api

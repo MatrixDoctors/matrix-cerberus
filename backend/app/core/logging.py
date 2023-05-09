@@ -50,7 +50,6 @@ def format_record(record: dict) -> str:
 
 
 def setup_logging(filepath: str, rotation: str, retention: str, use_stdout: bool):
-
     # disable handlers for specific uvicorn loggers
     # to redirect their output to the default uvicorn logger
     loggers = (
