@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: check-docstring-first
       - id: check-merge-conflict
@@ -10,7 +10,7 @@ repos:
       - id: check-ast
   # Python / Backend
   - repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 23.10.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
@@ -19,7 +19,7 @@ repos:
       - id: isort
   # Javascript / frontend
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: 'v8.45.0'
+    rev: 'v8.52.0'
     hooks:
       - id: eslint
         additional_dependencies:
